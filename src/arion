@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export PATH="$PATH:@path@"
+
+nix_dir="@nix_dir@"
+docker_compose_args=()
+files=()
+command="docker-compose"
+pkgs_argument="./arion-pkgs.nix"
+
+debug() {
+    # echo "$@"
+    :
+}
+
+while test $# != 0; do
+    case "$1" in
+        -f|--file)
+            shift
+            files+=("$1")
+            ;;
+        -f*)
+            files+=("${1/#-f/}")
+            ;;
+        --file=*)
+            files+=("${1/#--file=}")
+            ;;
+        --pkgs)
+            shift
+            pkgs_argument="$1"
+            ;;
+        -h|--help|help)
+            command="help"
+            shift
+            break
+            ;;
+        cat)
+            command="$1"
+            shift
+            break
+            ;;
+        repl)
+            command="$1"
+            shift
+            break
+            ;;
+        docker-compose)
+            command="docker-compose"
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+while test $# != 0; do
+    docker_compose_args+=("$1")
+    shift
+done
+
+case "$command" in
+    help)
+        cat <<EOF
+
+Arion wraps your system's docker-compose, providing a NixOps-like
+experience for simple container deployments.
+
+Usage:
+  arion up|logs|...     - execute docker-compose commands
+  arion cat             - display raw docker-compose.yaml
+  arion config          - validate and display the config file
+  arion repl            - explore the config interactively
+  arion help
+  arion docker-compose help
+  arion docker-compose help up|logs|...
+
+EOF
+        exit 0
+        ;;
+    *)
+        ;;
+esac
+
+if [[ ${#files[@]} == 0 ]]; then
+    files=("./arion-compose.nix")
+fi
+
+
+debug docker_compose_args: "${docker_compose_args[@]}"
+debug files: "${files[@]}"
+
+docker_compose_yaml=.tmp-nix-docker-compose-$$-$RANDOM.yaml
+cleanup() {
+  rm -f $docker_compose_yaml
+}
+trap cleanup EXIT
+
+modules="["
+
+for file in "${files[@]}"; do
+    case "$file" in
+        /*)
+            modules="$modules (/. + $(printf '"%q"' $file))"
+            ;;
+        *)
+            modules="$modules (./. + $(printf '"/%q"' $file))"
+            ;;
+    esac
+done
+
+modules="$modules ]"
+
+debug modules: $modules
+
+old_IFS="$IFS"
+IFS=""
+args=(
+     )
+IFS="$old_IFS"
+for arg in "${args[@]}"; do
+    echo arg: $arg
+done
+
+do_build() {
+  echo 1>&2 "Building configuration..."
+  nix-build \
+    "$nix_dir/eval-docker-compose.nix" \
+    --out-link $docker_compose_yaml \
+    --argstr uid "$UID" \
+    --arg modules "$modules" \
+    --arg pkgs "$pkgs_argument" \
+    --show-trace \
+    --attr 'config.build.dockerComposeYaml' \
+    >/dev/null ;
+}
+
+
+do_repl() {
+    # nix repl doesn't autocall its <FILES> arguments
+    # so we improvise. We need a file in this directory
+    # to make sure that all paths are as expected :(
+    trap do_repl_cleanup EXIT;
+
+    REPL_TMP=.tmp-repl-$$-$RANDOM
+    cat <<EOF
+Launch a repl for you, using a temporary file: $REPL_TMP.
+
+This loads the configuration from the modules
+  $files
+
+To get started:
+
+To see deployment-wide configuration
+  type config. and hit TAB
+To see the services
+  type config.docker-compose.services TAB or ENTER
+To bring the top-level Nixpkgs attributes into scope
+  type :a (config._module.args.pkgs) // { inherit config; }
+
+EOF
+    cat >"$REPL_TMP" <<EOF
+import $nix_dir/eval-docker-compose.nix {
+  uid = "$UID";
+  modules = $modules;
+  pkgs = $pkgs_argument;
+}
+EOF
+
+    nix repl \
+        "$REPL_TMP" \
+        ;
+}
+do_repl_cleanup() {
+    rm -f $REPL_TMP
+}
+
+case "$command" in
+    cat)
+        do_build
+        cat $docker_compose_yaml | jq .
+        ;;
+    repl)
+        do_repl
+        ;;
+    docker-compose)
+        if [[ ${#docker_compose_args[@]} != 0
+           && ${docker_compose_args[0]} != "help"
+           && ${docker_compose_args[0]} != "version"
+           ]]; then
+            do_build
+        fi
+        docker-compose -f $docker_compose_yaml "${docker_compose_args[@]}"
+        ;;
+esac
