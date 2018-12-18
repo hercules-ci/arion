@@ -105,17 +105,17 @@ modules="["
 for file in "${files[@]}"; do
     case "$file" in
         /*)
-            modules="$modules (/. + $(printf '"%q"' $file))"
+            modules="$modules (/. + $(printf '"%q"' "$file"))"
             ;;
         *)
-            modules="$modules (./. + $(printf '"/%q"' $file))"
+            modules="$modules (./. + $(printf '"/%q"' "$file"))"
             ;;
     esac
 done
 
 modules="$modules ]"
 
-debug modules: $modules
+debug modules: "$modules"
 
 old_IFS="$IFS"
 IFS=""
@@ -123,7 +123,7 @@ args=(
      )
 IFS="$old_IFS"
 for arg in "${args[@]}"; do
-    echo arg: $arg
+    echo "arg: $arg"
 done
 
 do_build() {
@@ -151,7 +151,7 @@ do_repl() {
 Launch a repl for you, using a temporary file: $REPL_TMP.
 
 This loads the configuration from the modules
-  $files
+  ${files[*]}
 
 To get started:
 
@@ -182,7 +182,7 @@ do_repl_cleanup() {
 case "$command" in
     cat)
         do_build
-        cat $docker_compose_yaml | jq .
+        jq . < "$docker_compose_yaml"
         ;;
     repl)
         do_repl
