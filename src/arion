@@ -79,6 +79,16 @@ Usage:
   arion docker-compose help
   arion docker-compose help up|logs|...
 
+Top-level arion options
+
+  These must be provided before the command.
+
+  --file FILE       Use FILE instead of the default ./arion-compose.nix
+                    Can be specified multiple times for a merged configuration.
+  --pkgs EXPR       Use EXPR instead of ./arion-pkgs.nix to get the
+                    Nixpkgs attrset used for bootstrapping and evaluating
+                    the configuration.
+
 EOF
         exit 0
         ;;

@@ -29,6 +29,8 @@ want to either build images or manage garbage collection roots if you
 control the deployment host. Either of these has yet to be
 implemented.
 
+Support for other Linux than NixOS is untested.
+
 # Install
 
 Have [Nix](https://nixos.org/nix/) and Docker installed.
@@ -36,13 +38,56 @@ Have [Nix](https://nixos.org/nix/) and Docker installed.
     git clone git@github.com:hercules-ci/arion.git
     nix-env -iA arion -f .
 
-# Example of usage
+# Example `arion-compose.nix`
 
-The command line inherits most `docker-compose` commands.
+This Nix expression serves the Nix manual at host port 8000 when launched with `arion up`. It is a function from a package set (`pkgs`) to a configuration.
+
+```
+{ pkgs, ... }:
+{
+  config.docker-compose.services = {
+
+    webserver = {
+      service.useHostStore = true;
+      # service.depends_on = [ "backend" ];
+      service.command = [ "sh" "-c" ''
+                  cd "$$WEB_ROOT"
+                  ${pkgs.python3}/bin/python -m http.server
+                '' ];
+      service.ports = [
+        "8000:8000" # host:container
+      ];
+      service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
+    };
+
+    # backend = { ... }
+  };
+}
+```
+
+The `pkgs` argument comes from a file called `arion-pkgs.nix`. It can be as simple as `import <nixpkgs> {}` to use the Nixpkgs from your `$NIX_PATH`.
+
+# A full featured example
+
+To see how Arion can be used in a project, have a look at [todomvc-nix](https://github.com/nix-community/todomvc-nix/tree/master/deploy/arion).
 
     git clone git@github.com:nix-community/todomvc-nix.git
     cd todomvc-nix/deploy/arion
     arion up
+
+# How it works
+
+Arion is essentially a thin wrapper around Nix and docker-compose.
+When it runs, it does the following:
+
+ - Evaluate the configuration using Nix, producing a `docker-compose.yaml` and a garbage collection root
+ - Invoke `docker-compose`
+ - Clean up the garbage collection root
+
+Most of the interesting stuff happens in Arion's Nix expressions,
+where it runs the module system (known from NixOS) and provides the configuration that makes the Docker Compose file do the things it needs to do.
+
+The interesting part is of course the [service-host-store.nix module](src/nix/service-host-store.nix) which performs the bind mounts to make the host Nix store available in the container.
 
 # "FAQ"
 
@@ -71,6 +116,13 @@ completing the command. This means that `arion up` without `-d` is
 safe with respect to garbage collection. A deployment that is more
 serious than local development must leave a GC root on the deployment
 host. This use case is not supported as of now.
+
+### What is messing with my environment variables?
+
+Docker Compose performs its own environment variable
+substitution. This can be a little annoying in `services.command` for
+example. Either reference a script from `pkgs.writeScript` or escape
+the dollar sign as `$$`.
 
 ### Why "Arion"?
 
