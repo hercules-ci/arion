@@ -36,6 +36,10 @@ examples assume you're in this repo's `examples/` directory.
 
 TODO examples
 
+# Do I need to use Hercules CI?
+
+Nope, it's just Nix and Docker Compose under the hood.
+
 # Why "Arion"?
 
 Arion comes from Greek mythology. Poseidon, the god of ~Docker~ the
