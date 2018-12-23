@@ -136,6 +136,20 @@ for arg in "${args[@]}"; do
     echo "arg: $arg"
 done
 
+do_eval() {
+  echo 1>&2 "Evaluating configuration..."
+  nix-instantiate \
+    "$nix_dir/eval-docker-compose.nix" \
+    --eval \
+    --json \
+    --argstr uid "$UID" \
+    --arg modules "$modules" \
+    --arg pkgs "$pkgs_argument" \
+    --show-trace \
+    --attr 'config.build.dockerComposeYamlText' \
+    | jq -r . >$docker_compose_yaml;
+}
+
 do_build() {
   echo 1>&2 "Building configuration..."
   nix-build \
@@ -191,7 +205,7 @@ do_repl_cleanup() {
 
 case "$command" in
     cat)
-        do_build
+        do_eval
         jq . < "$docker_compose_yaml"
         ;;
     repl)
@@ -201,8 +215,18 @@ case "$command" in
         if [[ ${#docker_compose_args[@]} != 0
            && ${docker_compose_args[0]} != "help"
            && ${docker_compose_args[0]} != "version"
-           ]]; then
-            do_build
+            ]]; then
+            case "${docker_compose_args[0]}" in
+                help|version)
+                    :
+                    ;;
+                config|down|events|exec|images|kill|logs|pause|port|ps|rm|stop|top|unpause)
+                    do_eval
+                    ;;
+                *)
+                    do_build
+                    ;;
+            esac
         fi
         docker-compose -f $docker_compose_yaml "${docker_compose_args[@]}"
         ;;

@@ -30,6 +30,9 @@ in
     build.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
     };
+    build.dockerComposeYamlText = lib.mkOption {
+      type = lib.types.string;
+    };
     docker-compose.raw = lib.mkOption {
       type = lib.types.attrs;
     };
@@ -39,7 +42,8 @@ in
     };
   };
   config = {
-    build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" (builtins.toJSON (config.docker-compose.raw));
+    build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
+    build.dockerComposeYamlText = builtins.toJSON (config.docker-compose.raw);
 
     docker-compose.raw = {
       version = "3";
