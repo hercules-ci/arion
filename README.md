@@ -42,7 +42,7 @@ Have [Nix](https://nixos.org/nix/) and Docker installed.
 
 This Nix expression serves the Nix manual at host port 8000 when launched with `arion up`. It is a function from a package set (`pkgs`) to a configuration.
 
-```
+```nix
 { pkgs, ... }:
 {
   config.docker-compose.services = {
@@ -89,7 +89,7 @@ where it runs the module system (known from NixOS) and provides the configuratio
 
 The interesting part is of course the [service-host-store.nix module](src/nix/service-host-store.nix) which performs the bind mounts to make the host Nix store available in the container.
 
-# "FAQ"
+# FAQ
 
 ### Do I need to use Hercules CI?
 
