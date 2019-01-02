@@ -1,4 +1,6 @@
-{ stdenv, lib, jq, coreutils }:
+{ stdenv, lib
+, coreutils, docker_compose, jq
+}:
 
 stdenv.mkDerivation {
     name = "arion";
@@ -10,7 +12,7 @@ stdenv.mkDerivation {
       cp -a nix $out/share/arion/
       cp -a arion-image $out/share/arion/
       substitute arion $out/bin/arion \
-        --subst-var-by path ${lib.makeBinPath [jq coreutils]} \
+        --subst-var-by path ${lib.makeBinPath [jq coreutils docker_compose]} \
         --subst-var-by nix_dir $out/share/arion/nix \
         ;
       chmod a+x $out/bin/arion
