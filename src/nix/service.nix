@@ -2,8 +2,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf string either;
-
+  inherit (types) listOf nullOr attrsOf string either int;
 in
 {
   options = {
@@ -16,7 +15,7 @@ in
       default = null;
     };
     service.environment = mkOption {
-      type = attrsOf string;
+      type = attrsOf (either string int);
       default = {};
     };
     service.image = mkOption {
@@ -29,6 +28,14 @@ in
     service.depends_on = mkOption {
       type = listOf string;
       default = [];
+    };
+    service.working_dir = mkOption {
+      type = nullOr string;
+      default = null;
+    };
+    service.entrypoint = mkOption {
+      type = nullOr string;
+      default = null;
     };
     service.restart = mkOption {
       type = nullOr string;
@@ -66,6 +73,10 @@ in
     inherit (config.service) depends_on;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
+  } // lib.optionalAttrs (config.service.working_dir != null) {
+    inherit (config.service) working_dir;
+  } // lib.optionalAttrs (config.service.entrypoint != null) {
+    inherit (config.service) entrypoint;
   } // lib.optionalAttrs (config.service.ports != []) {
     inherit (config.service) ports;
   } // lib.optionalAttrs (config.service.expose != []) {
