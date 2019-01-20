@@ -1,6 +1,5 @@
-{ pkgs ? import ./pkgs.nix }:
+args@{ pkgs ? import ./nix args, ... }:
 
 {
-  inherit (pkgs) arion;
-  tests = pkgs.callPackage ./tests {};
+  inherit (pkgs) arion tests;
 }
