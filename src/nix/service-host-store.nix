@@ -1,4 +1,9 @@
-# Bind-mounts the host store
+/*
+
+   This service-level bind mounts the host store into the container
+   when the service.useHostStore option is set to true.
+
+ */
 { lib, config, ... }:
 let
   inherit (lib) mkOption types mkIf;

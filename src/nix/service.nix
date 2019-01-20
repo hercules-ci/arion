@@ -1,3 +1,9 @@
+/*
+
+   This service-level module defines the build.service option, using
+   the user-facing options service.image, service.volumes, etc.
+
+ */
 { pkgs, lib, config, ... }:
 
 let

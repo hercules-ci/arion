@@ -2,7 +2,7 @@
 
 let
   # To make some prebuilt derivations available in the vm
-  preEval = import ../../src/nix/eval-docker-compose.nix {
+  preEval = import ../../src/nix/eval-composition.nix {
     modules = [ ../../examples/minimal/arion-compose.nix ];
     inherit pkgs;
   };

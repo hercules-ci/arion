@@ -1,3 +1,14 @@
+/*
+
+   This is a composition-level module.
+
+   It defines the low-level options that are read by arion, like
+    - build.dockerComposeYaml
+
+   It declares options like
+    - docker-compose.services
+
+ */
 { pkgs, uid, lib, config, ... }:
 
 let

@@ -11,7 +11,7 @@ let
 
   inherit (pkgs) lib;
 
-  composite = lib.evalModules {
+  composition = lib.evalModules {
     check = true;
     modules = builtinModules ++ modules;
   };
@@ -22,12 +22,12 @@ let
   ];
 
   argsModule = {
-    _file = ./eval-docker-compose.nix;
-    key = ./eval-docker-compose.nix;
+    _file = ./eval-composition.nix;
+    key = ./eval-composition.nix;
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
     config._module.args.uid = uid;
   };
 
 in
-  # Typically you need composite.config.build.dockerComposeYaml
-  composite
+  # Typically you need composition.config.build.dockerComposeYaml
+  composition
