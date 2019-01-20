@@ -138,9 +138,11 @@ done
 
 do_eval() {
   echo 1>&2 "Evaluating configuration..."
+  # read-write-mode is required for import from derivation
   nix-instantiate \
     "$nix_dir/eval-docker-compose.nix" \
     --eval \
+    --read-write-mode \
     --json \
     --argstr uid "$UID" \
     --arg modules "$modules" \
