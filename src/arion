@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-export PATH="$PATH:@path@"
+export PATH="@path@:$PATH"
 
 nix_dir="@nix_dir@"
 docker_compose_args=()
