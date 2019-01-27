@@ -36,6 +36,7 @@ Support for other Linux than NixOS is untested.
 Have [Nix](https://nixos.org/nix/) and Docker installed.
 
     git clone git@github.com:hercules-ci/arion.git
+    cd arion
     nix-env -iA arion -f .
 
 # Example `arion-compose.nix`
