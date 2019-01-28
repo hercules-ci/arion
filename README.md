@@ -33,7 +33,9 @@ Support for other Linux than NixOS is untested.
 
 # Install
 
-Have [Nix](https://nixos.org/nix/) and Docker installed.
+Have [Nix](https://nixos.org/nix/) and Docker installed. Ubuntu users:
+make sure you've installed via `apt-get install docker.io`. The Docker snap
+is broken and apparently unsupported by Canonical.
 
     git clone git@github.com:hercules-ci/arion.git
     cd arion
