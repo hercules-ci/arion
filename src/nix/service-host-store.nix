@@ -4,7 +4,7 @@
    when the service.useHostStore option is set to true.
 
  */
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 let
   inherit (lib) mkOption types mkIf;
 in
@@ -21,8 +21,7 @@ in
     service.build.context = "${../arion-image}";
     service.volumes = [
       "/nix/store:/nix/store"
-      "/bin/sh:/bin/sh"
-      "/usr/bin/env:/usr/bin/env"
+      "${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
     ];
   };
 }
