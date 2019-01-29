@@ -5,4 +5,5 @@ in
 
 recurseIntoAttrs {
   test = nixosTest ./arion-test;
+  preEval = pkgs.callPackage ./arion-test/preeval.nix {};
 }

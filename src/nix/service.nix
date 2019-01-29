@@ -15,37 +15,46 @@ in
     service.volumes = mkOption {
       type = listOf types.unspecified;
       default = [];
+      description = "";
     };
     service.build.context = mkOption {
       type = nullOr string;
       default = null;
+      description = "";
     };
     service.environment = mkOption {
       type = attrsOf (either string int);
       default = {};
+      description = "";
     };
     service.image = mkOption {
       type = string;
+      description = "";
     };
     service.command = mkOption {
       type = nullOr types.unspecified;
       default = null;
+      description = "";
     };
     service.depends_on = mkOption {
       type = listOf string;
       default = [];
+      description = "";
     };
     service.working_dir = mkOption {
       type = nullOr string;
       default = null;
+      description = "";
     };
     service.entrypoint = mkOption {
       type = nullOr string;
       default = null;
+      description = "";
     };
     service.restart = mkOption {
       type = nullOr string;
       default = null;
+      description = "";
     };
     service.ports = mkOption {
       type = listOf types.unspecified;
@@ -58,10 +67,12 @@ in
     service.expose = mkOption {
       type = listOf string;
       default = [];
+      description = "";
     };
 
     build.service = mkOption {
       type = attrsOf types.unspecified;
+      description = "";
     };
   };
 

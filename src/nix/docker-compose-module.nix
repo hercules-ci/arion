@@ -12,44 +12,27 @@
 { pkgs, uid, lib, config, ... }:
 
 let
-  evalService = name: modules:
-    let
-      composite = lib.evalModules {
-        check = true;
-        modules = builtinModules ++ modules;
-      };
-
-      builtinModules = [
-        argsModule
-        ./service.nix
-        ./service-host-store.nix
-      ];
-
-      argsModule = {
-        _file = ./docker-compose-module.nix;
-        key = ./docker-compose-module.nix;
-        config._module.args.pkgs = lib.mkForce pkgs;
-        config._module.args.uid = uid;
-      };
-
-    in
-      composite.config.build.service;
+  evalService = name: modules: (pkgs.callPackage ./eval-service.nix {} { inherit modules uid; }).config.build.service;
 
 in
 {
   options = {
     build.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
+      description = "";
     };
     build.dockerComposeYamlText = lib.mkOption {
       type = lib.types.string;
+      description = "";
     };
     docker-compose.raw = lib.mkOption {
       type = lib.types.attrs;
+      description = "";
     };
     docker-compose.services = lib.mkOption {
       default = {};
       type = with lib.types; attrsOf (coercedTo unspecified (a: [a]) (listOf unspecified));
+      description = "";
     };
   };
   config = {
