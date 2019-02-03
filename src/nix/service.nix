@@ -39,6 +39,18 @@ in
       type = listOf string;
       default = [];
     };
+    service.links = mkOption {
+      type = listOf string;
+      default = [];
+    };
+    service.external_links = mkOption {
+      type = listOf string;
+      default = [];
+    };
+    service.extra_hosts = mkOption {
+      type = listOf string;
+      default = [];
+    };
     service.working_dir = mkOption {
       type = nullOr string;
       default = null;
