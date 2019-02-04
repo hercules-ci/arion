@@ -8,7 +8,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf string either int;
+  inherit (types) listOf nullOr attrsOf string either int bool;
 in
 {
   options = {
@@ -17,6 +17,10 @@ in
       default = [];
     };
     service.build.context = mkOption {
+      type = nullOr string;
+      default = null;
+    };
+    service.hostname = mkOption {
       type = nullOr string;
       default = null;
     };
@@ -35,8 +39,24 @@ in
       type = listOf string;
       default = [];
     };
+    service.links = mkOption {
+      type = listOf string;
+      default = [];
+    };
+    service.external_links = mkOption {
+      type = listOf string;
+      default = [];
+    };
+    service.extra_hosts = mkOption {
+      type = listOf string;
+      default = [];
+    };
     service.working_dir = mkOption {
       type = nullOr string;
+      default = null;
+    };
+    service.privileged = mkOption {
+      type = nullOr bool;
       default = null;
     };
     service.entrypoint = mkOption {
