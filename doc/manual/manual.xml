@@ -1,0 +1,52 @@
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <info>
+
+    <title>Arion Manual</title>
+    <subtitle>Version @version@</subtitle>
+
+    <author>
+      <affiliation>
+        <orgname>Hercules Labs</orgname>
+      </affiliation>
+      <contrib>Author</contrib>
+    </author>
+
+  </info>
+
+  <xi:include href="introduction.xml" xpointer="xpointer(/book/chapter)" />
+
+  <chapter>
+    <title>Installation</title>
+    <section>
+      <title>Traditional Linux or Mac</title>
+      <para>
+        TODO: describe: install Nix and nix-env -i
+      </para>
+    </section>
+    <section>
+      <title>Not installing: use it in a project</title>
+      <para>
+        TODO: describe: using nix-shell or in a script, building
+                        images as part of nix-build, pinning,
+                        see also todomvc-nix.
+      </para>
+    </section>
+    <section>
+      <title>NixOS</title>
+      <para>
+        TODO: describe: Docker + environment.systemPackages
+      </para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Getting Started</title>
+  </chapter>
+
+  <xi:include href="options-composition.xml" />
+  <xi:include href="options-service.xml" />
+
+</book>

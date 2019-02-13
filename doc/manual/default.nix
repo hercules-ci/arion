@@ -1,9 +1,8 @@
-{ pkgs ? import ../../nix {} }:
+{ pkgs ? import ../../nix {}, version ? "unreleased" }:
 let
-  inherit (pkgs) recurseIntoAttrs callPackage runCommand lib;
+  inherit (pkgs) recurseIntoAttrs callPackage runCommand lib stdenv ;
 
   nixosManualPath = s: "${pkgs.path}/nixos/doc/manual/${s}";
-  revision = "0.0-fixme"; # FIXME
 
   # NixOS module system options in JSON format.
   options = { moduleType, description, optionsList }: recurseIntoAttrs rec {
@@ -19,8 +18,9 @@ let
         exit 1
       fi
       ${pkgs.buildPackages.libxslt.bin}/bin/xsltproc \
-        --stringparam revision '${revision}' \
-        -o intermediate.xml ${nixosManualPath "options-to-docbook.xsl"} $optionsXML
+        --stringparam revision '${version}' \
+        --stringparam sourceUrl 'https://github.com/hercules-ci/arion/blob/${version}' \
+        -o intermediate.xml ${./options-to-docbook.xsl} $optionsXML
       ${pkgs.buildPackages.libxslt.bin}/bin/xsltproc \
         -o "$out" ${nixosManualPath "postprocess-option-descriptions.xsl"} intermediate.xml
     '';
@@ -43,6 +43,10 @@ let
     
   };
 
+  fixPaths = opt: opt // builtins.trace opt.declarations {
+    declarations = map (d: lib.strings.removePrefix "/" (lib.strings.removePrefix (toString ../..) (toString d))) opt.declarations;
+  };
+
 in
 
 recurseIntoAttrs rec {
@@ -50,17 +54,49 @@ recurseIntoAttrs rec {
     moduleType = "composition";
     description = "List of Arion composition-level options in JSON format";
     optionsList = let composition = import ../../src/nix/eval-composition.nix { inherit pkgs; };
-                  in lib.optionAttrSetToDocList composition.options;
+                  in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList composition.options));
   };
   serviceOptions = options {
     moduleType = "service";
     description = "List of Arion service-level options in JSON format";
-    optionsList = let composition = pkgs.callPackage ../../src/nix/eval-service.nix {} { modules = []; uid = -1; };
-                  in lib.optionAttrSetToDocList composition.options;
+    optionsList = let service = pkgs.callPackage ../../src/nix/eval-service.nix {} { modules = []; uid = -1; };
+                  in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList service.options));
   };
   generatedDocBook = runCommand "generated-docbook" {} ''
     mkdir $out
     ln -s ${compositionOptions.optionsDocBook} $out/options-composition.xml
     ln -s ${serviceOptions.optionsDocBook} $out/options-service.xml
   '';
+  manual = stdenv.mkDerivation {
+    src = ./.;
+    name = "arion-manual";
+    version = version;
+    buildInputs = [
+      (pkgs.libxslt.bin or pkgs.libxslt)
+      pkgs.asciidoc
+    ];
+    XML_CATALOG_FILES = "${pkgs.docbook_xsl}/xml/xsl/docbook/catalog.xml";
+    configurePhase = ''
+      export docdir=$out/doc
+    '';
+    postPatch = ''
+      substituteInPlace manual.xml --subst-var version
+    '';
+    prePatch = ''
+      set -x
+      cp ${generatedDocBook}/* .
+      substituteInPlace options-service.xml \
+        --replace 'xml:id="appendix-configuration-options"' 'xml:id="appendix-service-options"' \
+        --replace '<title>Configuration Options</title>' '<title>Service Options</title>' \
+        --replace 'xml:id="configuration-variable-list"' 'xml:id="service-variable-list"' \
+        ;
+      substituteInPlace options-composition.xml \
+        --replace 'xml:id="appendix-configuration-options"' 'xml:id="appendix-composition-options"' \
+        --replace '<title>Configuration Options</title>' '<title>Composition Options</title>' \
+        --replace 'xml:id="configuration-variable-list"' 'xml:id="composition-variable-list"' \
+        ;
+      ls -R
+      set +x
+    '';
+  };
 }

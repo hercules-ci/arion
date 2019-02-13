@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Arion Manual</title><link rel="stylesheet" type="text/css" href="style.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /></head><body><div class="book"><div class="titlepage"><div><div><h1 class="title"><a id="idm140737317696320"></a>Arion Manual</h1></div><div><h2 class="subtitle">Version unreleased</h2></div><div><div class="author"><h3 class="author"></h3><div class="affiliation"><span class="orgname">Hercules Labs<br /></span></div></div></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl class="toc"><dt><span class="chapter"><a href="#_introduction">Introduction</a></span></dt><dt><span class="chapter"><a href="#idm140737317847200">Installation</a></span></dt><dd><dl><dt><span class="section"><a href="#idm140737317846432">Traditional Linux or Mac</a></span></dt><dt><span class="section"><a href="#idm140737317845056">Not installing: use it in a project</a></span></dt><dt><span class="section"><a href="#idm140737317671792">NixOS</a></span></dt></dl></dd><dt><span class="chapter"><a href="#idm140737317670384">Getting Started</a></span></dt><dt><span class="appendix"><a href="#appendix-composition-options">Composition Options</a></span></dt><dt><span class="appendix"><a href="#appendix-service-options">Service Options</a></span></dt></dl></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="_introduction"></a>Introduction</h1></div></div></div><p>Arion is a tool for building and running applications that
+consist of multiple docker containers. It has special support
+for docker images that are built with Nix, for a smooth
+development experience and improved performance.</p><p>It is built on top of <a class="ulink" href="https://docs.docker.com/compose/overview/" target="_top">Docker
+Compose</a>, which implements the container orchestration functionality.</p><p>Instead of configuring the compositions in YAML files like
+<code class="literal">docker-compose.yaml</code>, Arion uses the <a class="ulink" href="https://nixos.org/nix/" target="_top">Nix</a>
+language to declare the compositions. Because of this, Arion gives you
+the ability to declare your deployments, configuration and packaging
+in the same language. By replacing multiple tools with a single
+language, you decrease your mental load and you can more easily
+refactor and maintain your configurations.</p><p>Although Arion can be used as a Docker Compose with an improved
+configuration front end, there is more to be gained from integrating
+with Nix. In particular, the more structured approach of Nix compared
+to Dockerfiles allows the following:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Build components of your image in <span class="emphasis"><em>parallel, automatically</em></span>.
+</li><li class="listitem">
+Share packages between images, regardless of the order they were
+   added.
+</li><li class="listitem">
+Improve performance by <span class="emphasis"><em>skipping</em></span> container
+   image creation.
+</li><li class="listitem">
+Work with <span class="emphasis"><em>structured data</em></span> instead of strings,
+   templates and a multitude of expression languages.
+</li><li class="listitem">
+Use one language and refactor across deployments, configuration and
+   packaging.
+</li></ul></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="idm140737317847200"></a>Installation</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm140737317846432"></a>Traditional Linux or Mac</h2></div></div></div><p>
+        TODO: describe: install Nix and nix-env -i
+      </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm140737317845056"></a>Not installing: use it in a project</h2></div></div></div><p>
+        TODO: describe: using nix-shell or in a script, building
+                        images as part of nix-build, pinning,
+                        see also todomvc-nix.
+      </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idm140737317671792"></a>NixOS</h2></div></div></div><p>
+        TODO: describe: Docker + environment.systemPackages
+      </p></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="idm140737317670384"></a>Getting Started</h1></div></div></div></div><div class="appendix"><div class="titlepage"><div><div><h1 class="title"><a id="appendix-composition-options"></a>Composition Options</h1></div></div></div><div class="variablelist"><a id="composition-variable-list"></a><dl class="variablelist"><dt><span class="term"><a id="opt-build.dockerComposeYaml"></a><a class="term" href="#opt-build.dockerComposeYaml"><code class="option">build.dockerComposeYaml</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> package</p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/docker-compose-module.nix" target="_top">src/nix/docker-compose-module.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-build.dockerComposeYamlText"></a><a class="term" href="#opt-build.dockerComposeYamlText"><code class="option">build.dockerComposeYamlText</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> Concatenated string</p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/docker-compose-module.nix" target="_top">src/nix/docker-compose-module.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-docker-compose.raw"></a><a class="term" href="#opt-docker-compose.raw"><code class="option">docker-compose.raw</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> attribute set</p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/docker-compose-module.nix" target="_top">src/nix/docker-compose-module.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-docker-compose.services"></a><a class="term" href="#opt-docker-compose.services"><code class="option">docker-compose.services</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> attribute set of list of unspecifieds or unspecified convertible to its</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    {
+    
+    }
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/docker-compose-module.nix" target="_top">src/nix/docker-compose-module.nix</a></code></td></tr></table></dd></dl></div></div><div class="appendix"><div class="titlepage"><div><div><h1 class="title"><a id="appendix-service-options"></a>Service Options</h1></div></div></div><div class="variablelist"><a id="service-variable-list"></a><dl class="variablelist"><dt><span class="term"><a id="opt-build.service"></a><a class="term" href="#opt-build.service"><code class="option">build.service</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> attribute set of unspecifieds</p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.build.context"></a><a class="term" href="#opt-service.build.context"><code class="option">service.build.context</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> null or Concatenated string</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        null
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.command"></a><a class="term" href="#opt-service.command"><code class="option">service.command</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> null or unspecified</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        null
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.depends_on"></a><a class="term" href="#opt-service.depends_on"><code class="option">service.depends_on</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> list of Concatenated strings</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    [
+    
+    ]
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.entrypoint"></a><a class="term" href="#opt-service.entrypoint"><code class="option">service.entrypoint</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> null or Concatenated string</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        null
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.environment"></a><a class="term" href="#opt-service.environment"><code class="option">service.environment</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> attribute set of Concatenated string or signed integers</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    {
+    
+    }
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.expose"></a><a class="term" href="#opt-service.expose"><code class="option">service.expose</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> list of Concatenated strings</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    [
+    
+    ]
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.image"></a><a class="term" href="#opt-service.image"><code class="option">service.image</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> Concatenated string</p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.ports"></a><a class="term" href="#opt-service.ports"><code class="option">service.ports</code></a></span></dt><dd><p>Expose ports on host. "host:container" or structured.
+See https://docs.docker.com/compose/compose-file/#ports
+</p><p><span class="emphasis"><em>Type:</em></span> list of unspecifieds</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    [
+    
+    ]
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.restart"></a><a class="term" href="#opt-service.restart"><code class="option">service.restart</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> null or Concatenated string</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        null
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.useHostStore"></a><a class="term" href="#opt-service.useHostStore"><code class="option">service.useHostStore</code></a></span></dt><dd><p>Bind mounts the host store if enabled, avoiding copying.</p><p><span class="emphasis"><em>Type:</em></span> boolean</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        false
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service-host-store.nix" target="_top">src/nix/service-host-store.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.volumes"></a><a class="term" href="#opt-service.volumes"><code class="option">service.volumes</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> list of unspecifieds</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        
+    [
+    
+    ]
+  
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd><dt><span class="term"><a id="opt-service.working_dir"></a><a class="term" href="#opt-service.working_dir"><code class="option">service.working_dir</code></a></span></dt><dd><p></p><p><span class="emphasis"><em>Type:</em></span> null or Concatenated string</p><p><span class="emphasis"><em>Default:</em></span> <code class="literal">
+        null
+      </code></p><p><span class="emphasis"><em>Declared by:</em></span></p><table border="0" summary="Simple list" class="simplelist"><tr><td><code class="filename"><a class="filename" href="https://github.com/hercules-ci/arion/blob/unreleased/src/nix/service.nix" target="_top">src/nix/service.nix</a></code></td></tr></table></dd></dl></div></div></div></body></html>
