@@ -1,4 +1,4 @@
-{ modules ? [], uid ? 0, pkgs }:
+{ modules ? [], uid ? 0, pkgs, customNixRootPath ? "", }:
 
 let _pkgs = pkgs;
 in
@@ -26,6 +26,7 @@ let
     key = ./eval-composition.nix;
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
     config._module.args.uid = uid;
+    config._module.args.customNixRootPath = customNixRootPath;
   };
 
 in
