@@ -19,7 +19,7 @@ in
   };
   config = mkIf config.service.useHostStore {
     service.image = "arion-base";
-    service.build.context = "${../arion-image}";
+    service.build.context = "${../../../arion-image}";
     service.volumes = [
       "${customNixRootPath}/nix/store:/nix/store"
       "${customNixRootPath}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"

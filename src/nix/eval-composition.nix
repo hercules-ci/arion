@@ -18,7 +18,7 @@ let
 
   builtinModules = [
     argsModule
-    ./docker-compose-module.nix
+    ./modules/composition/docker-compose.nix
   ];
 
   argsModule = {
