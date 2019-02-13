@@ -9,7 +9,7 @@
     - docker-compose.services
 
  */
-{ pkgs, uid, lib, config, ... }:
+{ pkgs, uid, lib, config, customNixRootPath, ... }:
 
 let
   evalService = name: modules:
@@ -30,6 +30,7 @@ let
         key = ./docker-compose-module.nix;
         config._module.args.pkgs = lib.mkForce pkgs;
         config._module.args.uid = uid;
+        config._module.args.customNixRootPath = customNixRootPath;
       };
 
     in
