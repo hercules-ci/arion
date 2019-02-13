@@ -5,6 +5,7 @@
 
  */
 { lib, config, pkgs, ... }:
+
 let
   inherit (lib) mkOption types mkIf;
 in
@@ -18,10 +19,10 @@ in
   };
   config = mkIf config.service.useHostStore {
     service.image = "arion-base";
-    service.build.context = "${../arion-image}";
+    service.build.context = "${../../../arion-image}";
     service.volumes = [
-      "/nix/store:/nix/store"
-      "${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
+      "${config.host.nixStorePrefix}/nix/store:/nix/store"
+      "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
     ];
   };
 }

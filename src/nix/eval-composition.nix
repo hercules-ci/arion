@@ -1,4 +1,4 @@
-{ modules ? [], uid ? 0, pkgs }:
+{ modules ? [], uid ? "0", pkgs, hostNixStorePrefix ? "", }:
 
 let _pkgs = pkgs;
 in
@@ -18,14 +18,16 @@ let
 
   builtinModules = [
     argsModule
-    ./docker-compose-module.nix
+    ./modules/composition/docker-compose.nix
+    ./modules/composition/host-environment.nix
   ];
 
   argsModule = {
     _file = ./eval-composition.nix;
     key = ./eval-composition.nix;
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
-    config._module.args.uid = uid;
+    config.host.nixStorePrefix = hostNixStorePrefix;
+    config.host.uid = lib.toInt uid;
   };
 
 in

@@ -9,7 +9,7 @@
     - docker-compose.services
 
  */
-{ pkgs, uid, lib, config, ... }:
+{ pkgs, lib, config, ... }:
 
 let
   evalService = name: modules:
@@ -21,15 +21,16 @@ let
 
       builtinModules = [
         argsModule
-        ./service.nix
-        ./service-host-store.nix
+        ../service/docker-compose-service.nix
+        ../service/host-store.nix
+        ../service/host.nix
       ];
 
       argsModule = {
-        _file = ./docker-compose-module.nix;
-        key = ./docker-compose-module.nix;
+        _file = ./docker-compose.nix;
+        key = ./docker-compose.nix;
         config._module.args.pkgs = lib.mkForce pkgs;
-        config._module.args.uid = uid;
+        config.host = config.host;
       };
 
     in
