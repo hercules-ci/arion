@@ -17,16 +17,20 @@ docbookxsl = http://docbook.sourceforge.net/release/xsl/current
 
 all: manual.html
 
-manual.html: manual.xml introduction.xml
+manual.html: manual.xml introduction.xml options-composition.xml options-service.xml
 	$(xsltproc) --xinclude --stringparam profile.condition manual \
 	  $(docbookxsl)/profiling/profile.xsl manual.xml | \
 	  $(xsltproc) --output manual.html $(docbookxsl)/xhtml/docbook.xsl -
 
 # -e 's_<book lang="en">__' -e 's_</book>__'
 %.xml: %.asciidoc
-	asciidoc -b docbook -d book -a nolang $<
+	asciidoctor --backend docbook45 --doctype article $<
 	sed -e 's/<!DOCTYPE.*//' -e 's/<?asciidoc-toc?>//' -i $@
 	cat $@
+
+options-composition.xml options-service.xml:
+	@if test -z '$(generatedDocBook)'; then echo "generatedDocBook env var is required. Are you running in 'nix-shell -A manual'?"; exit 1; fi
+	cp $(generatedDocBook)/* .
 
 install: all
 	mkdir -p $(docdir)

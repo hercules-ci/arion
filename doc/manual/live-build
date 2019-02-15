@@ -1,0 +1,3 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -A manual
+#!nix-shell --run live-build

@@ -16,7 +16,7 @@
 
   </info>
 
-  <xi:include href="introduction.xml" xpointer="xpointer(/book/chapter)" />
+  <xi:include href="introduction.xml" xpointer="xpointer(/article/section)" />
 
   <chapter>
     <title>Installation</title>

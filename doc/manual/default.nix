@@ -1,4 +1,4 @@
-{ pkgs ? import ../../nix {}, version ? "unreleased" }:
+{ pkgs ? import ../../nix {}, version ? "local" }:
 let
   inherit (pkgs) recurseIntoAttrs callPackage runCommand lib stdenv ;
 
@@ -68,14 +68,22 @@ recurseIntoAttrs rec {
     ln -s ${serviceOptions.optionsDocBook} $out/options-service.xml
   '';
   manual = stdenv.mkDerivation {
-    src = ./.;
+    src = lib.sourceByRegex ./. [
+      "Makefile$"
+      ".*\.asciidoc$"
+      ".*\.xsl$"
+      ".*\.css$"
+      "^manual.xml$"
+      "^manual.xml$"
+    ];
     name = "arion-manual";
     version = version;
     buildInputs = [
       (pkgs.libxslt.bin or pkgs.libxslt)
-      pkgs.asciidoc
+      pkgs.asciidoctor
     ];
     XML_CATALOG_FILES = "${pkgs.docbook_xsl}/xml/xsl/docbook/catalog.xml";
+    inherit generatedDocBook;
     configurePhase = ''
       export docdir=$out/doc
     '';
@@ -97,6 +105,13 @@ recurseIntoAttrs rec {
         ;
       ls -R
       set +x
+    '';
+    shellHook = ''
+      live-build() {
+        inotifywait -e MODIFY -m -r . | while read; do
+          make
+        done
+      }
     '';
   };
 }
