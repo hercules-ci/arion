@@ -12,6 +12,9 @@ let
 in
 {
   options = {
+    build.service = mkOption {
+      type = attrsOf types.unspecified;
+    };
     service.volumes = mkOption {
       type = listOf types.unspecified;
       default = [];
@@ -86,9 +89,6 @@ in
     service.network_mode = mkOption {
       type = nullOr string;
       default = null;
-    };
-    build.service = mkOption {
-      type = attrsOf types.unspecified;
     };
   };
 
