@@ -83,6 +83,10 @@ in
       type = listOf string;
       default = [];
     };
+    service.network_mode = mkOption {
+      type = nullOr string;
+      default = null;
+    };
     build.service = mkOption {
       type = attrsOf types.unspecified;
     };
@@ -122,5 +126,7 @@ in
     inherit (config.service) extra_hosts;
   } // lib.optionalAttrs (config.service.expose != []) {
     inherit (config.service) expose;
+  } // lib.optionalAttrs (config.service.network_mode != null) {
+    inherit (config.service) network_mode;
   };
 }
