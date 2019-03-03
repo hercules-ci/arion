@@ -8,7 +8,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf string either int bool;
+  inherit (types) listOf nullOr attrsOf str either int bool;
 
   dockerComposeRef = fragment:
   ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
@@ -26,7 +26,7 @@ in
       description = "";
     };
     service.build.context = mkOption {
-      type = nullOr string;
+      type = nullOr str;
       default = null;
       description = ''
         Locates a Dockerfile to use for creating an image to use in this service.
@@ -35,17 +35,17 @@ in
       '';
     };
     service.hostname = mkOption {
-      type = nullOr string;
+      type = nullOr str;
       default = null;
       description = dockerComposeKitchenSink;
     };
     service.environment = mkOption {
-      type = attrsOf (either string int);
+      type = attrsOf (either str int);
       default = {};
       description = dockerComposeRef "environment";
     };
     service.image = mkOption {
-      type = string;
+      type = str;
       description = dockerComposeRef "image";
     };
     service.command = mkOption {
@@ -54,27 +54,27 @@ in
       description = dockerComposeRef "command";
     };
     service.depends_on = mkOption {
-      type = listOf string;
+      type = listOf str;
       default = [];
       description = dockerComposeRef "depends_on";
     };
     service.links = mkOption {
-      type = listOf string;
+      type = listOf str;
       default = [];
       description = dockerComposeRef "links";
     };
     service.external_links = mkOption {
-      type = listOf string;
+      type = listOf str;
       default = [];
       description = dockerComposeRef "external_links";
     };
     service.extra_hosts = mkOption {
-      type = listOf string;
+      type = listOf str;
       default = [];
       description = dockerComposeRef "extra_hosts";
     };
     service.working_dir = mkOption {
-      type = nullOr string;
+      type = nullOr str;
       default = null;
       description = dockerComposeKitchenSink;
     };
@@ -84,12 +84,12 @@ in
       description = dockerComposeKitchenSink;
     };
     service.entrypoint = mkOption {
-      type = nullOr string;
+      type = nullOr str;
       default = null;
       description = dockerComposeRef "entrypoint";
     };
     service.restart = mkOption {
-      type = nullOr string;
+      type = nullOr str;
       default = null;
       description = dockerComposeRef "restart";
     };
@@ -103,7 +103,7 @@ in
       '';
     };
     service.expose = mkOption {
-      type = listOf string;
+      type = listOf str;
       default = [];
       description = dockerComposeRef "expose";
     };
