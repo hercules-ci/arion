@@ -120,6 +120,16 @@ in
       default = [];
       description = dockerComposeRef "expose";
     };
+    service.env_file = mkOption {
+      type = listOf str;
+      default = [];
+      description = dockerComposeRef "env_file";
+    };
+    service.network_mode = mkOption {
+      type = nullOr str;
+      default = null;
+      description = dockerComposeRef "network_mode";
+    };
   };
 
   config.build.service = {
@@ -134,15 +144,29 @@ in
     inherit (config.service) command;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
+  } // lib.optionalAttrs (config.service.entrypoint != null) {
+    inherit (config.service) entrypoint;
+  } // lib.optionalAttrs (config.service.env_file != []) {
+    inherit (config.service) env_file;
+  } // lib.optionalAttrs (config.service.expose != []) {
+    inherit (config.service) expose;
+  } // lib.optionalAttrs (config.service.external_links != []) {
+    inherit (config.service) external_links;
+  } // lib.optionalAttrs (config.service.extra_hosts != []) {
+    inherit (config.service) extra_hosts;
+  } // lib.optionalAttrs (config.service.hostname != null) {
+    inherit (config.service) hostname;
+  } // lib.optionalAttrs (config.service.links != []) {
+    inherit (config.service) links;
+  } // lib.optionalAttrs (config.service.ports != []) {
+    inherit (config.service) ports;
+  } // lib.optionalAttrs (config.service.privileged != null) {
+    inherit (config.service) privileged;
+  } // lib.optionalAttrs (config.service.network_mode != null) {
+    inherit (config.service) network_mode;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.working_dir != null) {
     inherit (config.service) working_dir;
-  } // lib.optionalAttrs (config.service.entrypoint != null) {
-    inherit (config.service) entrypoint;
-  } // lib.optionalAttrs (config.service.ports != []) {
-    inherit (config.service) ports;
-  } // lib.optionalAttrs (config.service.expose != []) {
-    inherit (config.service) expose;
   };
 }
