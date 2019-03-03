@@ -20,6 +20,19 @@ let
 in
 {
   options = {
+    build.service = mkOption {
+      type = attrsOf types.unspecified;
+      description = ''
+        Raw input for the service in <code>docker-compose.yaml</code>.
+
+        You should not need to use this option. If anything is
+        missing, please contribute the missing option.
+
+        This option is user accessible because it may serve as an
+        escape hatch for some.
+      '';
+    };
+
     service.volumes = mkOption {
       type = listOf types.unspecified;
       default = [];
@@ -106,19 +119,6 @@ in
       type = listOf str;
       default = [];
       description = dockerComposeRef "expose";
-    };
-
-    build.service = mkOption {
-      type = attrsOf types.unspecified;
-      description = ''
-        Raw input for the service in <code>docker-compose.yaml</code>.
-
-        You should not need to use this option. If anything is
-        missing, please contribute the missing option.
-
-        This option is user accessible because it may serve as an
-        escape hatch for some.
-      '';
     };
   };
 
