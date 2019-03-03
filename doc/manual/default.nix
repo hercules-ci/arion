@@ -34,9 +34,6 @@ let
     '';
   };
 
-in
-
-recurseIntoAttrs rec {
   compositionOptions = options {
     moduleType = "composition";
     description = "List of Arion composition-level options in JSON format";
@@ -52,6 +49,7 @@ recurseIntoAttrs rec {
       in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList composition.options))
     '';
   };
+
   serviceOptions = options {
     moduleType = "service";
     description = "List of Arion service-level options in JSON format";
@@ -67,11 +65,13 @@ recurseIntoAttrs rec {
       in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList composition.options))
     '';
   };
+
   generatedDocBook = runCommand "generated-docbook" {} ''
     mkdir $out
     ln -s ${compositionOptions.optionsDocBook} $out/options-composition.xml
     ln -s ${serviceOptions.optionsDocBook} $out/options-service.xml
   '';
+
   manual = stdenv.mkDerivation {
     src = lib.sourceByRegex ./. [
       "Makefile$"
@@ -116,5 +116,9 @@ recurseIntoAttrs rec {
         done
       }
     '';
+    passthru = {
+      inherit generatedDocBook;
+    };
   };
-}
+in
+  manual
