@@ -8,8 +8,9 @@
       description = ''
         The numeric user id (UID) of the user running arion.
 
-        Assuming this user id is helpful when dealing with the user's
-        files, mounted into the container as a volume.
+        This lets you to write modules that interact with the host
+        user's files, which is helpful for local development, but not
+        intended for production-like deployment scenarios.
       '';
     };
 

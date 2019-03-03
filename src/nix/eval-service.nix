@@ -1,0 +1,25 @@
+{ lib, pkgs, ... }:
+
+{ modules, host }:
+let
+  composite = lib.evalModules {
+    check = true;
+    modules = builtinModules ++ modules;
+  };
+
+  builtinModules = [
+    argsModule
+    ./modules/service/docker-compose-service.nix
+    ./modules/service/host-store.nix
+    ./modules/service/host.nix
+  ];
+
+  argsModule = {
+    _file = ./docker-compose.nix;
+    key = ./docker-compose.nix;
+    config._module.args.pkgs = lib.mkForce pkgs;
+    config.host = host;
+  };
+
+in
+  composite
