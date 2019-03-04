@@ -4,10 +4,9 @@
 *Wait, what?*
 
 With Arion you can fire up containers without creating images for each
-service. Instead, it uses a mostly empty image, sort of like a base
-image, and makes the host's Nix store available in the container,
-allowing the container to run programs without having to re-package
-them into a docker image.
+service. It can use a mostly empty image, and makes the host's Nix
+store available in the container, allowing the container to run
+programs without having to re-package them into a docker image.
 
 Arion is configured using Nix with modules, like those in
 NixOS. Similar to `docker-compose` it can therefore combine
@@ -21,13 +20,10 @@ development environments while working
 on [Hercules CI](https://www.hercules-ci.com). (It was also born out
 of ancient Greek deities disguised as horses. More on that later.)
 
-We don't use it to deploy to 'real' environments and we have no plans
-to do so in the future.
-
-If you do want to use Arion for 'real' environments, you'll probably
-want to either build images or manage garbage collection roots if you
-control the deployment host. Either of these has yet to be
-implemented.
+If you do want to use Arion for production environments, you'll
+probably want to either build normal container images or manage
+garbage collection roots if you control the deployment host. Neither
+scenario is made easier by arion at this time.
 
 Support for other Linux than NixOS is untested.
 
@@ -68,7 +64,7 @@ This Nix expression serves the Nix manual at host port 8000 when launched with `
 }
 ```
 
-The `pkgs` argument comes from a file called `arion-pkgs.nix`. It can be as simple as `import <nixpkgs> {}` to use the Nixpkgs from your `$NIX_PATH`.
+The `pkgs` argument comes from a file called `arion-pkgs.nix`. It can be as simple as `import <nixpkgs> {}` to use the Nixpkgs from your `$NIX_PATH`, or you can use it to pin a specific Nixpkgs version.
 
 # A full featured example
 
@@ -90,7 +86,7 @@ When it runs, it does the following:
 Most of the interesting stuff happens in Arion's Nix expressions,
 where it runs the module system (known from NixOS) and provides the configuration that makes the Docker Compose file do the things it needs to do.
 
-The interesting part is of course the [service-host-store.nix module](src/nix/service-host-store.nix) which performs the bind mounts to make the host Nix store available in the container.
+One of the more interesting built-in modules is the [host-store.nix module](src/nix/modules/service/host-store.nix) which performs the bind mounts to make the host Nix store available in the container.
 
 # FAQ
 
@@ -101,7 +97,7 @@ Nope, it's just Nix and Docker Compose under the hood.
 
 ### Does Arion support Docker images?
 
-Yes, you can still specify a docker image. For example:
+Yes, you can also specify a normal Docker image. For example:
 
     postgres = {
       service.image = "postgres:10";

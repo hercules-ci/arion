@@ -1,0 +1,159 @@
+
+hr { color: #ddd; margin-top: 3ex; }
+h1, h2, h3, h4 { font-weight: bold; }
+h1 { font-size: 200%; margin-top: 5ex; }
+h2 { font-size: 160%; margin-top: 4ex; }
+h3,h4 { font-size: 120%; margin-top: 3ex; }
+
+/* From Semantic UI */
+body {
+  font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  font-size: 14px;
+  line-height: 1.4285em;
+  color: rgba(0,0,0,.87);
+}
+
+code.literal {
+    background-color: #f7f7f7;
+}
+
+a {
+ background-color:transparent;
+ -webkit-text-decoration-skip:objects
+}
+a {
+ color:#4183c4;
+ text-decoration:none
+}
+a:hover {
+ color:#1e70bf;
+ text-decoration:none
+}
+::-webkit-selection {
+ background-color:#cce2ff;
+ color:rgba(0,0,0,.87)
+}
+::-moz-selection {
+ background-color:#cce2ff;
+ color:rgba(0,0,0,.87)
+}
+::selection {
+ background-color:#cce2ff;
+ color:rgba(0,0,0,.87)
+}
+
+/* toc menu */
+@media screen and (min-width: 60em) {
+  body {
+    margin-left: 16.5em; 
+  }
+  div.toc {
+    position: fixed;
+    top: 0pt;
+    left: 1em;
+    height: 100%;
+    overflow-y: auto;
+    width: 15.5em;
+  }
+}
+@media screen and (min-width: 90em) {
+  div.toc {
+    left: 5em;
+  }
+}
+/* hide per chapter toc */
+div.chapter div.toc {
+    display: none;
+}
+
+
+/* From Nixpkgs: */
+
+div.book
+{
+    text-align: center;
+}
+
+div.book > div
+{
+    /*
+     * based on https://medium.com/@zkareemz/golden-ratio-62b3b6d4282a
+     * we do 70 characters per line to fit code listings better
+     * 70 * (font-size / 1.618)
+     * expression for emacs:
+     * (* 70 (/ 1 1.618))
+     */
+    max-width: 43.2em;
+    text-align: left;
+    margin: auto;
+}
+
+
+/***************************************************************************
+                               Special elements:
+ ***************************************************************************/
+
+.term
+{
+    font-weight: bold;
+
+}
+
+div.variablelist dd p, div.glosslist dd p
+{
+    margin-top: 0em;
+}
+
+div.variablelist dd, div.glosslist dd
+{
+    margin-left: 1.5em;
+}
+
+div.glosslist dt
+{
+    font-style: italic;
+}
+
+.varname
+{
+    color: #004000;
+}
+
+span.command strong
+{
+    font-weight: normal;
+    color: #004000;
+}
+
+div.calloutlist table
+{
+    box-shadow: none;
+}
+
+table
+{
+    border-collapse: collapse;
+    box-shadow: 0.4em 0.4em 0.5em #e0e0e0;
+}
+
+table.simplelist
+{
+    text-align: left;
+    color: #005aa0;
+    border: 0;
+    padding: 5px;
+    background: #fffff5;
+    font-weight: normal;
+    font-style: italic;
+    box-shadow: none;
+    margin-bottom: 1em;
+}
+
+div.navheader table, div.navfooter table {
+    box-shadow: none;
+}
+
+div.affiliation
+{
+    font-style: italic;
+}

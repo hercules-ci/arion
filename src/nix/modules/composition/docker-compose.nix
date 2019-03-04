@@ -10,47 +10,28 @@
 
  */
 { pkgs, lib, config, ... }:
-
 let
-  evalService = name: modules:
-    let
-      composite = lib.evalModules {
-        check = true;
-        modules = builtinModules ++ modules;
-      };
-
-      builtinModules = [
-        argsModule
-        ../service/docker-compose-service.nix
-        ../service/host-store.nix
-        ../service/host.nix
-      ];
-
-      argsModule = {
-        _file = ./docker-compose.nix;
-        key = ./docker-compose.nix;
-        config._module.args.pkgs = lib.mkForce pkgs;
-        config.host = config.host;
-      };
-
-    in
-      composite.config.build.service;
+evalService = name: modules: (pkgs.callPackage ../../eval-service.nix {} { inherit modules; inherit (config) host; }).config.build.service;
 
 in
 {
   options = {
     build.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
+      description = "A derivation that produces a docker-compose.yaml file for this composition.";
     };
     build.dockerComposeYamlText = lib.mkOption {
       type = lib.types.string;
+      description = "The text of build.dockerComposeYaml.";
     };
     docker-compose.raw = lib.mkOption {
       type = lib.types.attrs;
+      description = "Nested attribute set that will be turned into the docker-compose.yaml file, using Nix's toJSON builtin.";
     };
     docker-compose.services = lib.mkOption {
       default = {};
       type = with lib.types; attrsOf (coercedTo unspecified (a: [a]) (listOf unspecified));
+      description = "A attribute set of service configurations. A service specifies how to run an image. Each of these service configurations is specified using modules whose options are described in the Service Options section.";
     };
   };
   config = {
