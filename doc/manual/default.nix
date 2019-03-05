@@ -15,7 +15,7 @@ let
     optionsXML =
       # builtins.toFile "options.xml" (builtins.toXML optionsList);
       pkgs.runCommand "options.xml" {
-        buildInputs = [pkgs.nix pkgs.fakeroot pkgs.jq];
+        buildInputs = [pkgs.nix pkgs.jq];
         inherit optionsExpr;
       } ''
         export NIX_LOG_DIR=$PWD
