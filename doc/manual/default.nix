@@ -20,7 +20,15 @@ let
       } ''
         export NIX_LOG_DIR=$PWD
         export NIX_STATE_DIR=$PWD
-        nix-instantiate --option sandbox false --readonly-mode --eval --expr "$optionsExpr" --xml --strict >$out
+        nix-instantiate \
+          --option sandbox false \
+          --readonly-mode \
+          --eval \
+          --expr "$optionsExpr" \
+          --xml \
+          --strict \
+          --show-trace \
+          >$out
       '';
 
     optionsDocBook = runCommand "options-db.xml" {} ''
