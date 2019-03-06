@@ -18,7 +18,7 @@ in
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useInit</code>, but the
+        One way to use this is to enable <code>nixos.useSystemd</code>, but the
         NixOS configuration can be used in other ways.
       '';
     };
@@ -31,7 +31,7 @@ in
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useInit</code>, but the
+        One way to use this is to enable <code>nixos.useSystemd</code>, but the
         NixOS configuration can be used in other ways.
       '';
     };
@@ -44,7 +44,7 @@ in
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useInit</code>, but the
+        One way to use this is to enable <code>nixos.useSystemd</code>, but the
         NixOS configuration can be used in other ways.
       '';
     };

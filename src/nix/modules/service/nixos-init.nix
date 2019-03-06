@@ -7,18 +7,18 @@ let
 in
 {
   options = {
-    nixos.useInit = lib.mkOption {
+    nixos.useSystemd = lib.mkOption {
       type = types.bool;
       default = false;
       description = ''
-        When enabled, call the NixOS init system.
+        When enabled, call the NixOS systemd-based init system.
 
         Configure NixOS with <code>nixos.configuration</code>.
       '';
     };
   };
 
-  config = lib.mkIf (config.nixos.useInit) {
+  config = lib.mkIf (config.nixos.useSystemd) {
     nixos.configuration.imports = [
       ../nixos/container-systemd.nix
       (pkgs.path + "/nixos/modules/profiles/minimal.nix")
