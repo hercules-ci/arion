@@ -16,6 +16,11 @@ in
       default = false;
       description = "Bind mounts the host store if enabled, avoiding copying.";
     };
+    service.useHostNixDaemon = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Make the host Nix daemon available.";
+    };
   };
   config = mkIf config.service.useHostStore {
     service.image = "arion-base";
@@ -23,6 +28,6 @@ in
     service.volumes = [
       "${config.host.nixStorePrefix}/nix/store:/nix/store"
       "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
-    ];
+      ] ++ lib.optional config.service.useHostNixDaemon "/nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket";
   };
 }

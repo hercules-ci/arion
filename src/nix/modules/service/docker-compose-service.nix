@@ -36,7 +36,12 @@ in
     service.volumes = mkOption {
       type = listOf types.unspecified;
       default = [];
-      description = "";
+      description = dockerComposeRef "volumes";
+    };
+    service.tmpfs = mkOption {
+      type = listOf types.str;
+      default = [];
+      description = dockerComposeRef "tmpfs";
     };
     service.build.context = mkOption {
       type = nullOr str;
@@ -49,6 +54,11 @@ in
     };
     service.hostname = mkOption {
       type = nullOr str;
+      default = null;
+      description = dockerComposeKitchenSink;
+    };
+    service.tty = mkOption {
+      type = nullOr bool;
       default = null;
       description = dockerComposeKitchenSink;
     };
@@ -130,6 +140,11 @@ in
       default = null;
       description = dockerComposeRef "network_mode";
     };
+    service.stop_signal = mkOption {
+      type = nullOr str;
+      default = null;
+      description = dockerComposeRef "stop_signal";
+    };
   };
 
   config.build.service = {
@@ -166,6 +181,12 @@ in
     inherit (config.service) network_mode;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
+  } // lib.optionalAttrs (config.service.stop_signal != null) {
+    inherit (config.service) stop_signal;
+  } // lib.optionalAttrs (config.service.tmpfs != []) {
+    inherit (config.service) tmpfs;
+  } // lib.optionalAttrs (config.service.tty != null) {
+    inherit (config.service) tty;
   } // lib.optionalAttrs (config.service.working_dir != null) {
     inherit (config.service) working_dir;
   };

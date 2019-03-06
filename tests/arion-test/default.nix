@@ -2,8 +2,8 @@
 
 let
   # To make some prebuilt derivations available in the vm
-  preEval = import ../../src/nix/eval-composition.nix {
-    modules = [ ../../examples/minimal/arion-compose.nix ];
+  preEval = modules: import ../../src/nix/eval-composition.nix {
+    inherit modules;
     inherit pkgs;
   };
 in
@@ -31,14 +31,35 @@ in
     virtualisation.pathsInNixDB = [
       # Pre-build the image because we don't want to build the world
       # in the vm.
-      preEval.config.build.dockerComposeYaml
+      (preEval [ ../../examples/minimal/arion-compose.nix ]).config.build.dockerComposeYaml
+      (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.build.dockerComposeYaml
+      (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.build.dockerComposeYaml
       pkgs.stdenv
     ];
   };
   testScript = ''
     $machine->fail("curl localhost:8000");
     $machine->succeed("docker --version");
-    $machine->succeed("cp -r ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-    $machine->waitUntilSucceeds("curl localhost:8000");
+
+    subtest "minimal", sub {
+      $machine->succeed("cp -r ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+      $machine->waitUntilSucceeds("curl localhost:8000");
+      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->waitUntilFails("curl localhost:8000");
+    };
+
+    subtest "full-nixos", sub {
+      $machine->succeed("cp -r ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+      $machine->waitUntilSucceeds("curl localhost:8000");
+      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->waitUntilFails("curl localhost:8000");
+    };
+
+    subtest "nixos-unit", sub {
+      $machine->succeed("cp -r ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+      $machine->waitUntilSucceeds("curl localhost:8000");
+      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->waitUntilFails("curl localhost:8000");
+    };
   '';
 }
