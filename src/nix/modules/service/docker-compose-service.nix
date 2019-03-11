@@ -95,6 +95,16 @@ in
       default = [];
       description = dockerComposeRef "depends_on";
     };
+    service.devices = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"
+        "<code>docker run --device</code> documentation"}
+
+        ${dockerComposeRef "devices"}
+      '';
+    };
     service.links = mkOption {
       type = listOf str;
       default = [];
@@ -195,6 +205,8 @@ in
     inherit (config.service) command;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
+  } // lib.optionalAttrs (config.service.devices != []) {
+    inherit (config.service) devices;
   } // lib.optionalAttrs (config.service.entrypoint != null) {
     inherit (config.service) entrypoint;
   } // lib.optionalAttrs (config.service.env_file != []) {
