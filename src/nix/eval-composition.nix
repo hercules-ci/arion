@@ -20,6 +20,7 @@ let
     argsModule
     ./modules/composition/docker-compose.nix
     ./modules/composition/host-environment.nix
+    ./modules/composition/images.nix
   ];
 
   argsModule = {

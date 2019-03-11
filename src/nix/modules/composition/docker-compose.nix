@@ -45,7 +45,7 @@ in
 
     docker-compose.evaluatedServices = lib.mapAttrs evalService config.docker-compose.services;
     docker-compose.raw = {
-      version = "3";
+      version = "3.4";
       services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
     };
   };

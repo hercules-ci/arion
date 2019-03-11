@@ -163,6 +163,32 @@ do_build() {
     --show-trace \
     --attr 'config.build.dockerComposeYaml' \
     >/dev/null ;
+
+  echo 1>&2 "Ensuring required images are loaded..."
+  jq -r <"$docker_compose_yaml" \
+    '.["x-arion"].images | map("  - " + .imageName + ":" + .imageTag) | join("\n")'
+  eval "$(
+    jq -r '.["docker-compose"]["x-arion"].images as $images
+         | .["existing-images"] as $loaded
+         | $images
+         | map(
+             if $loaded[.imageName + ":" + .imageTag]
+             then ""
+             else "docker load <" + .image + ";" end
+           )
+         | join("\n")
+     ' <<EOF
+{
+  "docker-compose": $(cat $docker_compose_yaml),
+  "existing-images": {
+    $(docker images \
+        --filter "dangling=false" \
+        --format '"{{.Repository}}:{{.Tag}}": true,')
+    "": false
+  }
+}
+EOF
+      )"
 }
 
 

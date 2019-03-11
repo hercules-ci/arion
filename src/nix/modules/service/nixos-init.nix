@@ -23,7 +23,7 @@ in
       ../nixos/container-systemd.nix
       (pkgs.path + "/nixos/modules/profiles/minimal.nix")
     ];
-    service.command = [ "${config.nixos.build.toplevel}/init" ];
+    image.command = [ "${config.nixos.build.toplevel}/init" ];
     service.environment.container = "docker";
     service.volumes = [
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
