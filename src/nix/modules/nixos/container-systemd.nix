@@ -19,6 +19,6 @@
   systemd.services.systemd-logind.enable = false;
   systemd.services.console-getty.enable = false;
 
-  systemd.sockets.nix-daemon.enable = false;
-  systemd.services.nix-daemon.enable = false;
+  systemd.sockets.nix-daemon.enable = lib.mkDefault false;
+  systemd.services.nix-daemon.enable = lib.mkDefault false;
 }
