@@ -1,6 +1,6 @@
 { lib, pkgs, ... }:
 
-{ modules, host }:
+{ modules, host, name }:
 let
   composite = lib.evalModules {
     check = true;
@@ -21,6 +21,7 @@ let
     key = ./docker-compose.nix;
     config._module.args.pkgs = lib.mkForce pkgs;
     config.host = host;
+    config.service.name = name;
   };
 
 in

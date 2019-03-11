@@ -33,6 +33,14 @@ in
       '';
     };
 
+    service.name = mkOption {
+      type = str;
+      description = ''
+        The name of the service - <code>&lt;name></code> in the composition-level <code>docker-compose.services.&lt;name></code>
+      '';
+      readOnly = true;
+    };
+
     service.volumes = mkOption {
       type = listOf types.unspecified;
       default = [];
