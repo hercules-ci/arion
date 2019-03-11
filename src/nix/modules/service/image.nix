@@ -2,6 +2,36 @@
 let
   inherit (lib) types mkOption;
   inherit (types) attrsOf listOf nullOr package str unspecified bool;
+
+  # TODO: dummy-config is a useless layer. Nix 2.3 will let us inspect
+  #       the string context instead, so we can avoid this.
+  contentsList = config.image.contents ++ [
+    (pkgs.writeText "dummy-config.json" (builtins.toJSON config.image.rawConfig))
+  ];
+
+  builtImage = pkgs.dockerTools.buildLayeredImage {
+    inherit (config.image)
+      name
+      contents
+      ;
+    config = config.image.rawConfig;
+    maxLayers = 100;
+
+    # TODO: allow use of image's Nix package instead
+    # TODO: option to disable db generation
+    extraCommands = ''
+        echo "Generating the nix database..."
+        echo "Warning: only the database of the deepest Nix layer is loaded."
+        echo "         If you want to use nix commands in the container, it would"
+        echo "         be better to only have one layer that contains a nix store."
+        export NIX_REMOTE=local?root=$PWD
+        ${pkgs.nix}/bin/nix-store --load-db < ${pkgs.closureInfo {rootPaths = contentsList;}}/registration
+        mkdir -p nix/var/nix/gcroots/docker/
+        for i in ${lib.concatStringsSep " " contentsList}; do
+          ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
+        done;
+      '';
+  };
 in
 {
   options = {
@@ -72,13 +102,7 @@ in
     };
   };
   config = {
-    build.image = pkgs.dockerTools.buildLayeredImage {
-      inherit (config.image)
-              name
-              contents
-      ;
-      config = config.image.rawConfig;
-    };
+    build.image = builtImage;
     build.imageName = config.build.image.imageName;
     build.imageTag =
                  if config.build.image.imageTag != ""
