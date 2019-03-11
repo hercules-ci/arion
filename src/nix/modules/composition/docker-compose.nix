@@ -11,7 +11,7 @@
  */
 { pkgs, lib, config, ... }:
 let
-  evalService = name: modules: (pkgs.callPackage ../../eval-service.nix {} { inherit name modules; inherit (config) host; }).config.build.service;
+  evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} { inherit name modules; inherit (config) host; };
 
 in
 {
@@ -33,14 +33,20 @@ in
       type = with lib.types; attrsOf (coercedTo unspecified (a: [a]) (listOf unspecified));
       description = "A attribute set of service configurations. A service specifies how to run an image. Each of these service configurations is specified using modules whose options are described in the Service Options section.";
     };
+    docker-compose.evaluatedServices = lib.mkOption {
+      type = lib.types.attrsOf lib.types.attrs;
+      description = "Attribute set of evaluated service configurations.";
+      readOnly = true;
+    };
   };
   config = {
     build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
     build.dockerComposeYamlText = builtins.toJSON (config.docker-compose.raw);
 
+    docker-compose.evaluatedServices = lib.mapAttrs evalService config.docker-compose.services;
     docker-compose.raw = {
       version = "3";
-      services = lib.mapAttrs evalService config.docker-compose.services;
+      services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
     };
   };
 }

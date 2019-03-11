@@ -184,7 +184,7 @@ To get started:
 To see deployment-wide configuration
   type config. and hit TAB
 To see the services
-  type config.docker-compose.services TAB or ENTER
+  type config.docker-compose.evaluatedServices TAB or ENTER
 To bring the top-level Nixpkgs attributes into scope
   type :a (config._module.args.pkgs) // { inherit config; }
 
