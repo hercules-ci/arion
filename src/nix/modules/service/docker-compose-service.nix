@@ -11,7 +11,7 @@ let
   inherit (types) listOf nullOr attrsOf str either int bool;
 
   dockerComposeRef = fragment:
-  ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
+    ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
   dockerComposeKitchenSink = ''
     Analogous to the <code>docker run</code> counterpart.
 
