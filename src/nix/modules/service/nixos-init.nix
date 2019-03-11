@@ -29,9 +29,9 @@ in
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ];
     service.tmpfs = [
-      "/tmp"
-      "/run"
-      "/run/wrappers"
+      "/tmp:exec,mode=777"
+      "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
+      "/run/wrappers" # noexec breaks this intentionally
     ];
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;
