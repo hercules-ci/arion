@@ -10,13 +10,19 @@ let
   inherit (lib) mkOption types;
   inherit (types) listOf nullOr attrsOf str either int bool;
 
+  link = url: text:
+    ''<link xlink:href="${url}">${text}</link>'';
   dockerComposeRef = fragment:
-  ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
+    ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
   dockerComposeKitchenSink = ''
     Analogous to the <code>docker run</code> counterpart.
 
     ${dockerComposeRef "domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir"}
   '';
+
+  cap_add = lib.attrNames (lib.filterAttrs (name: value: value == true) config.service.capabilities);
+  cap_drop = lib.attrNames (lib.filterAttrs (name: value: value == false) config.service.capabilities);
+
 in
 {
   options = {
@@ -31,6 +37,14 @@ in
         This option is user accessible because it may serve as an
         escape hatch for some.
       '';
+    };
+
+    service.name = mkOption {
+      type = str;
+      description = ''
+        The name of the service - <code>&lt;name></code> in the composition-level <code>docker-compose.services.&lt;name></code>
+      '';
+      readOnly = true;
     };
 
     service.volumes = mkOption {
@@ -80,6 +94,16 @@ in
       type = listOf str;
       default = [];
       description = dockerComposeRef "depends_on";
+    };
+    service.devices = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"
+        "<code>docker run --device</code> documentation"}
+
+        ${dockerComposeRef "devices"}
+      '';
     };
     service.links = mkOption {
       type = listOf str;
@@ -145,6 +169,24 @@ in
       default = null;
       description = dockerComposeRef "stop_signal";
     };
+    service.capabilities = mkOption {
+      type = attrsOf (nullOr bool);
+      default = {};
+      example = { ALL = true; SYS_ADMIN = false; NET_ADMIN = false; };
+      description = ''
+        Enable/disable linux capabilities, or pick Docker's default.
+
+        Setting a capability to <code>true</code> means that it will be
+        "added". Setting it to <code>false</code> means that it will be "dropped".
+        ${dockerComposeRef "cap_add-cap_drop"}
+
+        Omitted and <code>null</code> capabilities will therefore be set
+        according to Docker's ${
+          link "https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"
+               "default list of capabilities."
+        }
+      '';
+    };
   };
 
   config.build.service = {
@@ -155,10 +197,16 @@ in
       ;
   } // lib.optionalAttrs (config.service.build.context != null) {
     inherit (config.service) build;
+  } // lib.optionalAttrs (cap_add != []) {
+    inherit cap_add;
+  } // lib.optionalAttrs (cap_drop != []) {
+    inherit cap_drop;
   } // lib.optionalAttrs (config.service.command != null) {
     inherit (config.service) command;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
+  } // lib.optionalAttrs (config.service.devices != []) {
+    inherit (config.service) devices;
   } // lib.optionalAttrs (config.service.entrypoint != null) {
     inherit (config.service) entrypoint;
   } // lib.optionalAttrs (config.service.env_file != []) {

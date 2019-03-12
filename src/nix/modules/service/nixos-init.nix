@@ -23,15 +23,15 @@ in
       ../nixos/container-systemd.nix
       (pkgs.path + "/nixos/modules/profiles/minimal.nix")
     ];
-    service.command = [ "${config.nixos.build.toplevel}/init" ];
+    image.command = [ "${config.nixos.build.toplevel}/init" ];
     service.environment.container = "docker";
     service.volumes = [
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ];
     service.tmpfs = [
-      "/tmp"
-      "/run"
-      "/run/wrappers"
+      "/tmp:exec,mode=777"
+      "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
+      "/run/wrappers" # noexec breaks this intentionally
     ];
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;

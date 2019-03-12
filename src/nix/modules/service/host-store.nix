@@ -8,6 +8,7 @@
 
 let
   inherit (lib) mkOption types mkIf;
+  escape = s: lib.replaceStrings ["$"] ["$$"] s;
 in
 {
   options = {
@@ -23,11 +24,13 @@ in
     };
   };
   config = mkIf config.service.useHostStore {
+    image.nixBuild = false; # no need to build and load
     service.image = "arion-base";
     service.build.context = "${../../../arion-image}";
     service.volumes = [
       "${config.host.nixStorePrefix}/nix/store:/nix/store"
       "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
       ] ++ lib.optional config.service.useHostNixDaemon "/nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket";
+    service.command = lib.mkDefault (map escape (config.image.rawConfig.Cmd or []));
   };
 }
