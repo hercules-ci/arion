@@ -46,6 +46,11 @@ while test $# != 0; do
             shift
             break
             ;;
+        exec)
+            command="$1"
+            shift
+            break
+            ;;
         docker-compose)
             command="docker-compose"
             shift
@@ -231,6 +236,45 @@ do_repl_cleanup() {
     rm -f $REPL_TMP
 }
 
+run_exec() {
+    case "${#docker_compose_args[@]}" in
+        0)
+            echo "As an argument to exec, please specify a service"
+            exit 1
+            ;;
+        1)
+            case "${docker_compose_args[0]}" in
+                -*|--*)
+                    echo "As an argument to exec, please specify a service"
+                    echo "Note that executing the default command currently does not support"
+                    echo "docker-compose options."
+                    # This requires parsing the options, in order to figure out
+                    # which service to invoke.
+                    exit 1
+                    ;;
+                *)
+                    serviceName="${docker_compose_args[0]}"
+                    do_eval
+                    default_args=()
+                    while read arg; do
+                        default_args+=("$arg")
+                    done < <(
+                        jq < "$docker_compose_yaml" \
+                            --arg serviceName "$serviceName" \
+                            -r \
+                            '.["x-arion"].serviceInfo.webserver.defaultExec | tostream | .[1] | select(.)'
+                        )
+                    docker-compose -f $docker_compose_yaml exec "$serviceName" "${default_args[@]}"
+                    ;;
+            esac
+            ;;
+        *)
+            do_eval
+            docker-compose -f $docker_compose_yaml exec "${docker_compose_args[@]}"
+            ;;
+    esac
+}
+
 case "$command" in
     cat)
         do_eval
@@ -238,6 +282,9 @@ case "$command" in
         ;;
     repl)
         do_repl
+        ;;
+    exec)
+        run_exec "$@"
         ;;
     docker-compose)
         if [[ ${#docker_compose_args[@]} != 0

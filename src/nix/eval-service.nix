@@ -9,6 +9,7 @@ let
 
   builtinModules = [
     argsModule
+    ./modules/service/default-exec.nix
     ./modules/service/docker-compose-service.nix
     ./modules/service/extended-info.nix
     ./modules/service/host-store.nix
