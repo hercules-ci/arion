@@ -29,10 +29,10 @@ in
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ];
     service.tmpfs = [
-      "/tmp:exec,mode=777"
       "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
       "/run/wrappers" # noexec breaks this intentionally
-    ];
+    ] ++ lib.optional (config.nixos.evaluatedConfig.boot.tmpOnTmpfs) "/tmp:exec,mode=777";
+
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;
   };
