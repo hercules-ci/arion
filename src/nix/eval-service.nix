@@ -10,6 +10,7 @@ let
   builtinModules = [
     argsModule
     ./modules/service/docker-compose-service.nix
+    ./modules/service/extended-info.nix
     ./modules/service/host-store.nix
     ./modules/service/host.nix
     ./modules/service/image.nix
