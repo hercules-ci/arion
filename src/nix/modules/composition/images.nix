@@ -31,6 +31,6 @@ in
   };
   config = {
     build.imagesToLoad = lib.attrValues serviceImages;
-    docker-compose.raw.x-arion.images = config.build.imagesToLoad;
+    docker-compose.extended.images = config.build.imagesToLoad;
   };
 }

@@ -26,7 +26,11 @@ in
     };
     docker-compose.raw = lib.mkOption {
       type = lib.types.attrs;
-      description = "Nested attribute set that will be turned into the docker-compose.yaml file, using Nix's toJSON builtin.";
+      description = "Attribute set that will be turned into the docker-compose.yaml file, using Nix's toJSON builtin.";
+    };
+    docker-compose.extended = lib.mkOption {
+      type = lib.types.attrs;
+      description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
     docker-compose.services = lib.mkOption {
       default = {};
@@ -47,6 +51,7 @@ in
     docker-compose.raw = {
       version = "3.4";
       services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
+      x-arion = config.docker-compose.extended;
     };
   };
 }

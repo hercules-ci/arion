@@ -21,6 +21,7 @@ in
   config = lib.mkIf (config.nixos.useSystemd) {
     nixos.configuration.imports = [
       ../nixos/container-systemd.nix
+      ../nixos/default-shell.nix
       (pkgs.path + "/nixos/modules/profiles/minimal.nix")
     ];
     image.command = [ "${config.nixos.build.toplevel}/init" ];
@@ -35,5 +36,6 @@ in
 
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;
+    service.defaultExec = [config.nixos.build.x-arion-defaultShell "-l"];
   };
 }

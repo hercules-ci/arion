@@ -51,6 +51,8 @@ in
     subtest "full-nixos", sub {
       $machine->succeed("cp -r ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
       $machine->waitUntilSucceeds("curl localhost:8000");
+      # Also test exec with defaultExec
+      $machine->succeed("cd work && export NIX_PATH=nixpkgs='${pkgs.path}' && (echo 'nix run -f ~/h/arion arion -c arion exec webserver'; echo 'target=world; echo Hello \$target'; echo exit) | script /dev/null | grep 'Hello world'");
       $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
