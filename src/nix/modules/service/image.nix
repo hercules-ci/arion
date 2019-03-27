@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, options, ... }:
 let
   inherit (lib) types mkOption;
   inherit (types) attrsOf listOf nullOr package str unspecified bool;
@@ -32,6 +32,8 @@ let
         done;
       '';
   };
+
+  priorityIsDefault = option: option.highestPrio >= (lib.mkDefault true).priority;
 in
 {
   options = {
@@ -58,8 +60,11 @@ in
         Whether to build this image with Nixpkgs'
         <code>dockerTools.buildLayeredImage</code>
         and then load it with <code>docker load</code>.
+
+        By default, an image will be built with Nix unless <option>service.image</option>
+        is set. See also <option>image.name</option>, which defaults to
+        the service name.
       '';
-      default = true;
     };
     image.name = mkOption {
       type = str;
@@ -111,5 +116,7 @@ in
 
     service.image = lib.mkDefault "${config.build.imageName}:${config.build.imageTag}";
     image.rawConfig.Cmd = config.image.command;
+
+    image.nixBuild = lib.mkDefault (priorityIsDefault options.service.image);
   };
 }
