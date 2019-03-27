@@ -7,11 +7,13 @@ let
       lib.filterAttrs filterFunction config.docker-compose.evaluatedServices
     );
 
-  filterFunction = _serviceName: service:
-    service.config.image.nixBuild;
+  filterFunction = serviceName: service:
+    builtins.addErrorContext "while evaluating whether the service ${serviceName} defines an image"
+      service.config.image.nixBuild;
 
-  addDetails = _serviceName: service:
-    let
+  addDetails = serviceName: service:
+    builtins.addErrorContext "while evaluating the image for service ${serviceName}"
+    (let
       inherit (service.config) build;
     in {
       image = build.image.outPath;
@@ -20,7 +22,7 @@ let
                  if build.image.imageTag != ""
                  then build.image.imageTag
                  else lib.head (lib.strings.splitString "-" (baseNameOf build.image.outPath));
-    };
+    });
 in
 {
   options = {
