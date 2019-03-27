@@ -17,6 +17,8 @@ nix-env -iA arion -f .
 TODO: describe: using nix-shell or in a script, building images as
       part of nix-build, pinning, see also todomvc-nix.
 
+TODO: exposed Nix functions: arion.build, arion.eval (a bit of IFD)
+
 == Mac or traditional Linux
 
 ```

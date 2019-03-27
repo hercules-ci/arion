@@ -1,8 +1,9 @@
 { stdenv, lib
 , coreutils, docker_compose, jq
 }:
+let
 
-stdenv.mkDerivation {
+  arion = stdenv.mkDerivation {
     name = "arion";
     src = ./src;
     unpackPhase = "";
@@ -18,4 +19,20 @@ stdenv.mkDerivation {
         ;
       chmod a+x $out/bin/arion
     '';
-}
+    inherit passthru;
+  };
+
+  passthru = {
+    inherit eval build;
+  };
+
+  eval = import "${nix_dir}/eval-composition.nix";
+
+  build = args@{...}:
+    let composition = eval args;
+    in composition.config.build.dockerComposeYaml;
+
+  nix_dir = "${arion.outPath}/share/arion/nix";
+
+in
+  arion
