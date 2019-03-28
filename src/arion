@@ -262,7 +262,7 @@ run_exec() {
                         jq < "$docker_compose_yaml" \
                             --arg serviceName "$serviceName" \
                             -r \
-                            '.["x-arion"].serviceInfo.webserver.defaultExec | tostream | .[1] | select(.)'
+                            '.["x-arion"].serviceInfo[$serviceName].defaultExec | tostream | .[1] | select(.)'
                         )
                     docker-compose -f $docker_compose_yaml exec "$serviceName" "${default_args[@]}"
                     ;;
