@@ -20,8 +20,8 @@ let
   ];
 
   argsModule = {
-    _file = ./docker-compose.nix;
-    key = ./docker-compose.nix;
+    _file = ./eval-service.nix;
+    key = ./eval-service.nix;
     config._module.args.pkgs = lib.mkForce pkgs;
     config.host = host;
     config.service.name = name;
