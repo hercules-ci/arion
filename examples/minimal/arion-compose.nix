@@ -4,7 +4,6 @@
 
     webserver = {
       service.useHostStore = true;
-      # service.depends_on = [ "backend" ];
       service.command = [ "sh" "-c" ''
                   cd "$$WEB_ROOT"
                   ${pkgs.python3}/bin/python -m http.server
@@ -14,8 +13,5 @@
       ];
       service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
     };
-
-    # backend = { ... }
   };
 }
-    
