@@ -210,7 +210,7 @@ want to either build normal container images or manage garbage
 collection roots if you control the deployment host. Neither scenario is
 made easier by arion at this time.
 
-Support for other Linux than NixOS is untested.
+Arion has run successfully on Linux distributions other than NixOS, but we only perform CI for Arion on NixOS.
 
 
 == How it works
