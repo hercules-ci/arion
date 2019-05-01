@@ -86,7 +86,7 @@ or more sophisticated (recommended) setup with https://github.com/nmattia/niv[Ni
 
 === arion-compose.nix
 
-Describe containers using NixOS modules. There are a few options:
+Describe containers using NixOS-style modules. There are a few options:
 
 ==== Minimal: Plain command using nixpkgs
 
