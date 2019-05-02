@@ -16,9 +16,6 @@
 
   </info>
 
-  <xi:include href="introduction.xml" xpointer="xpointer(/article)" />
-  <xi:include href="installation.xml" xpointer="xpointer(/article)" />
-
   <xi:include href="options-composition.xml" />
   <xi:include href="options-service.xml" />
 
