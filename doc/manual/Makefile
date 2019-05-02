@@ -17,7 +17,7 @@ docbookxsl = http://docbook.sourceforge.net/release/xsl/current
 
 all: manual.html
 
-manual.html: manual.xml introduction.xml installation.xml options-composition.xml options-service.xml
+manual.html: manual.xml options-composition.xml options-service.xml
 	$(xsltproc) --xinclude --stringparam profile.condition manual \
 	  $(docbookxsl)/profiling/profile.xsl manual.xml | \
 	  $(xsltproc) --output manual.html $(docbookxsl)/xhtml/docbook.xsl -
