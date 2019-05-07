@@ -174,6 +174,11 @@ in
       default = null;
       description = dockerComposeRef "stop_signal";
     };
+    service.sysctls = mkOption {
+      type = attrsOf (either str int);
+      default = {};
+      description = dockerComposeRef "sysctls";
+    };
     service.capabilities = mkOption {
       type = attrsOf (nullOr bool);
       default = {};
@@ -198,6 +203,7 @@ in
     inherit (config.service)
       volumes
       environment
+      sysctls
       image
       ;
   } // lib.optionalAttrs (config.service.build.context != null) {
