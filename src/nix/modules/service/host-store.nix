@@ -27,6 +27,7 @@ in
     image.nixBuild = false; # no need to build and load
     service.image = "arion-base";
     service.build.context = "${../../../arion-image}";
+    service.environment.NIX_REMOTE = lib.optionalString config.service.useHostNixDaemon "daemon";
     service.volumes = [
       "${config.host.nixStorePrefix}/nix/store:/nix/store"
       "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
