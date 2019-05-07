@@ -140,6 +140,11 @@ in
       default = null;
       description = dockerComposeRef "restart";
     };
+    service.user = mkOption {
+      type = nullOr str;
+      default = null;
+      description = dockerComposeKitchenSink;
+    };
     service.ports = mkOption {
       type = listOf types.unspecified;
       default = [];
@@ -237,5 +242,7 @@ in
     inherit (config.service) tty;
   } // lib.optionalAttrs (config.service.working_dir != null) {
     inherit (config.service) working_dir;
+  } // lib.optionalAttrs (config.service.user != null) {
+    inherit (config.service) user;
   };
 }
