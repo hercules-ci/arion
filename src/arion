@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Close off the python module search path
+#
+# Accepting directories from the environment into the search path
+# tends to break things. Docker Compose does not have a plugin
+# system as far as I can tell, so I don't expect this to break a
+# feature, but rather to make the program more robustly self-
+# contained.
+unset PYTHONPATH
+
 set -euo pipefail
 
 export PATH="@path@:$PATH"
