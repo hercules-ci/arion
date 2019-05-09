@@ -30,7 +30,7 @@ to Dockerfiles allows the following:
    templates and a multitude of expression languages
  * Refactor across deployments, configuration and packaging
 
-Arion allows to compose containers with different granuality:
+Arion allows to compose containers with different granularity:
 
   * <<Minimal: Plain command using nixpkgs>>
   * <<NixOS: run only one systemd service>>
