@@ -34,6 +34,7 @@ in
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.build.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.build.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.build.dockerComposeYaml
+      (preEval [ ../testcases/secrets/arion-compose.nix ]).config.build.dockerComposeYaml
       pkgs.stdenv
     ];
   };
@@ -61,6 +62,14 @@ in
       $machine->succeed("cp -r ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
       $machine->waitUntilSucceeds("curl localhost:8000");
       $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->waitUntilFails("curl localhost:8000");
+    };
+
+    subtest "secrets", sub {
+      $machine->succeed("cp -r ${../testcases/secrets} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+      $machine->waitUntilSucceeds("curl localhost:8000");
+      $machine->succeed("test qux = \"\$(curl localhost:8000/foo.txt)\"");
+      $machine->succeed("(cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down) && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
   '';
