@@ -13,7 +13,7 @@
 let
   cfg = config.docker-compose;
   inherit (lib) mkOption optionalAttrs mapAttrs;
-  inherit (lib.types) submodule attrsOf nullOr str path bool;
+  inherit (lib.types) submodule attrsOf nullOr either str path bool;
   evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} { inherit name modules; inherit (config) host; };
 
   dockerComposeRef = fragment:

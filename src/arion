@@ -118,7 +118,9 @@ fi
 debug docker_compose_args: "${docker_compose_args[@]}"
 debug files: "${files[@]}"
 
-docker_compose_yaml=.tmp-nix-docker-compose-$$-$RANDOM.yaml
+docker_system_id="$(docker info --format '{{.Name}}-{{.ID}}')"
+
+docker_compose_yaml=.tmp-arion-$$-$RANDOM.yaml
 cleanup() {
   rm -f $docker_compose_yaml
 }
@@ -203,6 +205,26 @@ do_build() {
 }
 EOF
       )"
+
+  # FIXME: Do something else for swarm
+  # FIXME: Include project name
+  export ARION_SECRETS_DIR="arion-secrets/$docker_system_id"
+
+  if [[ true = "$(jq <"$docker_compose_yaml" '.["x-arion"].hasTextSecrets')" ]]; then
+    echo 1>&2 "Evaluating configuration read-only for secrets..."
+    eval "$(nix-instantiate \
+      "$nix_dir/eval-composition.nix" \
+      --eval \
+      --readonly-mode \
+      --json \
+      --argstr uid "$UID" \
+      --arg modules "$modules" \
+      --arg pkgs "$pkgs_argument" \
+      --arg writableStore false \
+      --show-trace \
+      --attr 'config.build.writeSecretsScript' \
+      | jq -r)"
+  fi
 }
 
 

@@ -1,4 +1,9 @@
-{ modules ? [], uid ? "0", pkgs, hostNixStorePrefix ? "", }:
+{ modules ? []
+, uid ? "0"
+, pkgs
+, hostNixStorePrefix ? ""
+, writableStore ? true
+}:
 
 let _pkgs = pkgs;
 in
@@ -22,6 +27,7 @@ let
     ./modules/composition/host-environment.nix
     ./modules/composition/images.nix
     ./modules/composition/service-info.nix
+    ./modules/composition/text-secrets.nix
   ];
 
   argsModule = {
@@ -30,6 +36,7 @@ let
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
     config.host.nixStorePrefix = hostNixStorePrefix;
     config.host.uid = lib.toInt uid;
+    config.host.writableStore = writableStore;
   };
 
 in

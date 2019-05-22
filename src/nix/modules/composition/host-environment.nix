@@ -29,5 +29,14 @@
       '';
     };
 
+    host.writableStore = lib.mkOption {
+      type = lib.types.bool;
+      description = ''
+        Whether the Nix store is writable. Normally it is, but when extracting
+        secrets, it must not be writable in order to prevent secrets from
+        accidentally leaking into the Nix store.
+      '';
+    };
+
   };
 }
