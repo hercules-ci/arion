@@ -11,7 +11,35 @@
  */
 { pkgs, lib, config, ... }:
 let
+  cfg = config.docker-compose;
+  inherit (lib) mkOption optionalAttrs mapAttrs;
+  inherit (lib.types) submodule attrsOf nullOr str path bool;
   evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} { inherit name modules; inherit (config) host; };
+
+  dockerComposeRef = fragment:
+    ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
+
+  secretType = submodule {
+    options = {
+      file = mkOption {
+        type = either path str;
+        description = ''
+          Sets the secret's value to this file.
+
+          ${dockerComposeRef "secrets"}
+        '';
+      };
+      external = mkOption {
+        type = bool;
+        default = false;
+        description = ''
+          Whether the value of this secret is set via other means.
+
+          ${dockerComposeRef "secrets"}
+        '';
+      };
+    };
+  };
 
 in
 {
@@ -42,6 +70,11 @@ in
       description = "Attribute set of evaluated service configurations.";
       readOnly = true;
     };
+    docker-compose.secrets = lib.mkOption {
+      type = attrsOf secretType;
+      description = dockerComposeRef "secrets";
+      default = {};
+    };
   };
   config = {
     build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
@@ -52,6 +85,13 @@ in
       version = "3.4";
       services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
       x-arion = config.docker-compose.extended;
+    } // optionalAttrs (cfg.secrets != {}) {
+      secrets = mapAttrs (_k: s: optionalAttrs (s.external != false) {
+        inherit (s) external;
+      } // optionalAttrs (s.file != null) {
+        file = toString s.file;
+      }
+      ) cfg.secrets;
     };
   };
 }

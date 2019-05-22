@@ -7,8 +7,10 @@
 { pkgs, lib, config, ... }:
 
 let
-  inherit (lib) mkOption types;
+  inherit (lib) mkOption types mapAttrs mapAttrsToList;
   inherit (types) listOf nullOr attrsOf str either int bool;
+
+  cfg = config.service;
 
   link = url: text:
     ''<link xlink:href="${url}">${text}</link>'';
@@ -22,6 +24,48 @@ let
 
   cap_add = lib.attrNames (lib.filterAttrs (name: value: value == true) config.service.capabilities);
   cap_drop = lib.attrNames (lib.filterAttrs (name: value: value == false) config.service.capabilities);
+
+  serviceSecretType = types.submodule {
+    options = {
+      source = mkOption {
+        type = nullOr str;
+        default = null;
+        description = dockerComposeRef "secrets";
+      };
+      uid = mkOption {
+        type = nullOr (either str int);
+        default = null;
+        description = dockerComposeRef "secrets";
+      };
+      gid = mkOption {
+        type = nullOr (either str int);
+        default = null;
+        description = dockerComposeRef "secrets";
+      };
+      mode = mkOption {
+        type = nullOr str;
+        # default = "0444";
+        default = null;
+        description = ''
+          The default value of is usually 0444. This option may not be supported
+          when not deploying to a Swarm.
+
+          ${dockerComposeRef "secrets"}
+        '';
+      };
+    };
+  };
+  secrets = mapAttrsToList (k: s: {
+    target = k;
+  } //lib.optionalAttrs (s.source != null) {
+    inherit (s) source;
+  } // lib.optionalAttrs (s.uid != null) {
+    inherit (s) uid;
+  } // lib.optionalAttrs (s.gid != null) {
+    inherit (s) gid;
+  } // lib.optionalAttrs (s.mode != null) {
+    inherit (s) mode;
+  }) cfg.secrets;
 
 in
 {
@@ -197,6 +241,19 @@ in
         }
       '';
     };
+    service.secrets = mkOption {
+      type = attrsOf serviceSecretType;
+      default = {};
+      description = dockerComposeRef "secrets";
+      example = {
+        redis_secret = {
+          source = "web_cache_redis_secret";
+          uid = 123;
+          gid = 123;
+          mode = "0440";
+        };
+      };
+    };
   };
 
   config.build.service = {
@@ -242,6 +299,8 @@ in
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.stop_signal != null) {
     inherit (config.service) stop_signal;
+  } // lib.optionalAttrs (secrets != null) {
+    inherit secrets;
   } // lib.optionalAttrs (config.service.tmpfs != []) {
     inherit (config.service) tmpfs;
   } // lib.optionalAttrs (config.service.tty != null) {

@@ -63,5 +63,13 @@ in
       $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
+
+    subtest "secrets", sub {
+      $machine->succeed("cp -r ${../testcases/secrets} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+      $machine->waitUntilSucceeds("curl localhost:8000");
+      $machine->succeed("test qux = \"$(curl localhost:8000)\"");
+      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->waitUntilFails("curl localhost:8000");
+    };
   '';
 }
