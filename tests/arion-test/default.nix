@@ -12,11 +12,10 @@ in
   machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
-      pkgs.docker-compose
     ];
     virtualisation.docker.enable = true;
     
-    # no caches, because no internet
+    # no caches, because the test cannot access the internet
     nix.binaryCaches = lib.mkForce [];
 
     # FIXME: Sandbox seems broken with current version of NixOS test
@@ -29,14 +28,14 @@ in
 
     virtualisation.writableStore = true;
     virtualisation.pathsInNixDB = [
-      # Pre-build the image because we don't want to build the world
-      # in the vm.
+      # Pre-build the image because we don't want to build the world in the vm.
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.build.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.build.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.build.dockerComposeYaml
       (preEval [ ../testcases/secrets/arion-compose.nix ]).config.build.dockerComposeYaml
       pkgs.stdenv
     ];
+    virtualisation.memorySize = 4096; #MB
   };
   testScript = ''
     $machine->fail("curl localhost:8000");
@@ -45,7 +44,7 @@ in
     subtest "minimal", sub {
       $machine->succeed("cp -r ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
       $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->succeed("(cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down) && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
 
@@ -54,14 +53,14 @@ in
       $machine->waitUntilSucceeds("curl localhost:8000");
       # Also test exec with defaultExec
       $machine->succeed("cd work && export NIX_PATH=nixpkgs='${pkgs.path}' && (echo 'nix run -f ~/h/arion arion -c arion exec webserver'; echo 'target=world; echo Hello \$target'; echo exit) | script /dev/null | grep 'Hello world'");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->succeed("(cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down) && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
 
     subtest "nixos-unit", sub {
       $machine->succeed("cp -r ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
       $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
+      $machine->succeed("(cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down) && rm -rf work");
       $machine->waitUntilFails("curl localhost:8000");
     };
 
