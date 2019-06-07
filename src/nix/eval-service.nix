@@ -17,6 +17,7 @@ let
     ./modules/service/image.nix
     ./modules/service/nixos.nix
     ./modules/service/nixos-init.nix
+    ./modules/service/ngrok.nix
   ];
 
   argsModule = {
