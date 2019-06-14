@@ -1,0 +1,54 @@
+cabal-version:       2.2
+
+name:                arion-compose
+version:             0.1.0.0
+synopsis:            Run docker-compose with help from Nix/NixOS
+-- description:
+homepage:            https://github.com/hercules-ci/arion#readme
+-- bug-reports:
+license:             Apache-2.0
+license-file:        LICENSE
+author:              Robert Hensing
+maintainer:          robert@hercules-ci.com
+-- copyright:
+-- category:
+extra-source-files:  CHANGELOG.md, README.asciidoc
+write-ghc-enviroment-files:
+                     never
+
+common deps
+  build-depends:     base ^>=4.12.0.0
+                   , aeson
+                   , protolude
+
+
+library
+  import:              deps
+  -- exposed-modules:
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       process
+  hs-source-dirs:      src/haskell/lib
+  default-language:    Haskell2010
+
+executable arion
+  import:              deps
+  main-is:             Main.hs
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       optparse-applicative
+                     , process
+  hs-source-dirs:      src/haskell/exe
+  default-language:    Haskell2010
+
+test-suite arion-unit-tests
+  import:              deps
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       arion-compose
+                     , hspec
+                     , QuickCheck
+  hs-source-dirs:      src/haskell/test
+  default-language:    Haskell2010

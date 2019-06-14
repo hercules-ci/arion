@@ -1,0 +1,13 @@
+#!/usr/bin/env nix-shell
+#!nix-shell ./shell.nix
+#!nix-shell -i bash
+set -eux -o pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+ghcid \
+  --command 'ghci -isrc/haskell/exe -isrc/haskell/lib -isrc/haskell/test src/haskell/test/TestMain.hs' \
+  --test=Main.main \
+  --restart=hercules-ci-api.cabal \
+  --restart=../stack.yaml \
+  ;
