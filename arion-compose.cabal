@@ -19,6 +19,7 @@ write-ghc-enviroment-files:
 common deps
   build-depends:     base ^>=4.12.0.0
                    , aeson
+                   , text
                    , protolude
 
 

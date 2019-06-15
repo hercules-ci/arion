@@ -6,8 +6,7 @@ set -eux -o pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 ghcid \
-  --command 'ghci -isrc/haskell/exe -isrc/haskell/lib -isrc/haskell/test src/haskell/test/TestMain.hs' \
-  --test=Main.main \
+  --command 'ghci -isrc/haskell/exe src/haskell/exe/Main.hs' \
   --reload=src/haskell \
   --restart=hercules-ci-api.cabal \
   --restart=../stack.yaml \
