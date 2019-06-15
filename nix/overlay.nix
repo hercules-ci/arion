@@ -3,7 +3,8 @@ let
   inherit (self.arion-project) haskellPkgs;
 in
 {
-  arion = super.callPackage ../arion.nix {};
+  arion-v0 = super.callPackage ../arion.nix {};
+  arion = super.haskell.lib.justStaticExecutables haskellPkgs.arion-compose;
   tests = super.callPackage ../tests {};
   doc = super.callPackage ../doc {};
 
