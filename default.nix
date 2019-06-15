@@ -1,4 +1,4 @@
-args@{ pkgs ? import ./nix args, ... }:
+args@{ pkgs ? import ./nix args, system ? null, ... }:
 
 {
   inherit (pkgs) arion tests;

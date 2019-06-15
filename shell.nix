@@ -1,1 +1,1 @@
-(import ./nix {}).arion-project.shell
+args@{...}: (import ./nix args).arion-project.shell
