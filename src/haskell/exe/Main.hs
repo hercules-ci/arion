@@ -16,7 +16,6 @@ import Data.List.NonEmpty (NonEmpty(..))
 
 import Control.Arrow ((>>>))
 
-
 data CommonOptions =
   CommonOptions
     { files :: NonEmpty FilePath
@@ -24,46 +23,12 @@ data CommonOptions =
     }
   deriving (Show)
 
-
 newtype DockerComposeArgs =
   DockerComposeArgs { unDockerComposeArgs :: [Text] }
-
-
-data DockerComposeCmd =
-    Build
-  | Bundle
-  | Config
-  | Create
-  | Down
-  | Events
-  | Exec
-  | Help
-  | Images
-  | Kill
-  | Logs
-  | Pause
-  | Port
-  | Ps
-  | Pull
-  | Push
-  | Restart
-  | Rm
-  | Run
-  | Scale
-  | Start
-  | Stop
-  | Top
-  | Unpause
-  | Up
-  | Version
-  deriving (Show)
-
-
 
 ensureConfigFile :: [FilePath] -> NonEmpty FilePath
 ensureConfigFile []     = "./arion-compose.nix" :| []
 ensureConfigFile (x:xs) = x :| xs
-
 
 parseOptions :: Parser CommonOptions
 parseOptions = do
@@ -85,94 +50,68 @@ parseOptions = do
                    \and evaluating the configuration." )
     pure CommonOptions{..}
 
-
 parseCommand :: Parser (CommonOptions -> IO ())
 parseCommand =
   hsubparser
-    (    command "cat" (info (pure runCat) fullDesc)
-      <> command "repl" (info (pure runRepl) fullDesc)
-      <> command "exec" (info (pure runExec) fullDesc)
+    (    command "cat" (info (pure runCat) (progDesc "TODO: cat doc" <> fullDesc))
+      <> command "repl" (info (pure runRepl) (progDesc "TODO: repl doc" <> fullDesc))
+      <> command "exec" (info (pure runExec) (progDesc "TODO: exec doc" <> fullDesc))
     )
   <|>
   hsubparser
-    (    dcParser "build" Build "Build or rebuild services"
-      <> dcParser "bundle" Bundle "Generate a Docker bundle from the Compose file"
-      <> dcParser "config" Config "Validate and view the Compose file"
-      <> dcParser "create" Create "Create services"
-      <> dcParser "down" Down "Stop and remove containers, networks, images, and volumes"
-      <> dcParser "events" Events "Receive real time events from containers"
-      <> dcParser "exec" Exec "Execute a command in a running container"
-      <> dcParser "help" Help "Get help on a command"
-      <> dcParser "images" Images "List images"
-      <> dcParser "kill" Kill "Kill containers"
-      <> dcParser "logs" Logs "View output from containers"
-      <> dcParser "pause" Pause "Pause services"
-      <> dcParser "port" Port "Print the public port for a port binding"
-      <> dcParser "ps" Ps "List containers"
-      <> dcParser "pull" Pull "Pull service images"
-      <> dcParser "push" Push "Push service images"
-      <> dcParser "restart" Restart "Restart services"
-      <> dcParser "rm" Rm "Remove stopped containers"
-      <> dcParser "run" Run "Run a one-off command"
-      <> dcParser "scale" Scale "Set number of containers for a service"
-      <> dcParser "start" Start "Start services"
-      <> dcParser "stop" Stop "services"
-      <> dcParser "top" Top "Display the running processes"
-      <> dcParser "unpause" Unpause "Unpause services"
-      <> dcParser "up" Up "Create and start containers"
-      <> dcParser "version" Version "Show the Docker-Compose version information"
+    (    commandDC runBuildAndDC "build" "Build or rebuild services"
+      <> commandDC runBuildAndDC "bundle" "Generate a Docker bundle from the Compose file"
+      <> commandDC runEvalAndDC "config" "Validate and view the Compose file"
+      <> commandDC runBuildAndDC "create" "Create services"
+      <> commandDC runEvalAndDC "down" "Stop and remove containers, networks, images, and volumes"
+      <> commandDC runEvalAndDC "events" "Receive real time events from containers"
+      <> commandDC runEvalAndDC "exec" "Execute a command in a running container"
+      <> commandDC runDC "help" "Get help on a command"
+      <> commandDC runEvalAndDC "images" "List images"
+      <> commandDC runEvalAndDC "kill" "Kill containers"
+      <> commandDC runEvalAndDC "logs" "View output from containers"
+      <> commandDC runEvalAndDC "pause" "Pause services"
+      <> commandDC runEvalAndDC "port" "Print the public port for a port binding"
+      <> commandDC runEvalAndDC "ps" "List containers"
+      <> commandDC runBuildAndDC "pull" "Pull service images"
+      <> commandDC runBuildAndDC "push" "Push service images"
+      <> commandDC runBuildAndDC "restart" "Restart services"
+      <> commandDC runEvalAndDC "rm" "Remove stopped containers"
+      <> commandDC runBuildAndDC "run" "Run a one-off command"
+      <> commandDC runBuildAndDC "scale" "Set number of containers for a service"
+      <> commandDC runBuildAndDC "start" "Start services"
+      <> commandDC runEvalAndDC "stop" "Stop services"
+      <> commandDC runEvalAndDC "top" "Display the running processes"
+      <> commandDC runEvalAndDC "unpause" "Unpause services"
+      <> commandDC runBuildAndDC "up" "Create and start containers"
+      <> commandDC runDC "version" "Show the Docker-Compose version information"
 
       <> metavar "DOCKER-COMPOSE-COMMAND"
       <> commandGroup "Docker Compose Commands:"
     )
 
-
-dcParser
-  :: Text
-  -> DockerComposeCmd
-  -> Text
-  -> Mod CommandFields (CommonOptions -> IO ())
-dcParser cmdStr cmd help =
-  command
-    (T.unpack cmdStr)
-    (info
-      (runDockerCompose <$> pure cmd <*> parseDockerComposeArgs)
-      (progDesc (T.unpack help) <> fullDesc <> forwardOptions))
-
-
 parseAll :: Parser (IO ())
 parseAll =
   flip ($) <$> parseOptions <*> parseCommand
-
 
 parseDockerComposeArgs :: Parser DockerComposeArgs
 parseDockerComposeArgs =
   DockerComposeArgs <$>
     many (argument (T.pack <$> str) (metavar "DOCKER-COMPOSE ARGS..."))
 
+commandDC
+  :: (Text -> DockerComposeArgs -> CommonOptions -> IO ())
+  -> Text
+  -> Text
+  -> Mod CommandFields (CommonOptions -> IO ())
+commandDC run cmdStr help =
+  command
+    (T.unpack cmdStr)
+    (info
+      (run cmdStr <$> parseDockerComposeArgs)
+      (progDesc (T.unpack help) <> fullDesc <> forwardOptions))
 
-shouldEval :: DockerComposeCmd -> Bool
-shouldEval Up = True
-shouldEval Down = True
-
-
-runDockerCompose :: DockerComposeCmd -> DockerComposeArgs -> CommonOptions -> IO ()
-runDockerCompose cmd args opts = T.putStrLn (show cmd)
-
-
-runCat :: CommonOptions -> IO ()
-runCat (CommonOptions files pkgs) = do
-  T.putStrLn "Running cat ... TODO"
-  T.putStrLn (modulesNixExpr files)
-
-
-runRepl :: CommonOptions -> IO ()
-runRepl opts = T.putStrLn "Running repl ... TODO"
-
-
-runExec :: CommonOptions -> IO ()
-runExec opts = T.putStrLn "Running exec ... TODO"
-
+--------------------------------------------------------------------------------
 
 modulesNixExpr :: NonEmpty FilePath -> Text
 modulesNixExpr =
@@ -189,8 +128,38 @@ modulesNixExpr =
 
     wrapList s = "[ " <> s <> " ]"
 
+--------------------------------------------------------------------------------
+
+runDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
+runDC cmd (DockerComposeArgs args) opts =
+  T.putStrLn $ "TODO: docker-compose " <> cmd <> " " <> T.unwords args
+
+runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
+runBuildAndDC cmd dopts opts = do
+  T.putStrLn "TODO: build"
+  runDC cmd dopts opts
+
+runEvalAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
+runEvalAndDC cmd dopts opts = do
+  T.putStrLn "TODO: eval"
+  runDC cmd dopts opts
+
+runCat :: CommonOptions -> IO ()
+runCat (CommonOptions files pkgs) = do
+  T.putStrLn "Running cat ... TODO"
+  T.putStrLn (modulesNixExpr files)
+
+runRepl :: CommonOptions -> IO ()
+runRepl opts =
+  T.putStrLn "Running repl ... TODO"
+
+runExec :: CommonOptions -> IO ()
+runExec opts =
+  T.putStrLn "Running exec ... TODO"
 
 main :: IO ()
 main = 
   (join . execParser) (info (parseAll <**> helper) fullDesc)
+  where
+    execParser = customExecParser (prefs showHelpOnEmpty)
 
