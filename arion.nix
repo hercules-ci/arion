@@ -3,6 +3,7 @@
 }:
 let
 
+  # TODO: Replace by a new expression for the new Haskell main
   arion = stdenv.mkDerivation {
     name = "arion";
     src = ./src;

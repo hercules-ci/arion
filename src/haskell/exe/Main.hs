@@ -5,14 +5,20 @@
 
 import Protolude hiding (Down)
 
+import           Arion.Nix
+
 import Options.Applicative
 import Control.Applicative
 
+import qualified Data.Aeson.Encode.Pretty
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Builder as TB
 
 import qualified Data.List.NonEmpty as NE
 import Data.List.NonEmpty (NonEmpty(..))
+
 
 import Control.Arrow ((>>>))
 
@@ -46,7 +52,7 @@ parseOptions = do
           <> metavar "EXPR"
           <> showDefault
           <> value "./arion-pkgs.nix"
-          <> help "Use EXPR to get the Nixpkgs attrset used for bootstrapping \
+          <> help "Use Nix expression EXPR to get the Nixpkgs attrset used for bootstrapping \
                    \and evaluating the configuration." )
     pure CommonOptions{..}
 
@@ -111,28 +117,12 @@ commandDC run cmdStr help =
       (run cmdStr <$> parseDockerComposeArgs)
       (progDesc (T.unpack help) <> fullDesc <> forwardOptions))
 
---------------------------------------------------------------------------------
-
-modulesNixExpr :: NonEmpty FilePath -> Text
-modulesNixExpr =
-        NE.toList
-    >>> fmap pathExpr
-    >>> T.unwords
-    >>> wrapList
-  where
-    pathExpr path | isAbsolute path = "(/. + \""  <> T.pack path <> "\")"
-                  | otherwise       = "(./. + \"" <> T.pack path <> "\")"
-
-    isAbsolute ('/':_) = True
-    isAbsolute _       = False
-
-    wrapList s = "[ " <> s <> " ]"
 
 --------------------------------------------------------------------------------
 
 runDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runDC cmd (DockerComposeArgs args) opts =
-  T.putStrLn $ "TODO: docker-compose " <> cmd <> " " <> T.unwords args
+  panic $ "TODO: docker-compose " <> cmd <> " " <> T.unwords args
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
@@ -146,8 +136,13 @@ runEvalAndDC cmd dopts opts = do
 
 runCat :: CommonOptions -> IO ()
 runCat (CommonOptions files pkgs) = do
-  T.putStrLn "Running cat ... TODO"
-  T.putStrLn (modulesNixExpr files)
+  v <- Arion.Nix.evaluate EvaluationArgs
+    { evalUid = 0 -- TODO
+    , evalModules = files
+    , evalPkgs = pkgs
+    , evalWorkDir = Nothing
+    }
+  T.hPutStrLn stderr (TL.toStrict $ TB.toLazyText $ Data.Aeson.Encode.Pretty.encodePrettyToTextBuilder v)
 
 runRepl :: CommonOptions -> IO ()
 runRepl opts =

@@ -1,3 +1,5 @@
 FROM scratch
-COPY passwd /etc/passwd
-ADD tarball.tar.gz /
+# scratch itself can't be run.
+
+# This seems like a no-op:
+CMD []

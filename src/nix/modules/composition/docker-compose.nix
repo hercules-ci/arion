@@ -19,10 +19,17 @@ in
     build.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
       description = "A derivation that produces a docker-compose.yaml file for this composition.";
+      readOnly = true;
     };
     build.dockerComposeYamlText = lib.mkOption {
       type = lib.types.string;
       description = "The text of build.dockerComposeYaml.";
+      readOnly = true;
+    };
+    build.dockerComposeYamlAttrs = lib.mkOption {
+      type = lib.types.attrsOf lib.types.unspecified;
+      description = "The text of build.dockerComposeYaml.";
+      readOnly = true;
     };
     docker-compose.raw = lib.mkOption {
       type = lib.types.attrs;
@@ -45,7 +52,8 @@ in
   };
   config = {
     build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
-    build.dockerComposeYamlText = builtins.toJSON (config.docker-compose.raw);
+    build.dockerComposeYamlText = builtins.toJSON (config.build.dockerComposeYamlAttrs);
+    build.dockerComposeYamlAttrs = config.docker-compose.raw;
 
     docker-compose.evaluatedServices = lib.mapAttrs evalService config.docker-compose.services;
     docker-compose.raw = {
