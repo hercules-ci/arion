@@ -16,6 +16,7 @@ in
       passthru = o.passthru // {
         inherit eval build;
       };
+      pname = "arion"; # Cover up the needlessly long Haskell package name
     }));
   tests = super.callPackage ../tests {};
   doc = super.callPackage ../doc {};
