@@ -1,0 +1,6 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash
+
+# Build the Haskell package via cabal, outside Nix
+
+cabal new-build --write-ghc-environment-files=never

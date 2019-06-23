@@ -1,0 +1,15 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash
+#!nix-shell ./shell.nix
+
+# For quick manual testing of a hacked arion
+
+# NB: Only works inside the project directory
+
+cabal \
+  new-run \
+  --write-ghc-environment-files=never \
+  :pkg:arion-compose:exe:arion \
+  -- \
+  "$@" \
+  ;
