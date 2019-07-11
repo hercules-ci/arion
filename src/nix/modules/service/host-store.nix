@@ -17,6 +17,11 @@ in
       default = false;
       description = "Bind mounts the host store if enabled, avoiding copying.";
     };
+    service.hostStoreAsReadOnly = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Adds a ':ro' (read-only) access mode to the host nix store bind mount.";
+    };
     service.useHostNixDaemon = mkOption {
       type = types.bool;
       default = false;
@@ -29,8 +34,8 @@ in
     service.build.context = "${../../../arion-image}";
     service.environment.NIX_REMOTE = lib.optionalString config.service.useHostNixDaemon "daemon";
     service.volumes = [
-      "${config.host.nixStorePrefix}/nix/store:/nix/store"
-      "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system"
+      "${config.host.nixStorePrefix}/nix/store:/nix/store${lib.optionalString config.service.hostStoreAsReadOnly ":ro"}"
+      "${config.host.nixStorePrefix}${pkgs.buildEnv { name = "container-system-env"; paths = [ pkgs.bashInteractive pkgs.coreutils ]; }}:/run/system${lib.optionalString config.service.hostStoreAsReadOnly ":ro"}"
       ] ++ lib.optional config.service.useHostNixDaemon "/nix/var/nix/daemon-socket:/nix/var/nix/daemon-socket";
     service.command = lib.mkDefault (map escape (config.image.rawConfig.Cmd or []));
   };
