@@ -21,24 +21,30 @@ import           Data.List.NonEmpty             ( NonEmpty(..) )
 
 import           Control.Arrow                  ( (>>>) )
 
+data EvaluationMode =
+  ReadWrite | ReadOnly
+
 data EvaluationArgs = EvaluationArgs
  { evalUid :: Int
  , evalModules :: NonEmpty FilePath
  , evalPkgs :: Text
  , evalWorkDir :: Maybe FilePath
+ , evalMode :: EvaluationMode
+ , evalUserArgs :: [Text]
  }
 
 evaluate :: EvaluationArgs -> IO Value
 evaluate ea = do
   evalComposition <- getDataFileName "nix/eval-composition.nix"
-  let args =
-        [ evalComposition
-        , "--eval"
+  let commandArgs =
+        [ "--eval"
         , "--strict"
-        , "--read-write-mode"
         , "--json"
-        , "--show-trace"
-        , "--argstr"
+        , "--attr"
+        , "config.build.dockerComposeYamlAttrs"
+        ]
+      argArgs =
+        [ "--argstr"
         , "uid"
         , show $ evalUid ea
         , "--arg"
@@ -47,9 +53,13 @@ evaluate ea = do
         , "--arg"
         , "pkgs"
         , toS $ evalPkgs ea
-        , "--attr"
-        , "config.build.dockerComposeYamlAttrs"
         ]
+      args =
+        [ evalComposition ]
+        ++ commandArgs
+        ++ modeArguments (evalMode ea)
+        ++ argArgs
+        ++ map toS (evalUserArgs ea)
       stdin    = mempty
       procSpec = (proc "nix-instantiate" args) { cwd = evalWorkDir ea }
   
@@ -73,6 +83,9 @@ evaluate ea = do
     Right r -> pure r
     Left  e -> throwIO $ FatalError "Couldn't parse nix-instantiate output"
 
+modeArguments :: EvaluationMode -> [[Char]]
+modeArguments ReadWrite = [ "--read-write-mode" ]
+modeArguments ReadOnly = [ "--readonly-mode" ]
 
 modulesNixExpr :: NonEmpty FilePath -> [Char]
 modulesNixExpr =

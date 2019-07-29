@@ -4,8 +4,8 @@ module Spec
 where
 
 import           Test.Hspec
-import qualified Arion.FooSpec
+import qualified Arion.NixSpec
 
 spec :: Spec
 spec = do
-  describe "Arion.Foo" Arion.FooSpec.spec
+  describe "Arion.Nix" Arion.NixSpec.spec

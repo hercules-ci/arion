@@ -27,6 +27,7 @@ data-dir:            src
 common deps
   build-depends:     base ^>=4.12.0.0
                    , aeson
+                   , aeson-pretty
                    , async
                    , bytestring
                    , process
@@ -41,6 +42,7 @@ flag ghci
 library
   import:              deps
   exposed-modules:     Arion.Nix
+                       Arion.Aeson
   other-modules:       Paths_arion_compose
   -- other-extensions:
   hs-source-dirs:      src/haskell/lib
@@ -52,7 +54,6 @@ executable arion
   -- other-modules:
   -- other-extensions:
   build-depends:       optparse-applicative
-                     , aeson-pretty
                      , arion-compose
   hs-source-dirs:      src/haskell/exe
   default-language:    Haskell2010
@@ -64,7 +65,8 @@ test-suite arion-unit-tests
     ghc-options:       -Wno-missing-home-modules
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
-  -- other-modules:
+  other-modules:       Spec
+                     , Arion.NixSpec
   -- other-extensions:
   build-depends:       arion-compose
                      , hspec

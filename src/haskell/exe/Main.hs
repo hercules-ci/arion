@@ -6,6 +6,7 @@
 import Protolude hiding (Down)
 
 import           Arion.Nix
+import           Arion.Aeson
 
 import Options.Applicative
 import Control.Applicative
@@ -26,6 +27,7 @@ data CommonOptions =
   CommonOptions
     { files :: NonEmpty FilePath
     , pkgs :: Text
+    , nixArgs :: [Text]
     }
   deriving (Show)
 
@@ -54,7 +56,15 @@ parseOptions = do
           <> value "./arion-pkgs.nix"
           <> help "Use Nix expression EXPR to get the Nixpkgs attrset used for bootstrapping \
                    \and evaluating the configuration." )
-    pure CommonOptions{..}
+    showTrace <- flag False True (long "show-trace"
+                    <> help "Causes Nix to print out a stack trace in case of Nix expression evaluation errors.")
+    -- TODO --option support (https://github.com/pcapriotti/optparse-applicative/issues/284)
+    userNixArgs <- many (T.pack <$> strOption (long "nix-arg" <> metavar "ARG" <> help "Pass an extra argument to nix. Example: --nix-arg --option --nix-arg substitute --nix-arg false"))
+    pure $
+      let nixArgs = userNixArgs <|> "--show-trace" <$ guard showTrace
+      in CommonOptions{..}
+
+textArgument = fmap T.pack . strArgument
 
 parseCommand :: Parser (CommonOptions -> IO ())
 parseCommand =
@@ -135,14 +145,16 @@ runEvalAndDC cmd dopts opts = do
   runDC cmd dopts opts
 
 runCat :: CommonOptions -> IO ()
-runCat (CommonOptions files pkgs) = do
+runCat co = do
   v <- Arion.Nix.evaluate EvaluationArgs
     { evalUid = 0 -- TODO
-    , evalModules = files
-    , evalPkgs = pkgs
+    , evalModules = files co
+    , evalPkgs = pkgs co
     , evalWorkDir = Nothing
+    , evalMode = ReadWrite
+    , evalUserArgs = nixArgs co
     }
-  T.hPutStrLn stderr (TL.toStrict $ TB.toLazyText $ Data.Aeson.Encode.Pretty.encodePrettyToTextBuilder v)
+  T.hPutStrLn stderr (pretty v)
 
 runRepl :: CommonOptions -> IO ()
 runRepl opts =
