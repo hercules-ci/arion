@@ -6,7 +6,7 @@ set -eux -o pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 ghcid \
-  --command 'ghci -isrc/haskell/exe -isrc/haskell/lib -isrc/haskell/test src/haskell/test/TestMain.hs' \
+  --command 'cabal v2-repl arion-compose:arion-unit-tests --flags ghci --write-ghc-environment-files=never' \
   --test=Main.main \
   --reload=src/haskell \
   --restart=hercules-ci-api.cabal \

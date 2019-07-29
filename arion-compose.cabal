@@ -34,6 +34,9 @@ common deps
                    , text
                    , protolude
 
+flag ghci
+  default: False
+  manual: True
 
 library
   import:              deps
@@ -56,6 +59,9 @@ executable arion
 
 test-suite arion-unit-tests
   import:              deps
+  if flag(ghci)
+    hs-source-dirs:      src/haskell/lib
+    ghc-options:       -Wno-missing-home-modules
   type:                exitcode-stdio-1.0
   main-is:             TestMain.hs
   -- other-modules:
