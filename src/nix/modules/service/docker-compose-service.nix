@@ -90,6 +90,11 @@ in
       default = null;
       description = dockerComposeRef "command";
     };
+    service.container_name = mkOption {
+      type = nullOr types.str;
+      default = null;
+      description = dockerComposeRef "container_name";
+    };
     service.depends_on = mkOption {
       type = listOf str;
       default = [];
@@ -214,6 +219,8 @@ in
     inherit cap_drop;
   } // lib.optionalAttrs (config.service.command != null) {
     inherit (config.service) command;
+  } // lib.optionalAttrs (config.service.container_name != null) {
+    inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
   } // lib.optionalAttrs (config.service.devices != []) {
