@@ -174,6 +174,11 @@ in
       default = null;
       description = dockerComposeRef "network_mode";
     };
+    service.networks = mkOption {
+      type = nullOr (listOf types.str);
+      default = null;
+      description = dockerComposeRef "networks";
+    };
     service.stop_signal = mkOption {
       type = nullOr str;
       default = null;
@@ -245,6 +250,8 @@ in
     inherit (config.service) privileged;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
+  } // lib.optionalAttrs (config.service.networks != null) {
+    inherit (config.service) networks;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.stop_signal != null) {
