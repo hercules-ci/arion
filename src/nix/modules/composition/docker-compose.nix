@@ -21,7 +21,7 @@ in
       description = "A derivation that produces a docker-compose.yaml file for this composition.";
     };
     build.dockerComposeYamlText = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "The text of build.dockerComposeYaml.";
     };
     docker-compose.raw = lib.mkOption {
