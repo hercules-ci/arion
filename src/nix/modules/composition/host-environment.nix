@@ -15,7 +15,7 @@
     };
 
     host.nixStorePrefix = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       default = "";
       example = "/mnt/foo";
       description = ''
