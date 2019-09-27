@@ -12,7 +12,6 @@ in
   machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
-      pkgs.docker-compose
     ];
     virtualisation.docker.enable = true;
     
