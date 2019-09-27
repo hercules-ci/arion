@@ -9,6 +9,7 @@
             ],
             "environment": {
                 "NIX_REMOTE": "",
+                "PATH": "/usr/bin:/run/current-system/sw/bin/",
                 "container": "docker"
             },
             "image": "arion-base",
@@ -25,8 +26,8 @@
             "tty": true,
             "volumes": [
                 "/sys/fs/cgroup:/sys/fs/cgroup:ro",
-                "/nix/store:/nix/store",
-                "/nix/store/pssdmhzjnhflawv7rwk1yw39350iv40g-container-system-env:/run/system"
+                "/nix/store:/nix/store:ro",
+                "/nix/store/pssdmhzjnhflawv7rwk1yw39350iv40g-container-system-env:/run/system:ro"
             ]
         }
     },
