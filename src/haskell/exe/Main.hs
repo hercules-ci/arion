@@ -146,7 +146,7 @@ runEvalAndDC cmd dopts opts = do
 
 runCat :: CommonOptions -> IO ()
 runCat co = do
-  v <- Arion.Nix.evaluate EvaluationArgs
+  v <- Arion.Nix.evaluateComposition EvaluationArgs
     { evalUid = 0 -- TODO
     , evalModules = files co
     , evalPkgs = pkgs co

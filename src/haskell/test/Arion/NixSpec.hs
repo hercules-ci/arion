@@ -18,8 +18,8 @@ import qualified Data.Aeson.Encode.Pretty
 import Data.Char (isSpace)
 
 spec :: Spec
-spec = describe "evaluate" $ it "matches an example" $ do
-  x <- Arion.Nix.evaluate EvaluationArgs
+spec = describe "evaluateComposition" $ it "matches an example" $ do
+  x <- Arion.Nix.evaluateComposition EvaluationArgs
     { evalUid      = 123
     , evalModules  = NEL.fromList
                        ["src/haskell/testdata/Arion/NixSpec/arion-compose.nix"]

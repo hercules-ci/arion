@@ -33,8 +33,8 @@ data EvaluationArgs = EvaluationArgs
  , evalUserArgs :: [Text]
  }
 
-evaluate :: EvaluationArgs -> IO Value
-evaluate ea = do
+evaluateComposition :: EvaluationArgs -> IO Value
+evaluateComposition ea = do
   evalComposition <- getDataFileName "nix/eval-composition.nix"
   let commandArgs =
         [ "--eval"
