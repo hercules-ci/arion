@@ -40,7 +40,6 @@ run args = do
 
   withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
-    -- Wait for process exit and 'err' printout
     exitCode <- waitForProcess procHandle
 
     case exitCode of

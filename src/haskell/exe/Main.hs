@@ -70,9 +70,9 @@ textArgument = fmap T.pack . strArgument
 parseCommand :: Parser (CommonOptions -> IO ())
 parseCommand =
   hsubparser
-    (    command "cat" (info (pure runCat) (progDesc "TODO: cat doc" <> fullDesc))
-      <> command "repl" (info (pure runRepl) (progDesc "TODO: repl doc" <> fullDesc))
-      <> command "exec" (info (pure runExec) (progDesc "TODO: exec doc" <> fullDesc))
+    (    command "cat" (info (pure runCat) (progDesc "Spit out the docker compose file as JSON" <> fullDesc))
+      <> command "repl" (info (pure runRepl) (progDesc "Start a nix repl for the whole composition" <> fullDesc))
+      -- <> command "exec" (info (pure runExec) (progDesc "TODO: exec doc" <> fullDesc))
     )
   <|>
   hsubparser
@@ -172,8 +172,18 @@ runCat co = do
   T.hPutStrLn stdout (pretty v)
 
 runRepl :: CommonOptions -> IO ()
-runRepl opts =
-  T.putStrLn "Running repl ... TODO"
+runRepl co = do
+  putErrText
+    "Launching a repl for you. To get started:\n\
+    \\n\
+    \To see deployment-wide configuration\n\
+    \  type config. and hit TAB\n\
+    \To see the services\n\
+    \  type config.docker-compose.evaluatedServices TAB or ENTER\n\
+    \To bring the top-level Nixpkgs attributes into scope\n\
+    \  type :a (config._module.args.pkgs) // { inherit config; }\n\
+    \"
+  Arion.Nix.replForComposition =<< defaultEvaluationArgs co
 
 runExec :: CommonOptions -> IO ()
 runExec opts =

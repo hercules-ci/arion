@@ -2,7 +2,9 @@
 module Arion.Nix
   ( evaluateComposition
   , withEvaluatedComposition
+  , buildComposition
   , withBuiltComposition
+  , replForComposition
   , EvaluationArgs(..)
   , EvaluationMode(..)
   ) where
@@ -136,6 +138,27 @@ withBuiltComposition ea f = do
     Directory.removeFile path
     buildComposition path ea
     f path
+
+
+replForComposition :: EvaluationArgs -> IO ()
+replForComposition ea = do
+    evalComposition <- getEvalCompositionFile
+    let args =
+          [ "repl", evalComposition ]
+          ++ argArgs ea
+          ++ map toS (evalUserArgs ea)
+        procSpec = (proc "nix" args) { cwd = evalWorkDir ea }
+    
+    withCreateProcess procSpec $ \_in _out _err procHandle -> do
+
+      exitCode <- waitForProcess procHandle
+
+      case exitCode of
+        ExitSuccess -> pass
+        ExitFailure 1 -> exitFailure
+        e@ExitFailure {} -> do
+          throwIO $ FatalError $ "nix repl failed with " <> show exitCode
+          exitWith e
 
 argArgs :: EvaluationArgs -> [[Char]]
 argArgs ea =
