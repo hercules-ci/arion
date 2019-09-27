@@ -7,6 +7,7 @@ import Protolude hiding (Down)
 
 import           Arion.Nix
 import           Arion.Aeson
+import qualified Arion.DockerCompose as DockerCompose
 
 import Options.Applicative
 import Control.Applicative
@@ -131,29 +132,43 @@ commandDC run cmdStr help =
 --------------------------------------------------------------------------------
 
 runDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
-runDC cmd (DockerComposeArgs args) opts =
-  panic $ "TODO: docker-compose " <> cmd <> " " <> T.unwords args
+runDC cmd (DockerComposeArgs args) opts = do
+  DockerCompose.run DockerCompose.Args
+    { files = []
+    , otherArgs = [cmd] ++ args
+    }
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
-  T.putStrLn "TODO: build"
-  runDC cmd dopts opts
+  ea <- defaultEvaluationArgs opts
+  Arion.Nix.withBuiltComposition ea $ \path ->
+    DockerCompose.run DockerCompose.Args
+      { files = [path]
+      , otherArgs = [cmd] ++ unDockerComposeArgs dopts
+      }
 
 runEvalAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runEvalAndDC cmd dopts opts = do
-  T.putStrLn "TODO: eval"
-  runDC cmd dopts opts
+  ea <- defaultEvaluationArgs opts
+  Arion.Nix.withEvaluatedComposition ea $ \path ->
+    DockerCompose.run DockerCompose.Args
+      { files = [path]
+      , otherArgs = [cmd] ++ unDockerComposeArgs dopts
+      }
+
+defaultEvaluationArgs :: CommonOptions -> IO EvaluationArgs
+defaultEvaluationArgs co = pure EvaluationArgs
+  { evalUid = 0 -- TODO
+  , evalModules = files co
+  , evalPkgs = pkgs co
+  , evalWorkDir = Nothing
+  , evalMode = ReadWrite
+  , evalUserArgs = nixArgs co
+  }
 
 runCat :: CommonOptions -> IO ()
 runCat co = do
-  v <- Arion.Nix.evaluateComposition EvaluationArgs
-    { evalUid = 0 -- TODO
-    , evalModules = files co
-    , evalPkgs = pkgs co
-    , evalWorkDir = Nothing
-    , evalMode = ReadWrite
-    , evalUserArgs = nixArgs co
-    }
+  v <- Arion.Nix.evaluateComposition =<< defaultEvaluationArgs co
   T.hPutStrLn stdout (pretty v)
 
 runRepl :: CommonOptions -> IO ()

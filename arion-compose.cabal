@@ -30,8 +30,10 @@ common deps
                    , aeson-pretty
                    , async
                    , bytestring
+                   , directory
                    , process
                    , process-extras
+                   , temporary
                    , text
                    , protolude
 
@@ -43,6 +45,7 @@ library
   import:              deps
   exposed-modules:     Arion.Nix
                        Arion.Aeson
+                       Arion.DockerCompose
   other-modules:       Paths_arion_compose
   -- other-extensions:
   hs-source-dirs:      src/haskell/lib

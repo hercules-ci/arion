@@ -1,10 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Arion.Nix where
+module Arion.Nix
+  ( evaluateComposition
+  , withEvaluatedComposition
+  , withBuiltComposition
+  , EvaluationArgs(..)
+  , EvaluationMode(..)
+  ) where
 
 import           Prelude                        ( )
 import           Protolude
+import           Arion.Aeson                    ( pretty )
 import           Data.Aeson
 import qualified Data.String
+import qualified System.Directory              as Directory
 import           System.Process
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Lazy          as BL
@@ -20,6 +28,8 @@ import qualified Data.List.NonEmpty            as NE
 import           Data.List.NonEmpty             ( NonEmpty(..) )
 
 import           Control.Arrow                  ( (>>>) )
+import           System.IO.Temp                 ( withTempFile )
+import           System.IO                      ( hClose )
 
 data EvaluationMode =
   ReadWrite | ReadOnly
@@ -35,7 +45,7 @@ data EvaluationArgs = EvaluationArgs
 
 evaluateComposition :: EvaluationArgs -> IO Value
 evaluateComposition ea = do
-  evalComposition <- getDataFileName "nix/eval-composition.nix"
+  evalComposition <- getEvalCompositionFile
   let commandArgs =
         [ "--eval"
         , "--strict"
@@ -43,22 +53,11 @@ evaluateComposition ea = do
         , "--attr"
         , "config.build.dockerComposeYamlAttrs"
         ]
-      argArgs =
-        [ "--argstr"
-        , "uid"
-        , show $ evalUid ea
-        , "--arg"
-        , "modules"
-        , modulesNixExpr $ evalModules ea
-        , "--arg"
-        , "pkgs"
-        , toS $ evalPkgs ea
-        ]
       args =
         [ evalComposition ]
         ++ commandArgs
         ++ modeArguments (evalMode ea)
-        ++ argArgs
+        ++ argArgs ea
         ++ map toS (evalUserArgs ea)
       stdin    = mempty
       procSpec = (proc "nix-instantiate" args) { cwd = evalWorkDir ea }
@@ -82,6 +81,77 @@ evaluateComposition ea = do
   case v of
     Right r -> pure r
     Left  e -> throwIO $ FatalError "Couldn't parse nix-instantiate output"
+
+-- | Run with docker-compose.yaml tmpfile
+withEvaluatedComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
+withEvaluatedComposition ea f = do
+  v <- evaluateComposition ea
+  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path handle -> do
+    T.hPutStrLn handle (pretty v)
+    hClose handle
+    f path
+
+
+buildComposition :: FilePath -> EvaluationArgs -> IO ()
+buildComposition outLink ea = do
+  evalComposition <- getEvalCompositionFile
+  let commandArgs =
+        [ "--attr"
+        , "config.build.dockerComposeYaml"
+        , "--out-link"
+        , outLink
+        ]
+      args =
+        [ evalComposition ]
+        ++ commandArgs
+        ++ argArgs ea
+        ++ map toS (evalUserArgs ea)
+      stdin    = mempty
+      procSpec = (proc "nix-build" args) { cwd = evalWorkDir ea }
+  
+  -- TODO: lazy IO is tricky. Let's use conduit/pipes instead?
+  (exitCode, out, err) <- PBL.readCreateProcessWithExitCode procSpec stdin
+    
+  -- Stream 'err'
+  errDone <- async (BL.hPutStr stderr err)
+
+  -- Force 'out'
+  -- TODO: use it?
+  _v <- Protolude.evaluate out
+
+  -- Wait for process exit and 'err' printout
+  wait errDone
+
+  case exitCode of
+    ExitSuccess -> pass
+    ExitFailure e -> throwIO $ FatalError "Build failed" -- TODO: don't print this exception in main
+
+-- | Do something with a docker-compose.yaml.
+withBuiltComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
+withBuiltComposition ea f = do
+  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path handle -> do
+    hClose handle
+    -- Known problem: kills atomicity of withTempFile; won't fix because we should manage gc roots,
+    -- impl of which will probably avoid this "problem". It seems unlikely to cause issues.
+    Directory.removeFile path
+    buildComposition path ea
+    f path
+
+argArgs :: EvaluationArgs -> [[Char]]
+argArgs ea =
+      [ "--argstr"
+      , "uid"
+      , show $ evalUid ea
+      , "--arg"
+      , "modules"
+      , modulesNixExpr $ evalModules ea
+      , "--arg"
+      , "pkgs"
+      , toS $ evalPkgs ea
+      ]
+
+getEvalCompositionFile :: IO FilePath
+getEvalCompositionFile = getDataFileName "nix/eval-composition.nix"
 
 modeArguments :: EvaluationMode -> [[Char]]
 modeArguments ReadWrite = [ "--read-write-mode" ]

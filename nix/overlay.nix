@@ -28,6 +28,7 @@ in
       buildInputs = [
         haskellPkgs.cabal-install
         haskellPkgs.ghcid
+        super.docker-compose
       ];
     };
   };
