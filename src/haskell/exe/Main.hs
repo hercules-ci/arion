@@ -154,7 +154,7 @@ runCat co = do
     , evalMode = ReadWrite
     , evalUserArgs = nixArgs co
     }
-  T.hPutStrLn stderr (pretty v)
+  T.hPutStrLn stdout (pretty v)
 
 runRepl :: CommonOptions -> IO ()
 runRepl opts =
