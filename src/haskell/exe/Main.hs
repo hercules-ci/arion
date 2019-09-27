@@ -22,8 +22,9 @@ import qualified Data.Text.Lazy.Builder as TB
 import qualified Data.List.NonEmpty as NE
 import Data.List.NonEmpty (NonEmpty(..))
 
-
 import Control.Arrow ((>>>))
+
+import System.Posix.User (getRealUserID)
 
 data CommonOptions =
   CommonOptions
@@ -159,14 +160,16 @@ runEvalAndDC cmd dopts opts = do
       }
 
 defaultEvaluationArgs :: CommonOptions -> IO EvaluationArgs
-defaultEvaluationArgs co = pure EvaluationArgs
-  { evalUid = 0 -- TODO
-  , evalModules = files co
-  , evalPkgs = pkgs co
-  , evalWorkDir = Nothing
-  , evalMode = ReadWrite
-  , evalUserArgs = nixArgs co
-  }
+defaultEvaluationArgs co = do
+  uid <- getRealUserID
+  pure EvaluationArgs
+    { evalUid = fromIntegral uid
+    , evalModules = files co
+    , evalPkgs = pkgs co
+    , evalWorkDir = Nothing
+    , evalMode = ReadWrite
+    , evalUserArgs = nixArgs co
+    }
 
 runCat :: CommonOptions -> IO ()
 runCat co = do

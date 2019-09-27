@@ -38,6 +38,7 @@ common deps
                    , temporary
                    , text
                    , protolude
+                   , unix
 
 flag ghci
   default: False
