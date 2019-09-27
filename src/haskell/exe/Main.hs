@@ -7,6 +7,7 @@ import Protolude hiding (Down)
 
 import           Arion.Nix
 import           Arion.Aeson
+import           Arion.Images (loadImages)
 import qualified Arion.DockerCompose as DockerCompose
 
 import Options.Applicative
@@ -141,7 +142,8 @@ runDC cmd (DockerComposeArgs args) opts = do
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
   ea <- defaultEvaluationArgs opts
-  Arion.Nix.withBuiltComposition ea $ \path ->
+  Arion.Nix.withBuiltComposition ea $ \path -> do
+    loadImages path
     DockerCompose.run DockerCompose.Args
       { files = [path]
       , otherArgs = [cmd] ++ unDockerComposeArgs dopts

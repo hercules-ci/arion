@@ -1,9 +1,6 @@
 {
     "services": {
         "webserver": {
-            "build": {
-                "context": "/nix/store/l6jwin74n93d66ralxzb001c22yjii9x-arion-image"
-            },
             "command": [
                 "/nix/store/b9w61w4g8sqgrm3rid6ca22krslqghb3-nixos-system-unnamed-19.03.173100.e726e8291b2/init"
             ],
@@ -12,7 +9,7 @@
                 "PATH": "/usr/bin:/run/current-system/sw/bin/",
                 "container": "docker"
             },
-            "image": "arion-base",
+            "image": "webserver:<HASH>",
             "ports": [
                 "8000:80"
             ],
@@ -33,7 +30,13 @@
     },
     "version": "3.4",
     "x-arion": {
-        "images": [],
+        "images": [
+            {
+                "image": "<STOREPATH>",
+                "imageName": "webserver",
+                "imageTag": "<HASH>"
+            }
+        ],
         "serviceInfo": {
             "webserver": {
                 "defaultExec": [

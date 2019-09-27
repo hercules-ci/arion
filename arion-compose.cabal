@@ -31,6 +31,8 @@ common deps
                    , async
                    , bytestring
                    , directory
+                   , lens
+                   , lens-aeson
                    , process
                    , process-extras
                    , temporary
@@ -46,6 +48,7 @@ library
   exposed-modules:     Arion.Nix
                        Arion.Aeson
                        Arion.DockerCompose
+                       Arion.Images
   other-modules:       Paths_arion_compose
   -- other-extensions:
   hs-source-dirs:      src/haskell/lib

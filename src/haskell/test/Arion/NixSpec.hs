@@ -32,11 +32,26 @@ spec = describe "evaluateComposition" $ it "matches an example" $ do
   expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
   censorPaths actual `shouldBe` censorPaths expected
 
-censorPaths :: Text -> Text
-censorPaths x = case T.breakOn "/nix/store/" x of
+censorPaths = censorImages . censorStorePaths
+--censorPaths = censorStorePaths
+
+censorStorePaths :: Text -> Text
+censorStorePaths x = case T.breakOn "/nix/store/" x of
   (prefix, tl) | (tl :: Text) == "" -> prefix
   (prefix, tl) -> prefix <> "<STOREPATH>" <> censorPaths
     (T.dropWhile isNixNameChar $ T.drop (T.length "/nix/store/") tl)
+
+-- Probably slow, due to not O(1) <>
+censorImages :: Text -> Text
+censorImages x = case T.break (\c -> c == ':' || c == '"') x of
+  (prefix, tl) | tl == "" -> prefix
+  (prefix, tl) | let imageId = T.take 33 (T.drop 1 tl)
+               , T.last imageId == '\"'
+                 -- Approximation of nix hash validation
+               , T.all (\c -> (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z')) (T.take 32 imageId)
+               -> prefix <> T.take 1 tl <> "<HASH>" <> censorImages (T.drop 33 tl)
+  (prefix, tl) -> prefix <> T.take 1 tl <> censorImages (T.drop 1 tl)
+
 
 -- | WARNING: THIS IS LIKELY WRONG: DON'T REUSE
 isNixNameChar :: Char -> Bool
