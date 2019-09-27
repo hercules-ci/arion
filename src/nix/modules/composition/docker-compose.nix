@@ -22,7 +22,7 @@ in
       readOnly = true;
     };
     build.dockerComposeYamlText = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "The text of build.dockerComposeYaml.";
       readOnly = true;
     };

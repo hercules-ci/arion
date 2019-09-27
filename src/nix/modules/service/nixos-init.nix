@@ -26,6 +26,7 @@ in
     ];
     image.command = [ "${config.nixos.build.toplevel}/init" ];
     service.environment.container = "docker";
+    service.environment.PATH = "/usr/bin:/run/current-system/sw/bin/";
     service.volumes = [
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ];

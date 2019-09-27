@@ -90,6 +90,11 @@ in
       default = null;
       description = dockerComposeRef "command";
     };
+    service.container_name = mkOption {
+      type = nullOr types.str;
+      default = null;
+      description = dockerComposeRef "container_name";
+    };
     service.depends_on = mkOption {
       type = listOf str;
       default = [];
@@ -169,6 +174,11 @@ in
       default = null;
       description = dockerComposeRef "network_mode";
     };
+    service.networks = mkOption {
+      type = nullOr (listOf types.str);
+      default = null;
+      description = dockerComposeRef "networks";
+    };
     service.stop_signal = mkOption {
       type = nullOr str;
       default = null;
@@ -214,6 +224,8 @@ in
     inherit cap_drop;
   } // lib.optionalAttrs (config.service.command != null) {
     inherit (config.service) command;
+  } // lib.optionalAttrs (config.service.container_name != null) {
+    inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
   } // lib.optionalAttrs (config.service.devices != []) {
@@ -238,6 +250,8 @@ in
     inherit (config.service) privileged;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
+  } // lib.optionalAttrs (config.service.networks != null) {
+    inherit (config.service) networks;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.stop_signal != null) {
