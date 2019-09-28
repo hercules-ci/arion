@@ -50,6 +50,7 @@ library
                        Arion.Aeson
                        Arion.DockerCompose
                        Arion.Images
+                       Arion.Services
   other-modules:       Paths_arion_compose
   -- other-extensions:
   hs-source-dirs:      src/haskell/lib

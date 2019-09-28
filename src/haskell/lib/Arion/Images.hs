@@ -27,6 +27,7 @@ data Image = Image
 
 type TaggedImage = Text
 
+-- | Subject to change
 loadImages :: FilePath -> IO ()
 loadImages fp = do
 

@@ -3,15 +3,17 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Protolude hiding (Down)
+import Protolude hiding (Down, option)
 
 import           Arion.Nix
 import           Arion.Aeson
 import           Arion.Images (loadImages)
 import qualified Arion.DockerCompose as DockerCompose
+import           Arion.Services (getDefaultExec)
 
 import Options.Applicative
 import Control.Applicative
+import Control.Monad.Fail
 
 import qualified Data.Aeson.Encode.Pretty
 import qualified Data.Text as T
@@ -74,7 +76,7 @@ parseCommand =
   hsubparser
     (    command "cat" (info (pure runCat) (progDesc "Spit out the docker compose file as JSON" <> fullDesc))
       <> command "repl" (info (pure runRepl) (progDesc "Start a nix repl for the whole composition" <> fullDesc))
-      -- <> command "exec" (info (pure runExec) (progDesc "TODO: exec doc" <> fullDesc))
+      <> command "exec" (info (parseExecCommand) (progDesc "Execute a command in a running container" <> fullDesc))
     )
   <|>
   hsubparser
@@ -84,7 +86,6 @@ parseCommand =
       <> commandDC runBuildAndDC "create" "Create services"
       <> commandDC runEvalAndDC "down" "Stop and remove containers, networks, images, and volumes"
       <> commandDC runEvalAndDC "events" "Receive real time events from containers"
-      <> commandDC runEvalAndDC "exec" "Execute a command in a running container"
       <> commandDC runDC "help" "Get help on a command"
       <> commandDC runEvalAndDC "images" "List images"
       <> commandDC runEvalAndDC "kill" "Kill containers"
@@ -190,9 +191,79 @@ runRepl co = do
     \"
   Arion.Nix.replForComposition =<< defaultEvaluationArgs co
 
-runExec :: CommonOptions -> IO ()
-runExec opts =
-  T.putStrLn "Running exec ... TODO"
+detachFlag :: Parser Bool
+detachFlag = flag False True (long "detach" <> short 'd' <> help "Detached mode: Run command in the background.")
+
+privilegedFlag :: Parser Bool
+privilegedFlag = flag False True (long "privileged" <> help "Give extended privileges to the process.")
+
+userOption :: Parser Text
+userOption = strOption (long "user" <> short 'u' <> help "Run the command as this user.")
+
+noTTYFlag :: Parser Bool
+noTTYFlag = flag False True (short 'T' <> help "Disable pseudo-tty allocation. By default `exec` allocates a TTY.")
+
+indexOption :: Parser Int
+indexOption = option
+  (auto >>= \i -> i <$ unless (i >= 1) (fail "container index must be >= 1"))
+  (long "index" <> value 1 <> help "Index of the container if there are multiple instances of a service.")
+
+envOption :: Parser (Text, Text)
+envOption = option (auto >>= spl) (long "env" <> short 'e' <> help "Set environment variables (can be used multiple times, not supported in Docker API < 1.25)")
+  where spl s = case T.break (== '=') s of
+          (_, "") -> fail "--env parameter needs to combine key and value with = sign"
+          (k, ev) -> pure (k, T.drop 1 ev)
+
+workdirOption :: Parser Text
+workdirOption = strOption (long "workdir" <> short 'w' <> metavar "DIR" <> help "Working directory in which to start the command in the container.")
+
+parseExecCommand :: Parser (CommonOptions -> IO ())
+parseExecCommand = runExec
+  <$> detachFlag
+  <*> privilegedFlag
+  <*> optional userOption
+  <*> noTTYFlag
+  <*> indexOption
+  <*> many envOption
+  <*> optional workdirOption
+  <*> textArgument (metavar "SERVICE")
+  <*> orEmpty' (
+      (:) <$> argument (T.pack <$> str) (metavar "COMMAND")
+          <*> many (argument (T.pack <$> str) (metavar "ARG"))
+  )
+
+orEmpty' :: (Alternative f, Monoid a) => f a -> f a
+orEmpty' m = fromMaybe mempty <$> optional m
+
+runExec :: Bool -> Bool -> Maybe Text -> Bool -> Int -> [(Text, Text)] -> Maybe Text -> Text -> [Text] -> CommonOptions -> IO ()
+runExec detach privileged user noTTY index envs workDir service commandAndArgs opts = do
+  putErrText $ "Service: " <> service
+
+  ea <- defaultEvaluationArgs opts
+  Arion.Nix.withEvaluatedComposition ea $ \path -> do
+    commandAndArgs'' <- case commandAndArgs of
+      [] -> getDefaultExec path service
+      x -> pure x
+    let commandAndArgs' = case commandAndArgs'' of
+          [] -> ["/bin/sh"]
+          x -> x
+  
+    let args = concat
+          [ ["exec"]
+          , ("--detach" <$ guard detach :: [Text])
+          , "--privileged" <$ guard privileged
+          , "-T" <$ guard noTTY
+          , (\(k, v) -> ["--env", k <> "=" <> v]) =<< envs
+          , join $ toList (user <&> \u -> ["--user", u])
+          , ["--index", show index]
+          , join $ toList (workDir <&> \w -> ["--workdir", w])
+          , [service]
+          , commandAndArgs'
+          ]
+    DockerCompose.run DockerCompose.Args
+      { files = [path]
+      , otherArgs = args
+      }
 
 main :: IO ()
 main = 

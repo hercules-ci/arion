@@ -118,7 +118,6 @@ buildComposition outLink ea = do
   errDone <- async (BL.hPutStr stderr err)
 
   -- Force 'out'
-  -- TODO: use it?
   _v <- Protolude.evaluate out
 
   -- Wait for process exit and 'err' printout
