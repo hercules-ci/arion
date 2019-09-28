@@ -9,6 +9,5 @@ ghcid \
   --command 'cabal v2-repl arion-compose:arion-unit-tests --flags ghci --write-ghc-environment-files=never' \
   --test=Main.main \
   --reload=src/haskell \
-  --restart=hercules-ci-api.cabal \
-  --restart=../stack.yaml \
+  --restart=arion-compose.cabal \
   ;
