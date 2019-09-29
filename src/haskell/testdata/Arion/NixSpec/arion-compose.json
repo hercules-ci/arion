@@ -9,7 +9,7 @@
                 "PATH": "/usr/bin:/run/current-system/sw/bin/",
                 "container": "docker"
             },
-            "image": "webserver:<HASH>",
+            "image": "arion-base:<HASH>",
             "ports": [
                 "8000:80"
             ],
@@ -33,7 +33,7 @@
         "images": [
             {
                 "image": "<STOREPATH>",
-                "imageName": "webserver",
+                "imageName": "arion-base",
                 "imageTag": "<HASH>"
             }
         ],
