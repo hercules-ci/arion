@@ -69,7 +69,7 @@ let
             declarations = map (d: "src/nix" + (lib.strings.removePrefix (toString ${src}) (toString d))) opt.declarations;
           };
           inherit (pkgs) lib;
-          composition = pkgs.callPackage ${src}/eval-service.nix {} { modules = []; host = {}; name = abort "The manual's service options section must not depend on the service name."; };
+          composition = pkgs.callPackage ${src}/eval-service.nix {} { modules = []; host = {}; name = abort "The manual's service options section must not depend on the service name."; composition = abort "The manual's service options must not depend on the composition."; };
       in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList composition.options))
     '';
   };

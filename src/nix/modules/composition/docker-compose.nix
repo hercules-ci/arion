@@ -11,7 +11,11 @@
  */
 { pkgs, lib, config, ... }:
 let
-  evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} { inherit name modules; inherit (config) host; };
+  evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} {
+    inherit name modules;
+    inherit (config) host;
+    composition = config;
+  };
 
 in
 {
