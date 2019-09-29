@@ -33,7 +33,6 @@ common deps
                    , lens
                    , lens-aeson
                    , process
-                   , process-extras
                    , temporary
                    , text
                    , protolude

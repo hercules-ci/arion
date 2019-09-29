@@ -9,8 +9,6 @@ import qualified Data.String
 import           System.Process
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Lazy          as BL
-import qualified System.Process.ByteString.Lazy
-                                                as PBL
 import           Paths_arion_compose
 import           Control.Applicative
 

@@ -18,8 +18,6 @@ import qualified System.Directory              as Directory
 import           System.Process
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Lazy          as BL
-import qualified System.Process.ByteString.Lazy
-                                               as PBL
 import           Paths_arion_compose
 import           Control.Applicative
 
@@ -61,28 +59,30 @@ evaluateComposition ea = do
         ++ modeArguments (evalMode ea)
         ++ argArgs ea
         ++ map toS (evalUserArgs ea)
-      stdin    = mempty
-      procSpec = (proc "nix-instantiate" args) { cwd = evalWorkDir ea }
+      procSpec = (proc "nix-instantiate" args)
+        { cwd = evalWorkDir ea
+        , std_out = CreatePipe
+        }
   
-  -- TODO: lazy IO is tricky. Let's use conduit/pipes instead?
-  (exitCode, out, err) <- PBL.readCreateProcessWithExitCode procSpec stdin
+  withCreateProcess procSpec $ \_in outHM _err procHandle -> do
+    let outHandle = fromMaybe (panic "stdout missing") outHM
 
-  -- Stream 'err'
-  errDone <- async (BL.hPutStr stderr err)
+    out <- BL.hGetContents outHandle
 
-  -- Force 'out'
-  v <- Protolude.evaluate (eitherDecode out)
+    v <- Protolude.evaluate (eitherDecode out)
 
-  -- Wait for process exit and 'err' printout
-  wait errDone
+    exitCode <- waitForProcess procHandle
 
-  case exitCode of
-    ExitSuccess -> pass
-    ExitFailure e -> throwIO $ FatalError "Evaluation failed" -- TODO: don't print this exception in main
+    case exitCode of
+      ExitSuccess -> pass
+      ExitFailure 1 -> exitFailure
+      e@ExitFailure {} -> do
+        throwIO $ FatalError $ "evaluation failed with " <> show exitCode
+        exitWith e
 
-  case v of
-    Right r -> pure r
-    Left  e -> throwIO $ FatalError "Couldn't parse nix-instantiate output"
+    case v of
+      Right r -> pure r
+      Left  e -> throwIO $ FatalError "Couldn't parse nix-instantiate output"
 
 -- | Run with docker-compose.yaml tmpfile
 withEvaluatedComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
@@ -108,24 +108,18 @@ buildComposition outLink ea = do
         ++ commandArgs
         ++ argArgs ea
         ++ map toS (evalUserArgs ea)
-      stdin    = mempty
       procSpec = (proc "nix-build" args) { cwd = evalWorkDir ea }
   
-  -- TODO: lazy IO is tricky. Let's use conduit/pipes instead?
-  (exitCode, out, err) <- PBL.readCreateProcessWithExitCode procSpec stdin
-    
-  -- Stream 'err'
-  errDone <- async (BL.hPutStr stderr err)
+  withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
-  -- Force 'out'
-  _v <- Protolude.evaluate out
+    exitCode <- waitForProcess procHandle
 
-  -- Wait for process exit and 'err' printout
-  wait errDone
-
-  case exitCode of
-    ExitSuccess -> pass
-    ExitFailure e -> throwIO $ FatalError "Build failed" -- TODO: don't print this exception in main
+    case exitCode of
+      ExitSuccess -> pass
+      ExitFailure 1 -> exitFailure
+      e@ExitFailure {} -> do
+        throwIO $ FatalError $ "nix-build failed with " <> show exitCode
+        exitWith e
 
 -- | Do something with a docker-compose.yaml.
 withBuiltComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
