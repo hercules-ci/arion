@@ -1,0 +1,6 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash
+
+# A Haskell REPL for hacking on the Haskell code
+
+cabal new-repl --write-ghc-environment-files=never

@@ -1,0 +1,42 @@
+{
+  "services": {
+    "webserver": {
+      "environment": {
+        "container": "docker"
+      },
+      "image": "webserver:xr4ljmz3qfcwlq9rl4mr4qdrzw93rl70",
+      "ports": [
+        "8000:80"
+      ],
+      "stop_signal": "SIGRTMIN+3",
+      "sysctls": {},
+      "tmpfs": [
+        "/run",
+        "/run/wrappers",
+        "/tmp:exec,mode=777"
+      ],
+      "tty": true,
+      "volumes": [
+        "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+      ]
+    }
+  },
+  "version": "3.4",
+  "x-arion": {
+    "images": [
+      {
+        "image": "/nix/store/xr4ljmz3qfcwlq9rl4mr4qdrzw93rl70-docker-image-webserver.tar.gz",
+        "imageName": "webserver",
+        "imageTag": "xr4ljmz3qfcwlq9rl4mr4qdrzw93rl70"
+      }
+    ],
+    "serviceInfo": {
+      "webserver": {
+        "defaultExec": [
+          "/run/current-system/sw/bin/bash",
+          "-l"
+        ]
+      }
+    }
+  }
+}

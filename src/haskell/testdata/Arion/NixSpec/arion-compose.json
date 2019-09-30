@@ -1,0 +1,49 @@
+{
+    "services": {
+        "webserver": {
+            "command": [
+                "/nix/store/b9w61w4g8sqgrm3rid6ca22krslqghb3-nixos-system-unnamed-19.03.173100.e726e8291b2/init"
+            ],
+            "environment": {
+                "NIX_REMOTE": "",
+                "PATH": "/usr/bin:/run/current-system/sw/bin/",
+                "container": "docker"
+            },
+            "image": "arion-base:<HASH>",
+            "ports": [
+                "8000:80"
+            ],
+            "stop_signal": "SIGRTMIN+3",
+            "sysctls": {},
+            "tmpfs": [
+                "/run",
+                "/run/wrappers",
+                "/tmp:exec,mode=777"
+            ],
+            "tty": true,
+            "volumes": [
+                "/sys/fs/cgroup:/sys/fs/cgroup:ro",
+                "/nix/store:/nix/store:ro",
+                "/nix/store/pssdmhzjnhflawv7rwk1yw39350iv40g-container-system-env:/run/system:ro"
+            ]
+        }
+    },
+    "version": "3.4",
+    "x-arion": {
+        "images": [
+            {
+                "image": "<STOREPATH>",
+                "imageName": "arion-base",
+                "imageTag": "<HASH>"
+            }
+        ],
+        "serviceInfo": {
+            "webserver": {
+                "defaultExec": [
+                    "/run/current-system/sw/bin/bash",
+                    "-l"
+                ]
+            }
+        }
+    }
+}

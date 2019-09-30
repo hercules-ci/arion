@@ -1,0 +1,13 @@
+#!/usr/bin/env nix-shell
+#!nix-shell ./shell.nix
+#!nix-shell -i bash
+set -eux -o pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+ghcid \
+  --command 'cabal v2-repl arion-compose:arion-unit-tests --flags ghci --write-ghc-environment-files=never' \
+  --test=Main.main \
+  --reload=src/haskell \
+  --restart=arion-compose.cabal \
+  ;

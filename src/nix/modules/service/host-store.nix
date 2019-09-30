@@ -30,8 +30,7 @@ in
   };
   config = mkIf config.service.useHostStore {
     image.nixBuild = false; # no need to build and load
-    service.image = "arion-base";
-    service.build.context = "${../../../arion-image}";
+    service.image = config.composition.arionBaseImage;
     service.environment.NIX_REMOTE = lib.optionalString config.service.useHostNixDaemon "daemon";
     service.volumes = [
       "${config.host.nixStorePrefix}/nix/store:/nix/store${lib.optionalString config.service.hostStoreAsReadOnly ":ro"}"

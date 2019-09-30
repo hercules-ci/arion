@@ -1,6 +1,6 @@
-args@{ pkgs ? import ./nix args, ... }:
-
+{ pkgs ? import ./nix {}
+, haskellPackages ? pkgs.haskellPackages
+}:
 {
-  inherit (pkgs) arion tests;
-  doc = pkgs.recurseIntoAttrs (import ./doc { inherit pkgs; });
+  arion = import ./nix/arion.nix { inherit pkgs haskellPackages; };
 }
