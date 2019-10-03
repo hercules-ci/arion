@@ -17,7 +17,7 @@ docbookxsl = http://docbook.sourceforge.net/release/xsl/current
 
 all: manual.html
 
-manual.html: manual.xml options-composition.xml options-service.xml
+manual.html: manual.xml options-composition.xml
 	$(xsltproc) --xinclude --stringparam profile.condition manual \
 	  $(docbookxsl)/profiling/profile.xsl manual.xml | \
 	  $(xsltproc) --output manual.html $(docbookxsl)/xhtml/docbook.xsl -
@@ -27,8 +27,8 @@ manual.html: manual.xml options-composition.xml options-service.xml
 	asciidoctor --backend docbook45 --doctype article $<
 	sed -e 's/<!DOCTYPE.*//' -e 's/<?asciidoc-[a-z]*?>//' -i $@
 
-options-composition.xml options-service.xml:
-	echo "options-composition.xml and options-service.xml should be written by the derivation. Are you running in 'nix-shell -A manual'?"; exit 1; fi
+options-composition.xml:
+	echo "options-composition.xml should be written by the derivation. Are you running in 'nix-shell -A manual'?"; exit 1; fi
 
 install: all
 	mkdir -p $(docdir)

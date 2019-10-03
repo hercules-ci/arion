@@ -7,14 +7,14 @@
 let
   serviceInfo =
     lib.mapAttrs getInfo (
-      lib.filterAttrs filterFunction config.docker-compose.evaluatedServices
+      lib.filterAttrs filterFunction config.docker-compose.services
     );
 
   filterFunction = _serviceName: service:
     # shallow equality suffices for emptiness test
-    builtins.attrNames service.config.build.extendedInfo != [];
+    builtins.attrNames service.build.extendedInfo != [];
 
-  getInfo = _serviceName: service: service.config.build.extendedInfo;
+  getInfo = _serviceName: service: service.build.extendedInfo;
 
 in
 {

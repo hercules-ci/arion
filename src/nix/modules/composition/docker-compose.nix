@@ -9,13 +9,25 @@
     - docker-compose.services
 
  */
-{ pkgs, lib, config, ... }:
+compositionArgs@{ lib, config, options, pkgs, ... }:
 let
-  evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} {
-    inherit name modules;
-    inherit (config) host;
-    composition = config;
+  inherit (lib) types;
+
+  service = {
+    imports = [ argsModule ] ++ import ../service/all-modules.nix;
   };
+  argsModule =
+    { name, # injected by types.submodule
+      ...
+    }: {
+      _file = ./docker-compose.nix;
+      key = ./docker-compose.nix;
+
+      config._module.args.pkgs = lib.mkDefault compositionArgs.pkgs;
+      config.host = compositionArgs.config.host;
+      config.composition = compositionArgs.config;
+      config.service.name = name;
+    };
 
 in
 {
@@ -44,14 +56,8 @@ in
       description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
     docker-compose.services = lib.mkOption {
-      default = {};
-      type = with lib.types; attrsOf (coercedTo unspecified (a: [a]) (listOf unspecified));
-      description = "A attribute set of service configurations. A service specifies how to run an image. Each of these service configurations is specified using modules whose options are described in the Service Options section.";
-    };
-    docker-compose.evaluatedServices = lib.mkOption {
-      type = lib.types.attrsOf lib.types.attrs;
-      description = "Attribute set of evaluated service configurations.";
-      readOnly = true;
+      type = lib.types.attrsOf (lib.types.submodule service);
+      description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
   };
   config = {
@@ -59,10 +65,9 @@ in
     build.dockerComposeYamlText = builtins.toJSON (config.build.dockerComposeYamlAttrs);
     build.dockerComposeYamlAttrs = config.docker-compose.raw;
 
-    docker-compose.evaluatedServices = lib.mapAttrs evalService config.docker-compose.services;
     docker-compose.raw = {
       version = "3.4";
-      services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
+      services = lib.mapAttrs (k: c: c.build.service) config.docker-compose.services;
       x-arion = config.docker-compose.extended;
     };
   };

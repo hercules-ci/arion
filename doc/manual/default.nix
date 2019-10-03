@@ -58,26 +58,9 @@ let
     '';
   };
 
-  serviceOptions = options {
-    moduleType = "service";
-    description = "List of Arion service-level options in JSON format";
-    optionsExpr = let
-      src = ../../src/nix;
-    in ''
-      let pkgs = import ${pkgs.path} {};
-          fixPaths = opt: opt // {
-            declarations = map (d: "src/nix" + (lib.strings.removePrefix (toString ${src}) (toString d))) opt.declarations;
-          };
-          inherit (pkgs) lib;
-          composition = pkgs.callPackage ${src}/eval-service.nix {} { modules = []; host = {}; name = abort "The manual's service options section must not depend on the service name."; composition = abort "The manual's service options must not depend on the composition."; };
-      in map fixPaths (lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList composition.options))
-    '';
-  };
-
   generatedDocBook = runCommand "generated-docbook" {} ''
     mkdir $out
     ln -s ${compositionOptions.optionsDocBook} $out/options-composition.xml
-    ln -s ${serviceOptions.optionsDocBook} $out/options-service.xml
   '';
 
   manual = stdenv.mkDerivation {
@@ -105,11 +88,6 @@ let
     '';
     prePatch = ''
       cp ${generatedDocBook}/* .
-      substituteInPlace options-service.xml \
-        --replace 'xml:id="appendix-configuration-options"' 'xml:id="appendix-service-options"' \
-        --replace '<title>Configuration Options</title>' '<title>Service Options</title>' \
-        --replace 'xml:id="configuration-variable-list"' 'xml:id="service-variable-list"' \
-        ;
       substituteInPlace options-composition.xml \
         --replace 'xml:id="appendix-configuration-options"' 'xml:id="appendix-composition-options"' \
         --replace '<title>Configuration Options</title>' '<title>Composition Options</title>' \

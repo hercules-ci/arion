@@ -4,12 +4,12 @@ let
 
   serviceImages =
     lib.mapAttrs addDetails (
-      lib.filterAttrs filterFunction config.docker-compose.evaluatedServices
+      lib.filterAttrs filterFunction config.docker-compose.services
     );
 
   filterFunction = serviceName: service:
     builtins.addErrorContext "while evaluating whether the service ${serviceName} defines an image"
-      service.config.image.nixBuild;
+      service.image.nixBuild;
 
   addDetails = serviceName: service:
     builtins.addErrorContext "while evaluating the image for service ${serviceName}"
