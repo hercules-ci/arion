@@ -28,6 +28,7 @@ in
   options = {
     build.imagesToLoad = lib.mkOption {
       type = listOf unspecified;
+      internal = true;
       description = "List of dockerTools image derivations.";
     };
   };

@@ -5,16 +5,13 @@
  */
 { config, lib, ... }:
 let
+  inherit (lib) mapAttrs filterAttrs;
+
   serviceInfo =
-    lib.mapAttrs getInfo (
-      lib.filterAttrs filterFunction config.services
-    );
-
-  filterFunction = _serviceName: service:
-    # shallow equality suffices for emptiness test
-    builtins.attrNames service.build.extendedInfo != [];
-
-  getInfo = _serviceName: service: service.build.extendedInfo;
+    filterAttrs (_k: v: v != {})
+      (mapAttrs (_serviceName: service: service.out.extendedInfo)
+        config.services
+      );
 
 in
 {
