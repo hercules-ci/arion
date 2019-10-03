@@ -4,7 +4,7 @@ let
 
   serviceImages =
     lib.mapAttrs addDetails (
-      lib.filterAttrs filterFunction config.docker-compose.services
+      lib.filterAttrs filterFunction config.services
     );
 
   filterFunction = serviceName: service:
@@ -14,7 +14,7 @@ let
   addDetails = serviceName: service:
     builtins.addErrorContext "while evaluating the image for service ${serviceName}"
     (let
-      inherit (service.config) build;
+      inherit (service) build;
     in {
       image = build.image.outPath;
       imageName = build.imageName or service.image.name;

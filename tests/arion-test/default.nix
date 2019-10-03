@@ -30,9 +30,9 @@ in
     virtualisation.pathsInNixDB = [
       # Pre-build the image because we don't want to build the world
       # in the vm.
-      (preEval [ ../../examples/minimal/arion-compose.nix ]).config.build.dockerComposeYaml
-      (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.build.dockerComposeYaml
-      (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.build.dockerComposeYaml
+      (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
       pkgs.stdenv
     ];
   };

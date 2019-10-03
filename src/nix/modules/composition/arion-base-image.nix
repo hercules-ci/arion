@@ -34,7 +34,7 @@ in
 
   config = {
     arionBaseImage = "${name}:${tag}";
-    build.imagesToLoad = lib.mkIf (lib.any (s: s.service.useHostStore) (lib.attrValues config.docker-compose.services)) [
+    build.imagesToLoad = lib.mkIf (lib.any (s: s.service.useHostStore) (lib.attrValues config.services)) [
       { image = builtImage; imageName = name; imageTag = tag; }
     ];  
   };

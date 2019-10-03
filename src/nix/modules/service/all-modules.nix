@@ -7,4 +7,5 @@
   ./image.nix
   ./nixos.nix
   ./nixos-init.nix
+  ../lib/assert.nix
 ]

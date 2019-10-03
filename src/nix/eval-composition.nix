@@ -34,7 +34,7 @@ let
   };
 
 in
-  # Typically you need composition.config.build.dockerComposeYaml
+  # Typically you need composition.config.out.dockerComposeYaml
   composition // {
     # throw in lib and pkgs for repl convenience
     inherit lib;

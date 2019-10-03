@@ -7,7 +7,7 @@
 let
   serviceInfo =
     lib.mapAttrs getInfo (
-      lib.filterAttrs filterFunction config.docker-compose.services
+      lib.filterAttrs filterFunction config.services
     );
 
   filterFunction = _serviceName: service:

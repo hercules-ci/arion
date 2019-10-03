@@ -1,6 +1,6 @@
 /*
 
-   This service-level module defines the build.service option, using
+   This service-level module defines the out.service option, using
    the user-facing options service.image, service.volumes, etc.
 
  */
@@ -25,8 +25,12 @@ let
 
 in
 {
+  imports = [
+    (lib.mkRenamedOptionModule ["build" "service"] ["out" "service"])
+  ];
+
   options = {
-    build.service = mkOption {
+    out.service = mkOption {
       type = attrsOf types.unspecified;
       description = ''
         Raw input for the service in <code>docker-compose.yaml</code>.
@@ -37,12 +41,13 @@ in
         This option is user accessible because it may serve as an
         escape hatch for some.
       '';
+      apply = config.assertWarn;
     };
 
     service.name = mkOption {
       type = str;
       description = ''
-        The name of the service - <code>&lt;name></code> in the composition-level <code>docker-compose.services.&lt;name></code>
+        The name of the service - <code>&lt;name></code> in the composition-level <code>services.&lt;name></code>
       '';
       readOnly = true;
     };
@@ -209,7 +214,7 @@ in
     };
   };
 
-  config.build.service = {
+  config.out.service = {
     inherit (config.service)
       volumes
       environment

@@ -3,10 +3,10 @@
    This is a composition-level module.
 
    It defines the low-level options that are read by arion, like
-    - build.dockerComposeYaml
+    - out.dockerComposeYaml
 
    It declares options like
-    - docker-compose.services
+    - services
 
  */
 compositionArgs@{ lib, config, options, pkgs, ... }:
@@ -31,20 +31,24 @@ let
 
 in
 {
+  imports = [
+    ../lib/assert.nix
+    (lib.mkRenamedOptionModule ["docker-compose" "services"] ["services"])
+  ];
   options = {
-    build.dockerComposeYaml = lib.mkOption {
+    out.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
       description = "A derivation that produces a docker-compose.yaml file for this composition.";
       readOnly = true;
     };
-    build.dockerComposeYamlText = lib.mkOption {
+    out.dockerComposeYamlText = lib.mkOption {
       type = lib.types.str;
-      description = "The text of build.dockerComposeYaml.";
+      description = "The text of out.dockerComposeYaml.";
       readOnly = true;
     };
-    build.dockerComposeYamlAttrs = lib.mkOption {
+    out.dockerComposeYamlAttrs = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
-      description = "The text of build.dockerComposeYaml.";
+      description = "The text of out.dockerComposeYaml.";
       readOnly = true;
     };
     docker-compose.raw = lib.mkOption {
@@ -55,19 +59,19 @@ in
       type = lib.types.attrs;
       description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
-    docker-compose.services = lib.mkOption {
+    services = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule service);
       description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
   };
   config = {
-    build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
-    build.dockerComposeYamlText = builtins.toJSON (config.build.dockerComposeYamlAttrs);
-    build.dockerComposeYamlAttrs = config.docker-compose.raw;
+    out.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.out.dockerComposeYamlText;
+    out.dockerComposeYamlText = builtins.toJSON (config.out.dockerComposeYamlAttrs);
+    out.dockerComposeYamlAttrs = config.assertWarn config.docker-compose.raw;
 
     docker-compose.raw = {
       version = "3.4";
-      services = lib.mapAttrs (k: c: c.build.service) config.docker-compose.services;
+      services = lib.mapAttrs (k: c: c.out.service) config.services;
       x-arion = config.docker-compose.extended;
     };
   };
