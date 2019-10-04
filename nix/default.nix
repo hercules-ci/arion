@@ -1,12 +1,13 @@
 /**
  * This is the entry-point for all nix execution in this project.
  */
-{ nixpkgsSrc ? ./nixpkgs.nix
+{ sources ? import ./sources.nix
+, nixpkgsSrc ? sources.nixpkgs
 , system ? null
 , ...
 }:
 
-import (import ./nixpkgs.nix) ({
+import nixpkgsSrc ({
   # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
   config = {
   };

@@ -3,6 +3,8 @@ let
   inherit (self.arion-project) haskellPkgs;
   inherit (super) lib;
 
+  sources = import ./sources.nix;
+
 in
 {
 
@@ -19,7 +21,10 @@ in
         haskellPkgs.ghcid
         super.docker-compose
         (import ~/h/ghcide-nix {}).ghcide-ghc864
+        self.niv
       ];
     };
   };
+
+  inherit (import (sources.niv) {}) niv;
 }
