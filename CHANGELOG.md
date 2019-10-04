@@ -1,4 +1,4 @@
-# Revision history for arion-compose
+# Revision history for Arion
 
 ## Unreleased
 
