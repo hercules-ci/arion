@@ -7,6 +7,7 @@ in
 dimension "Nixpkgs version" {
     "nixos-19_03" = {
       nixpkgsSource = "nixpkgs";
+      isReferenceNixpkgs = true;
     };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
@@ -16,15 +17,15 @@ dimension "Nixpkgs version" {
       enableDoc = false;
     };
   } (
-    _name: { nixpkgsSource, enableDoc ? true }:
+    _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true }:
 
 
       dimension "System" {
-        "x86_64-linux" = {};
+        "x86_64-linux" = { isReferenceTarget = isReferenceNixpkgs; };
         # TODO: darwin
         # "x86_64-darwin" = { enableNixOSTests = false; };
       } (
-        system: {}:
+        system: { isReferenceTarget ? false }:
           let
             pkgs = import ./. { inherit system; nixpkgsSrc = sources.${nixpkgsSource}; };
           in
@@ -32,6 +33,8 @@ dimension "Nixpkgs version" {
             inherit (pkgs) arion tests;
           } // lib.optionalAttrs enableDoc {
             doc = pkgs.recurseIntoAttrs (import ../doc { inherit pkgs; });
+          } // lib.optionalAttrs isReferenceTarget {
+            inherit (pkgs.arion-project.haskellPkgs) arion-compose-checked;
           }
       )
   )
