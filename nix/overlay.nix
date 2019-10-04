@@ -22,9 +22,11 @@ in
         super.docker-compose
         (import ~/h/ghcide-nix {}).ghcide-ghc864
         self.niv
+        self.releaser
       ];
     };
   };
 
   inherit (import (sources.niv) {}) niv;
+  releaser = self.haskellPackages.callCabal2nix "releaser" sources.releaser {};
 }

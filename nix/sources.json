@@ -47,5 +47,17 @@
         "type": "tarball",
         "url": "https://github.com/hercules-ci/project.nix/archive/33e5f3cb25feff4ccd00f8c60a05976e2ee01802.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "releaser": {
+        "branch": "master",
+        "description": "Automation of Haskell package release process.",
+        "homepage": null,
+        "owner": "domenkozar",
+        "repo": "releaser",
+        "rev": "43a4e27654f388e8eacab631e24e26792ff88fe2",
+        "sha256": "072jlbw0hdc4nvs9frd7wdyzdv4mz2dc5ib35iaqi9rzdafq6822",
+        "type": "tarball",
+        "url": "https://github.com/domenkozar/releaser/archive/43a4e27654f388e8eacab631e24e26792ff88fe2.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
