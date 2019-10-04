@@ -183,9 +183,7 @@ runRepl co = do
     "Launching a repl for you. To get started:\n\
     \\n\
     \To see deployment-wide configuration\n\
-    \  type config. and hit TAB\n\
-    \To see the services\n\
-    \  type config.docker-compose.evaluatedServices TAB or ENTER\n\
+    \  type config. and use tab completion\n\
     \To bring the top-level Nixpkgs attributes into scope\n\
     \  type :a (config._module.args.pkgs) // { inherit config; }\n\
     \"

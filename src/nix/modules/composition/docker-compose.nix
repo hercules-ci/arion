@@ -3,36 +3,52 @@
    This is a composition-level module.
 
    It defines the low-level options that are read by arion, like
-    - build.dockerComposeYaml
+    - out.dockerComposeYaml
 
    It declares options like
-    - docker-compose.services
+    - services
 
  */
-{ pkgs, lib, config, ... }:
+compositionArgs@{ lib, config, options, pkgs, ... }:
 let
-  evalService = name: modules: pkgs.callPackage ../../eval-service.nix {} {
-    inherit name modules;
-    inherit (config) host;
-    composition = config;
+  inherit (lib) types;
+
+  service = {
+    imports = [ argsModule ] ++ import ../service/all-modules.nix;
   };
+  argsModule =
+    { name, # injected by types.submodule
+      ...
+    }: {
+      _file = ./docker-compose.nix;
+      key = ./docker-compose.nix;
+
+      config._module.args.pkgs = lib.mkDefault compositionArgs.pkgs;
+      config.host = compositionArgs.config.host;
+      config.composition = compositionArgs.config;
+      config.service.name = name;
+    };
 
 in
 {
+  imports = [
+    ../lib/assert.nix
+    (lib.mkRenamedOptionModule ["docker-compose" "services"] ["services"])
+  ];
   options = {
-    build.dockerComposeYaml = lib.mkOption {
+    out.dockerComposeYaml = lib.mkOption {
       type = lib.types.package;
       description = "A derivation that produces a docker-compose.yaml file for this composition.";
       readOnly = true;
     };
-    build.dockerComposeYamlText = lib.mkOption {
+    out.dockerComposeYamlText = lib.mkOption {
       type = lib.types.str;
-      description = "The text of build.dockerComposeYaml.";
+      description = "The text of out.dockerComposeYaml.";
       readOnly = true;
     };
-    build.dockerComposeYamlAttrs = lib.mkOption {
+    out.dockerComposeYamlAttrs = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
-      description = "The text of build.dockerComposeYaml.";
+      description = "The text of out.dockerComposeYaml.";
       readOnly = true;
     };
     docker-compose.raw = lib.mkOption {
@@ -43,26 +59,19 @@ in
       type = lib.types.attrs;
       description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
-    docker-compose.services = lib.mkOption {
-      default = {};
-      type = with lib.types; attrsOf (coercedTo unspecified (a: [a]) (listOf unspecified));
-      description = "A attribute set of service configurations. A service specifies how to run an image. Each of these service configurations is specified using modules whose options are described in the Service Options section.";
-    };
-    docker-compose.evaluatedServices = lib.mkOption {
-      type = lib.types.attrsOf lib.types.attrs;
-      description = "Attribute set of evaluated service configurations.";
-      readOnly = true;
+    services = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule service);
+      description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
   };
   config = {
-    build.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.build.dockerComposeYamlText;
-    build.dockerComposeYamlText = builtins.toJSON (config.build.dockerComposeYamlAttrs);
-    build.dockerComposeYamlAttrs = config.docker-compose.raw;
+    out.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.out.dockerComposeYamlText;
+    out.dockerComposeYamlText = builtins.toJSON (config.out.dockerComposeYamlAttrs);
+    out.dockerComposeYamlAttrs = config.assertWarn config.docker-compose.raw;
 
-    docker-compose.evaluatedServices = lib.mapAttrs evalService config.docker-compose.services;
     docker-compose.raw = {
       version = "3.4";
-      services = lib.mapAttrs (k: c: c.config.build.service) config.docker-compose.evaluatedServices;
+      services = lib.mapAttrs (k: c: c.out.service) config.services;
       x-arion = config.docker-compose.extended;
     };
   };

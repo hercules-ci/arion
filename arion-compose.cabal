@@ -19,6 +19,7 @@ data-files:          nix/*.nix
                    , nix/modules/composition/*.nix
                    , nix/modules/nixos/*.nix
                    , nix/modules/service/*.nix
+                   , nix/modules/lib/*.nix
 
 -- all data is verbatim from some sources
 data-dir:            src

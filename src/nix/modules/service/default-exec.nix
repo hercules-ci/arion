@@ -14,6 +14,6 @@ in
     };
   };
   config = {
-    build.extendedInfo.defaultExec = config.service.defaultExec;
+    out.extendedInfo.defaultExec = config.service.defaultExec;
   };
 }

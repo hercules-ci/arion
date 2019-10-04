@@ -51,7 +51,7 @@ evaluateComposition ea = do
         , "--strict"
         , "--json"
         , "--attr"
-        , "config.build.dockerComposeYamlAttrs"
+        , "config.out.dockerComposeYamlAttrs"
         ]
       args =
         [ evalComposition ]
@@ -99,7 +99,7 @@ buildComposition outLink ea = do
   evalComposition <- getEvalCompositionFile
   let commandArgs =
         [ "--attr"
-        , "config.build.dockerComposeYaml"
+        , "config.out.dockerComposeYaml"
         , "--out-link"
         , outLink
         ]

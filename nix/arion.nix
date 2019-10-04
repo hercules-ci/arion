@@ -11,7 +11,7 @@ let
   eval = import (srcDir + "/nix/eval-composition.nix");
   build = args@{...}:
     let composition = eval args;
-    in composition.config.build.dockerComposeYaml;
+    in composition.config.out.dockerComposeYaml;
 
 in
   justStaticExecutables (overrideCabal arion-compose (o: {

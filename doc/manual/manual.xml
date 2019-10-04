@@ -17,6 +17,5 @@
   </info>
 
   <xi:include href="options-composition.xml" />
-  <xi:include href="options-service.xml" />
 
 </book>

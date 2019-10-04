@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+projectRoot="$(dirname ${BASH_SOURCE[0]})"
+resultLink="$projectRoot/result-run-arion-quick"
+
+[[ -e "$resultLink" ]] || {
+  echo 1>&2 "You don't have a prebuilt arion yet; building it."
+  nix-build "$projectRoot" -A arion --out-link "$resultLink"
+}
+
+echo 1>&2 "Note that you will need to rm '$resultLink' to rebuild the arion executable when needed."
+
+export arion_compose_datadir="$projectRoot/src"
+
+exec "$resultLink/bin/arion" "$@"

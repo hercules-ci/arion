@@ -4,8 +4,11 @@ let
   inherit (lib.types) attrsOf unspecified;
 in
 {
+  imports = [
+    (lib.mkRenamedOptionModule ["build" "extendedInfo"] ["out" "extendedInfo"])
+  ];
   options = {
-    build.extendedInfo = mkOption {
+    out.extendedInfo = mkOption {
       type = attrsOf unspecified;
       description = ''
         Information about a service to include in the Docker Compose file,
