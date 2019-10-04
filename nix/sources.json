@@ -11,6 +11,18 @@
         "url": "https://github.com/nmattia/niv/archive/1dd094156b249586b66c16200ecfd365c7428dc0.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "nixos-19.09": {
+        "branch": "nixos-19.09",
+        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
+        "homepage": "https://github.com/NixOS/nixpkgs",
+        "owner": "NixOS",
+        "repo": "nixpkgs-channels",
+        "rev": "3ba0d9f75ccffd41e32cfea4046805f8bbab12f5",
+        "sha256": "0w20drs4mwlq12k1sss1x8adyf5ph5jd52n8wdcgmn4sm60qjmki",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/3ba0d9f75ccffd41e32cfea4046805f8bbab12f5.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixos-unstable": {
         "branch": "nixos-unstable",
         "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",

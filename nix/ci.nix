@@ -9,10 +9,17 @@ dimension "Nixpkgs version" {
       nixpkgsSource = "nixpkgs";
       isReferenceNixpkgs = true;
     };
+    "nixos-19_09" = {
+      nixpkgsSource = "nixos-19.09";
+
+      # Broken since 19.09, wontfix because doc tooling will be changed.
+      # TODO: reenable
+      enableDoc = false;
+    };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
 
-      # Broken on unstable, wontfix because doc tooling will be changed.
+      # Broken since 19.09, wontfix because doc tooling will be changed.
       # TODO: reenable
       enableDoc = false;
     };
