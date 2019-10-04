@@ -1,6 +1,9 @@
 # Revision history for arion-compose
 
-## 0.1.0.0 -- YYYY-mm-dd
+## Unreleased
 
-* First version. Released on an unsuspecting world.
-* *BREAKING:* useHostStore now uses a proper empty base image, like `scratch`.
+<!-- TODO: use better template -->
+
+## 0.1.0.0 -- 2019-10-04
+
+* First released version. Released on an unsuspecting world.
