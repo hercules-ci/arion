@@ -8,7 +8,7 @@ let
 in
 {
 
-  arion = import ./arion.nix { pkgs = self; };
+  inherit (import ./.. { pkgs = self; }) arion;
   tests = super.callPackage ../tests {};
   doc = super.callPackage ../doc {};
 
