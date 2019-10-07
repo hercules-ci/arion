@@ -1,0 +1,75 @@
+{
+    "niv": {
+        "branch": "master",
+        "description": "Easy dependency management for Nix projects",
+        "homepage": "https://github.com/nmattia/niv",
+        "owner": "nmattia",
+        "repo": "niv",
+        "rev": "1dd094156b249586b66c16200ecfd365c7428dc0",
+        "sha256": "1b2vjnn8iac5iiqszjc2v1s1ygh0yri998c0k3s4x4kn0dsqik21",
+        "type": "tarball",
+        "url": "https://github.com/nmattia/niv/archive/1dd094156b249586b66c16200ecfd365c7428dc0.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixos-19.09": {
+        "branch": "nixos-19.09",
+        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
+        "homepage": "https://github.com/NixOS/nixpkgs",
+        "owner": "NixOS",
+        "repo": "nixpkgs-channels",
+        "rev": "3ba0d9f75ccffd41e32cfea4046805f8bbab12f5",
+        "sha256": "0w20drs4mwlq12k1sss1x8adyf5ph5jd52n8wdcgmn4sm60qjmki",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/3ba0d9f75ccffd41e32cfea4046805f8bbab12f5.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixos-unstable": {
+        "branch": "nixos-unstable",
+        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
+        "homepage": "https://github.com/NixOS/nixpkgs",
+        "owner": "NixOS",
+        "repo": "nixpkgs-channels",
+        "rev": "cb4332e3eb6dfdb653f1fc7397a0292df228a533",
+        "sha256": "1722wphznqhpfny08rcy19l85r2l893ckjc3h1vfivj6aj64fwjr",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/cb4332e3eb6dfdb653f1fc7397a0292df228a533.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz",
+        "version": ""
+    },
+    "nixpkgs": {
+        "branch": "nixos-19.03",
+        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
+        "homepage": "https://github.com/NixOS/nixpkgs",
+        "owner": "NixOS",
+        "repo": "nixpkgs-channels",
+        "rev": "6420e2649fa9e267481fb78e602022dab9d1dcd1",
+        "sha256": "1z3hx7gp8nxk3fspi8vik3j9zxpajj3s7nxvjvx3b5igndxwbp74",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/6420e2649fa9e267481fb78e602022dab9d1dcd1.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "project.nix": {
+        "branch": "master",
+        "description": "A configuration manager for your projects",
+        "homepage": null,
+        "owner": "hercules-ci",
+        "repo": "project.nix",
+        "rev": "33e5f3cb25feff4ccd00f8c60a05976e2ee01802",
+        "sha256": "0c3q3il5h6q3ms8m6da51knvjsfvpz12sh3a3av4d2a5ikm5ncl1",
+        "type": "tarball",
+        "url": "https://github.com/hercules-ci/project.nix/archive/33e5f3cb25feff4ccd00f8c60a05976e2ee01802.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "releaser": {
+        "branch": "master",
+        "description": "Automation of Haskell package release process.",
+        "homepage": null,
+        "owner": "domenkozar",
+        "repo": "releaser",
+        "rev": "43a4e27654f388e8eacab631e24e26792ff88fe2",
+        "sha256": "072jlbw0hdc4nvs9frd7wdyzdv4mz2dc5ib35iaqi9rzdafq6822",
+        "type": "tarball",
+        "url": "https://github.com/domenkozar/releaser/archive/43a4e27654f388e8eacab631e24e26792ff88fe2.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}

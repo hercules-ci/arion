@@ -1,5 +1,6 @@
 module Main where
 
+import           Prelude()
 import           Protolude
 import           Test.Hspec.Runner
 import qualified Spec

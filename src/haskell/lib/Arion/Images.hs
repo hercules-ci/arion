@@ -10,7 +10,6 @@ import Protolude hiding (to)
 
 import qualified Data.Aeson as Aeson
 import           Arion.Aeson (decodeFile)
-import qualified Data.ByteString as BS
 import qualified System.Process as Process
 
 import Control.Lens

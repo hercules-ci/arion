@@ -16,12 +16,9 @@ import           Data.Aeson
 import qualified Data.String
 import qualified System.Directory              as Directory
 import           System.Process
-import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Lazy          as BL
 import           Paths_arion_compose
-import           Control.Applicative
 
-import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
 
 import qualified Data.List.NonEmpty            as NE
@@ -76,21 +73,20 @@ evaluateComposition ea = do
     case exitCode of
       ExitSuccess -> pass
       ExitFailure 1 -> exitFailure
-      e@ExitFailure {} -> do
+      ExitFailure {} -> do
         throwIO $ FatalError $ "evaluation failed with " <> show exitCode
-        exitWith e
 
     case v of
       Right r -> pure r
-      Left  e -> throwIO $ FatalError "Couldn't parse nix-instantiate output"
+      Left  e -> throwIO $ FatalError ("Couldn't parse nix-instantiate output" <> show e)
 
 -- | Run with docker-compose.yaml tmpfile
 withEvaluatedComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
 withEvaluatedComposition ea f = do
   v <- evaluateComposition ea
-  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path handle -> do
-    T.hPutStrLn handle (pretty v)
-    hClose handle
+  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path yamlHandle -> do
+    T.hPutStrLn yamlHandle (pretty v)
+    hClose yamlHandle
     f path
 
 
@@ -117,15 +113,14 @@ buildComposition outLink ea = do
     case exitCode of
       ExitSuccess -> pass
       ExitFailure 1 -> exitFailure
-      e@ExitFailure {} -> do
+      ExitFailure {} -> do
         throwIO $ FatalError $ "nix-build failed with " <> show exitCode
-        exitWith e
 
 -- | Do something with a docker-compose.yaml.
 withBuiltComposition :: EvaluationArgs -> (FilePath -> IO r) -> IO r
 withBuiltComposition ea f = do
-  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path handle -> do
-    hClose handle
+  withTempFile "." ".tmp-arion-docker-compose.yaml" $ \path emptyYamlHandle -> do
+    hClose emptyYamlHandle
     -- Known problem: kills atomicity of withTempFile; won't fix because we should manage gc roots,
     -- impl of which will probably avoid this "problem". It seems unlikely to cause issues.
     Directory.removeFile path
@@ -149,9 +144,8 @@ replForComposition ea = do
       case exitCode of
         ExitSuccess -> pass
         ExitFailure 1 -> exitFailure
-        e@ExitFailure {} -> do
+        ExitFailure {} -> do
           throwIO $ FatalError $ "nix repl failed with " <> show exitCode
-          exitWith e
 
 argArgs :: EvaluationArgs -> [[Char]]
 argArgs ea =

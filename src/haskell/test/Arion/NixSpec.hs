@@ -6,16 +6,11 @@ where
 
 import           Protolude
 import           Test.Hspec
-import           Test.QuickCheck
 import qualified Data.List.NonEmpty            as NEL
 import           Arion.Aeson
 import           Arion.Nix
 import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
-import qualified Data.Text.Lazy.IO             as TL
-import qualified Data.Text.Lazy.Builder        as TB
-import qualified Data.Aeson.Encode.Pretty
-import Data.Char (isSpace)
 
 spec :: Spec
 spec = describe "evaluateComposition" $ it "matches an example" $ do
@@ -32,8 +27,8 @@ spec = describe "evaluateComposition" $ it "matches an example" $ do
   expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
   censorPaths actual `shouldBe` censorPaths expected
 
+censorPaths :: Text -> Text
 censorPaths = censorImages . censorStorePaths
---censorPaths = censorStorePaths
 
 censorStorePaths :: Text -> Text
 censorStorePaths x = case T.breakOn "/nix/store/" x of
@@ -61,4 +56,4 @@ isNixNameChar c | c >= 'A' && c <= 'Z' = True
 isNixNameChar c | c == '-' = True
 isNixNameChar c | c == '.' = True
 isNixNameChar c | c == '_' = True -- WRONG?
-isNixNameChar c = False -- WRONG?
+isNixNameChar _ = False -- WRONG?

@@ -3,10 +3,12 @@ let
   inherit (self.arion-project) haskellPkgs;
   inherit (super) lib;
 
+  sources = import ./sources.nix;
+
 in
 {
 
-  arion = import ./arion.nix { pkgs = self; };
+  inherit (import ./.. { pkgs = self; }) arion;
   tests = super.callPackage ../tests {};
   doc = super.callPackage ../doc {};
 
@@ -19,7 +21,12 @@ in
         haskellPkgs.ghcid
         super.docker-compose
         (import ~/h/ghcide-nix {}).ghcide-ghc864
+        self.niv
+        self.releaser
       ];
     };
   };
+
+  inherit (import (sources.niv) {}) niv;
+  releaser = self.haskellPackages.callCabal2nix "releaser" sources.releaser {};
 }

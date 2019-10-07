@@ -4,11 +4,9 @@ import Prelude ()
 import           Data.Aeson
 import qualified Data.ByteString.Lazy          as BL
 import qualified Data.Text.Lazy                as TL
-import qualified Data.Text.Lazy.IO             as TL
 import qualified Data.Text.Lazy.Builder        as TB
 import qualified Data.Aeson.Encode.Pretty
 import           Data.Aeson.Encode.Pretty       ( defConfig
-                                                , keyOrder
                                                 , confCompare
                                                 , confTrailingNewline
                                                 )

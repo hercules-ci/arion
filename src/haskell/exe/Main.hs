@@ -12,19 +12,12 @@ import qualified Arion.DockerCompose as DockerCompose
 import           Arion.Services (getDefaultExec)
 
 import Options.Applicative
-import Control.Applicative
 import Control.Monad.Fail
 
-import qualified Data.Aeson.Encode.Pretty
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Builder as TB
 
-import qualified Data.List.NonEmpty as NE
 import Data.List.NonEmpty (NonEmpty(..))
-
-import Control.Arrow ((>>>))
 
 import System.Posix.User (getRealUserID)
 
@@ -69,6 +62,7 @@ parseOptions = do
       let nixArgs = userNixArgs <|> "--show-trace" <$ guard showTrace
       in CommonOptions{..}
 
+textArgument :: Mod ArgumentFields [Char] -> Parser Text
 textArgument = fmap T.pack . strArgument
 
 parseCommand :: Parser (CommonOptions -> IO ())
@@ -124,18 +118,18 @@ commandDC
   -> Text
   -> Text
   -> Mod CommandFields (CommonOptions -> IO ())
-commandDC run cmdStr help =
+commandDC run cmdStr helpText =
   command
     (T.unpack cmdStr)
     (info
       (run cmdStr <$> parseDockerComposeArgs)
-      (progDesc (T.unpack help) <> fullDesc <> forwardOptions))
+      (progDesc (T.unpack helpText) <> fullDesc <> forwardOptions))
 
 
 --------------------------------------------------------------------------------
 
 runDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
-runDC cmd (DockerComposeArgs args) opts = do
+runDC cmd (DockerComposeArgs args) _opts = do
   DockerCompose.run DockerCompose.Args
     { files = []
     , otherArgs = [cmd] ++ args
@@ -265,7 +259,7 @@ runExec detach privileged user noTTY index envs workDir service commandAndArgs o
 
 main :: IO ()
 main = 
-  (join . execParser) (info (parseAll <**> helper) fullDesc)
+  (join . arionExecParser) (info (parseAll <**> helper) fullDesc)
   where
-    execParser = customExecParser (prefs showHelpOnEmpty)
+    arionExecParser = customExecParser (prefs showHelpOnEmpty)
 

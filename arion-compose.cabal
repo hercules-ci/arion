@@ -1,9 +1,9 @@
 cabal-version:       2.4
 
 name:                arion-compose
-version:             0.1.0.0
+version: 0.1.0.0
 synopsis:            Run docker-compose with help from Nix/NixOS
--- description:
+description:         Arion is a tool for building and running applications that consist of multiple docker containers using NixOS modules. It has special support for docker images that are built with Nix, for a smooth development experience and improved performance.
 homepage:            https://github.com/hercules-ci/arion#readme
 -- bug-reports:
 license:             Apache-2.0
@@ -11,10 +11,10 @@ license-file:        LICENSE
 author:              Robert Hensing
 maintainer:          robert@hercules-ci.com
 -- copyright:
--- category:
-extra-source-files:  CHANGELOG.md, README.asciidoc
-write-ghc-enviroment-files:
-                     never
+category:            Distribution, Network, Cloud, Distributed Computing
+extra-source-files:  CHANGELOG.md, README.asciidoc,
+                     src/haskell/testdata/**/*.nix
+                     src/haskell/testdata/**/*.json
 data-files:          nix/*.nix
                    , nix/modules/composition/*.nix
                    , nix/modules/nixos/*.nix
@@ -24,7 +24,7 @@ data-files:          nix/*.nix
 -- all data is verbatim from some sources
 data-dir:            src
 
-common deps
+common common
   build-depends:     base ^>=4.12.0.0
                    , aeson
                    , aeson-pretty
@@ -38,25 +38,27 @@ common deps
                    , text
                    , protolude
                    , unix
+  ghc-options:     -Wall
 
 flag ghci
   default: False
   manual: True
 
 library
-  import:              deps
+  import:              common
   exposed-modules:     Arion.Nix
                        Arion.Aeson
                        Arion.DockerCompose
                        Arion.Images
                        Arion.Services
   other-modules:       Paths_arion_compose
+  autogen-modules:     Paths_arion_compose
   -- other-extensions:
   hs-source-dirs:      src/haskell/lib
   default-language:    Haskell2010
 
 executable arion
-  import:              deps
+  import:              common
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
@@ -66,7 +68,7 @@ executable arion
   default-language:    Haskell2010
 
 test-suite arion-unit-tests
-  import:              deps
+  import:              common
   if flag(ghci)
     hs-source-dirs:      src/haskell/lib
     ghc-options:       -Wno-missing-home-modules
