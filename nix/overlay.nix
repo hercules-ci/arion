@@ -20,7 +20,6 @@ in
         haskellPkgs.cabal-install
         haskellPkgs.ghcid
         super.docker-compose
-        (import ~/h/ghcide-nix {}).ghcide-ghc864
         self.niv
         self.releaser
       ];
