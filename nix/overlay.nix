@@ -5,12 +5,34 @@ let
 
   sources = import ./sources.nix;
 
+  fakeRepo = src: super.runCommand "source" { inherit src; buildInputs = [super.git]; } ''
+    cp -r --no-preserve=mode $src $out
+    git init
+    cp -r .git $out
+  '';
+
 in
 {
 
   inherit (import ./.. { pkgs = self; }) arion;
   tests = super.callPackage ../tests {};
-  doc = super.callPackage ../doc {};
+
+  doc-options = import ../docs/options.nix {};
+  doc-options-check = self.runCommand "doc-options-check" {} ''
+    diff --color -u ${../docs/modules/ROOT/partials/NixOSOptions.adoc} ${self.doc-options}
+    touch $out
+  '';
+  doc = self.stdenv.mkDerivation { 
+    name = "arion-documentation"; 
+    buildInputs = [super.antora]; 
+    src = fakeRepo ../.;
+    HOME = ".";
+    buildPhase = "antora antora-playbook";
+    installPhase = ''
+      mkdir $out
+      mv public/* $out/
+    '';
+  };
 
   arion-project = super.recurseIntoAttrs {
     haskellPkgs = super.haskellPackages.extend (import ./haskell-overlay.nix self super);

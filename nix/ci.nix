@@ -8,20 +8,15 @@ dimension "Nixpkgs version" {
     "nixos-19_03" = {
       nixpkgsSource = "nixpkgs";
       isReferenceNixpkgs = true;
+      enableDoc = false;
     };
     "nixos-19_09" = {
       nixpkgsSource = "nixos-19.09";
-
-      # Broken since 19.09, wontfix because doc tooling will be changed.
-      # TODO: reenable
-      enableDoc = false;
+      enableDoc = true;
     };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
-
-      # Broken since 19.09, wontfix because doc tooling will be changed.
-      # TODO: reenable
-      enableDoc = false;
+      enableDoc = true;
     };
   } (
     _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true }:
@@ -39,7 +34,7 @@ dimension "Nixpkgs version" {
           {
             inherit (pkgs) arion tests;
           } // lib.optionalAttrs enableDoc {
-            doc = pkgs.recurseIntoAttrs (import ../doc { inherit pkgs; });
+            inherit (pkgs) doc doc-options doc-options-check;
           } // lib.optionalAttrs isReferenceTarget {
             inherit (pkgs.arion-project.haskellPkgs) arion-compose-checked;
           }

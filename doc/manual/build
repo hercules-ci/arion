@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-nix-shell -A manual --run 'patchPhase && make'
