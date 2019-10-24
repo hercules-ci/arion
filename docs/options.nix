@@ -1,9 +1,8 @@
 { pkgs ? import ../nix {} }:
 
 let
-  eval = import (pkgs.path + "/nixos/lib/eval-config.nix") {
-    baseModules = import ../src/nix/modules.nix;
-    modules = [];
+  eval = pkgs.lib.evalModules {
+    modules = import ../src/nix/modules.nix;
   };
   options = pkgs.nixosOptionsDoc {
     options = eval.options;
