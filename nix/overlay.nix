@@ -5,6 +5,12 @@ let
 
   sources = import ./sources.nix;
 
+  fakeRepo = src: super.runCommand "source" { inherit src; buildInputs = [super.git]; } ''
+    cp -r --no-preserve=mode $src $out
+    git init
+    cp -r .git $out
+  '';
+
 in
 {
 
@@ -19,7 +25,7 @@ in
   doc = self.stdenv.mkDerivation { 
     name = "arion-documentation"; 
     buildInputs = [super.antora]; 
-    src = ../.;
+    src = fakeRepo ../.;
     HOME = ".";
     buildPhase = "antora antora-playbook";
     installPhase = ''
