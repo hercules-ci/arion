@@ -1,3 +1,5 @@
+# This is not used when the docs are imported into the docs site.
+# It is only here for development preview.
 content:
   sources:
   - url: .
