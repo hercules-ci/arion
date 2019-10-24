@@ -18,7 +18,7 @@ let
 
   builtinModules = [
     argsModule
-  ] ++ import ./module-composition.nix;
+  ] ++ import ./modules.nix;
 
   argsModule = {
     _file = ./eval-composition.nix;

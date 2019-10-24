@@ -2,7 +2,7 @@
 
 let
   eval = import (pkgs.path + "/nixos/lib/eval-config.nix") {
-    baseModules = import ../src/nix/module-composition.nix;
+    baseModules = import ../src/nix/modules.nix;
     modules = [];
   };
   options = pkgs.nixosOptionsDoc {
