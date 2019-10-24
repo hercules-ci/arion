@@ -1,5 +1,6 @@
 { sources ? import ./sources.nix
-, nixpkgsSrc ? sources.nixpkgs
+, nixpkgsName ? "nixos-19.09"
+, nixpkgsSrc ? sources.${nixpkgsName}
 , system ? builtins.currentSystem
 , ...
 }:

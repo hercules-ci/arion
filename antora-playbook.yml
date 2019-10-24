@@ -1,0 +1,11 @@
+content:
+  sources:
+  - url: .
+    start_path: docs
+    branches: HEAD
+ui:
+  bundle:
+    url: ./docs/ui-bundle.zip
+output:
+  dir: ./public
+

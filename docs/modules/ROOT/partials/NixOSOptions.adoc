@@ -1,0 +1,941 @@
+= Arion options
+
+== docker-compose.extended
+
+Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+
+No Example:: {blank}
+
+== docker-compose.raw
+
+Attribute set that will be turned into the docker-compose.yaml file, using Nix's toJSON builtin.
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+
+No Example:: {blank}
+
+== host.nixStorePrefix
+
+Prefixes store paths on the host, allowing the Nix store to be
+stored at an alternate location without altering the format of
+store paths.
+
+For example: instead of mounting the host's /nix/store as the
+container's /nix/store, this will mount /mnt/foo/nix/store
+as the container's /nix/store.
+
+
+[discrete]
+=== details
+
+Type:: string
+Default::
++
+----
+""
+----
+
+
+Example::
++
+----
+"/mnt/foo"
+----
+
+
+== host.uid
+
+The numeric user id (UID) of the user running arion.
+
+This lets you to write modules that interact with the host
+user's files, which is helpful for local development, but not
+intended for production-like deployment scenarios.
+
+
+[discrete]
+=== details
+
+Type:: signed integer
+No Default:: {blank}
+
+No Example:: {blank}
+
+== out.dockerComposeYaml
+
+A derivation that produces a docker-compose.yaml file for this composition.
+
+[discrete]
+=== details
+
+Type:: package
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== out.dockerComposeYamlAttrs
+
+The text of out.dockerComposeYaml.
+
+[discrete]
+=== details
+
+Type:: attribute set of unspecifieds
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== out.dockerComposeYamlText
+
+The text of out.dockerComposeYaml.
+
+[discrete]
+=== details
+
+Type:: string
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services
+
+An attribute set of service configurations. A service specifies how to run an image as a container.
+
+[discrete]
+=== details
+
+Type:: attribute set of submodules
+No Default:: {blank}
+
+No Example:: {blank}
+
+== services.<name>.composition
+
+The composition configuration.
+
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services.<name>.host
+
+The composition-level host option values.
+
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services.<name>.image.command
+
+
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.image.contents
+
+Top level paths in the container.
+
+
+[discrete]
+=== details
+
+Type:: list of packages
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.image.name
+
+A human readable name for the docker image.
+
+Shows up in the <code>docker ps</code> output in the
+<code>IMAGE</code> column, among other places.
+
+
+[discrete]
+=== details
+
+Type:: string
+Default::
++
+----
+{"_type":"literalExample","text":"config.service.name"}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.image.nixBuild
+
+Whether to build this image with Nixpkgs'
+<code>dockerTools.buildLayeredImage</code>
+and then load it with <code>docker load</code>.
+
+By default, an image will be built with Nix unless <option>service.image</option>
+is set. See also <option>image.name</option>, which defaults to
+the service name.
+
+
+[discrete]
+=== details
+
+Type:: boolean
+No Default:: {blank}
+
+No Example:: {blank}
+
+== services.<name>.image.rawConfig
+
+This is a low-level fallback for when a container option has not
+been modeled in the Arion module system.
+
+This attribute set does not have an appropriate merge function.
+Please use the specific <code>image</code> options instead.
+
+Run-time configuration of the container. A full list of the
+options are available at in the <link xlink:href="https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions">Docker Image Specification
+v1.2.0</link>.
+
+
+[discrete]
+=== details
+
+Type:: attribute set of unspecifieds
+Default::
++
+----
+{}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.nixos.build
+
+NixOS build products from <code>config.system.build</code>, such as <code>toplevel</code> and <code>etc</code>.
+
+This option is unused by default, because not all images use NixOS.
+
+One way to use this is to enable <code>nixos.useSystemd</code>, but the
+NixOS configuration can be used in other ways.
+
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services.<name>.nixos.configuration
+
+Modules to add to the NixOS configuration.
+
+This option is unused by default, because not all images use NixOS.
+
+One way to use this is to enable <code>nixos.useSystemd</code>, but the
+NixOS configuration can be used in other ways.
+
+
+[discrete]
+=== details
+
+Type:: list of unspecifieds or unspecified convertible to it
+Default::
++
+----
+{}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.nixos.evaluatedConfig
+
+Evaluated NixOS configuration, to be read by service-level modules.
+
+This option is unused by default, because not all images use NixOS.
+
+One way to use this is to enable <code>nixos.useSystemd</code>, but the
+NixOS configuration can be used in other ways.
+
+
+[discrete]
+=== details
+
+Type:: attribute set
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services.<name>.nixos.useSystemd
+
+When enabled, call the NixOS systemd-based init system.
+
+Configure NixOS with <code>nixos.configuration</code>.
+
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+false
+----
+
+
+No Example:: {blank}
+
+== services.<name>.out.extendedInfo
+
+Information about a service to include in the Docker Compose file,
+but that will not be used by the <code>docker-compose</code> command
+itself.
+
+It will be inserted in <code>x-arion.serviceInfo.&lt;service.name></code>.
+
+
+[discrete]
+=== details
+
+Type:: attribute set of unspecifieds
+Default::
++
+----
+{}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.out.service
+
+Raw input for the service in <code>docker-compose.yaml</code>.
+
+You should not need to use this option. If anything is
+missing, please contribute the missing option.
+
+This option is user accessible because it may serve as an
+escape hatch for some.
+
+
+[discrete]
+=== details
+
+Type:: attribute set of unspecifieds
+No Default:: {blank}
+
+No Example:: {blank}
+
+== services.<name>.service.build.context
+
+Locates a Dockerfile to use for creating an image to use in this service.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#context">Docker Compose#context</link>
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.capabilities
+
+Enable/disable linux capabilities, or pick Docker's default.
+
+Setting a capability to <code>true</code> means that it will be
+"added". Setting it to <code>false</code> means that it will be "dropped".
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#cap_add-cap_drop">Docker Compose#cap_add-cap_drop</link>
+
+Omitted and <code>null</code> capabilities will therefore be set
+according to Docker's <link xlink:href="https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities">default list of capabilities.</link>
+
+
+[discrete]
+=== details
+
+Type:: attribute set of null or booleans
+Default::
++
+----
+{}
+----
+
+
+Example::
++
+----
+{"ALL":true,"NET_ADMIN":false,"SYS_ADMIN":false}
+----
+
+
+== services.<name>.service.command
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#command">Docker Compose#command</link>
+
+[discrete]
+=== details
+
+Type:: null or unspecified
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.container_name
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#container_name">Docker Compose#container_name</link>
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.defaultExec
+
+Container program and arguments to invoke when calling
+<code>arion exec &lt;service.name></code> without further arguments.
+
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+["/bin/sh"]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.depends_on
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#depends_on">Docker Compose#depends_on</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.devices
+
+See <link xlink:href="https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"><code>docker run --device</code> documentation</link>
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#devices">Docker Compose#devices</link>
+
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.entrypoint
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#entrypoint">Docker Compose#entrypoint</link>
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.env_file
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#env_file">Docker Compose#env_file</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.environment
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#environment">Docker Compose#environment</link>
+
+[discrete]
+=== details
+
+Type:: attribute set of string or signed integers
+Default::
++
+----
+{}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.expose
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#expose">Docker Compose#expose</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.external_links
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#external_links">Docker Compose#external_links</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.extra_hosts
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#extra_hosts">Docker Compose#extra_hosts</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.hostStoreAsReadOnly
+
+Adds a ':ro' (read-only) access mode to the host nix store bind mount.
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+true
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.hostname
+
+Analogous to the <code>docker run</code> counterpart.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir">Docker Compose#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir</link>
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.image
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#image">Docker Compose#image</link>
+
+[discrete]
+=== details
+
+Type:: string
+No Default:: {blank}
+
+No Example:: {blank}
+
+== services.<name>.service.links
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#links">Docker Compose#links</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.name
+
+The name of the service - <code>&lt;name></code> in the composition-level <code>services.&lt;name></code>
+
+
+[discrete]
+=== details
+
+Type:: string
+No Default:: {blank}
+Read Only:: {blank}
+No Example:: {blank}
+
+== services.<name>.service.network_mode
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#network_mode">Docker Compose#network_mode</link>
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.networks
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#networks">Docker Compose#networks</link>
+
+[discrete]
+=== details
+
+Type:: null or list of strings
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.ports
+
+Expose ports on host. "host:container" or structured.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#ports">Docker Compose#ports</link>
+
+
+[discrete]
+=== details
+
+Type:: list of unspecifieds
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.privileged
+
+Analogous to the <code>docker run</code> counterpart.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir">Docker Compose#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir</link>
+
+
+[discrete]
+=== details
+
+Type:: null or boolean
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.restart
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#restart">Docker Compose#restart</link>
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.stop_signal
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#stop_signal">Docker Compose#stop_signal</link>
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.sysctls
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#sysctls">Docker Compose#sysctls</link>
+
+[discrete]
+=== details
+
+Type:: attribute set of string or signed integers
+Default::
++
+----
+{}
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.tmpfs
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#tmpfs">Docker Compose#tmpfs</link>
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.tty
+
+Analogous to the <code>docker run</code> counterpart.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir">Docker Compose#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir</link>
+
+
+[discrete]
+=== details
+
+Type:: null or boolean
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.useHostNixDaemon
+
+Make the host Nix daemon available.
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+false
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.useHostStore
+
+Bind mounts the host store if enabled, avoiding copying.
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+false
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.user
+
+Analogous to the <code>docker run</code> counterpart.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir">Docker Compose#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir</link>
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.volumes
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#volumes">Docker Compose#volumes</link>
+
+[discrete]
+=== details
+
+Type:: list of unspecifieds
+Default::
++
+----
+[]
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.working_dir
+
+Analogous to the <code>docker run</code> counterpart.
+
+See <link xlink:href="https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir">Docker Compose#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir</link>
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+

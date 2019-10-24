@@ -1,0 +1,6 @@
+name: arion
+title: Arion Documentation
+version: 'master'
+nav:
+- modules/ROOT/nav.adoc
+- modules/reference/nav.adoc
