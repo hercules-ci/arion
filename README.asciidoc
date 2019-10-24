@@ -1,1 +1,7 @@
-# [Documentation](https://docs.hercules-ci.com/arion/)
+Arion is a tool for building and running applications that
+consist of multiple docker containers using NixOS modules.
+It has special support for docker images that are built with Nix,
+for a smooth development experience and improved performance.
+
+
+# [Intro and Documentation](https://docs.hercules-ci.com/arion/)
