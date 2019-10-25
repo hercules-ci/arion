@@ -4,4 +4,4 @@ It has special support for docker images that are built with Nix,
 for a smooth development experience and improved performance.
 
 
-# [Intro and Documentation](https://docs.hercules-ci.com/arion/)
+# https://docs.hercules-ci.com/arion/[Intro and Documentation]
