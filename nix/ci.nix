@@ -24,8 +24,7 @@ dimension "Nixpkgs version" {
 
       dimension "System" {
         "x86_64-linux" = { isReferenceTarget = isReferenceNixpkgs; };
-        # TODO: darwin
-        # "x86_64-darwin" = { enableNixOSTests = false; };
+        "x86_64-darwin" = { enableNixOSTests = false; };
       } (
         system: { isReferenceTarget ? false }:
           let
