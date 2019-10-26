@@ -18,7 +18,7 @@ spec = describe "evaluateComposition" $ it "matches an example" $ do
     { evalUid      = 123
     , evalModules  = NEL.fromList
                        ["src/haskell/testdata/Arion/NixSpec/arion-compose.nix"]
-    , evalPkgs     = "import <nixpkgs> {}"
+    , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
     , evalWorkDir  = Nothing
     , evalMode     = ReadOnly
     , evalUserArgs = ["--show-trace"]
