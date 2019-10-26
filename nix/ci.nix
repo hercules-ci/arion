@@ -24,15 +24,16 @@ dimension "Nixpkgs version" {
 
       dimension "System" {
         "x86_64-linux" = { isReferenceTarget = isReferenceNixpkgs; };
-        # TODO: darwin
-        # "x86_64-darwin" = { enableNixOSTests = false; };
+        "x86_64-darwin" = { enableNixOSTests = false; };
       } (
-        system: { isReferenceTarget ? false }:
+        system: { isReferenceTarget ? false, enableNixOSTests ? true }:
           let
             pkgs = import ./. { inherit system; nixpkgsSrc = sources.${nixpkgsSource}; };
           in
           {
-            inherit (pkgs) arion tests;
+            inherit (pkgs) arion;
+          } // lib.optionalAttrs enableNixOSTests {
+            inherit (pkgs) tests;
           } // lib.optionalAttrs enableDoc {
             inherit (pkgs) doc doc-options doc-options-check;
           } // lib.optionalAttrs isReferenceTarget {
