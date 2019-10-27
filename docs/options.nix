@@ -8,8 +8,11 @@ let
     options = eval.options;
   };
 
-in pkgs.writeText "agent-options" ''
+in (pkgs.writeText "agent-options" ''
   = Arion options
 
   ${options.optionsAsciiDoc}
-''
+'').overrideAttrs (o: {
+  # Work around https://github.com/hercules-ci/hercules-ci-agent/issues/168
+  allowSubstitutes = true;
+})
