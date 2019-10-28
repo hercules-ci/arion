@@ -78,10 +78,10 @@ Arion is configured declaratively with two files:
 
 === arion-pkgs.nix
 
-Arion needs `arion-pkgs.nix` to import nixpkgs, it's contents can be as simple as:
+Arion needs `arion-pkgs.nix` to import nixpkgs, for example:
 
 ```nix
-import <nixpkgs> {}
+import <nixpkgs> { system = "x86_64-linux"; }
 ```
 
 or more sophisticated (recommended) setup with https://github.com/nmattia/niv[Niv].
