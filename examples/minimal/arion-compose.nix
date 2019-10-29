@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  config.docker-compose.services = {
+  config.services = {
 
     webserver = {
       service.useHostStore = true;

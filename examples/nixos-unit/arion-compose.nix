@@ -17,7 +17,7 @@
  */
 
 {
-  docker-compose.services.webserver = { config, pkgs, ... }: {
+  services.webserver = { config, pkgs, ... }: {
 
     nixos.configuration = {config, pkgs, ...}: {
       boot.isContainer = true;

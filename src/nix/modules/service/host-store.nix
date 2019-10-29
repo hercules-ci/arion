@@ -1,6 +1,6 @@
 /*
 
-   This service-level bind mounts the host store into the container
+   This service-level module bind mounts the host store into the container
    when the service.useHostStore option is set to true.
 
  */

@@ -97,7 +97,7 @@ Describe containers using NixOS-style modules. There are a few options:
 ```nix
 { pkgs, ... }:
 {
-  config.docker-compose.services = {
+  config.services = {
 
     webserver = {
       service.useHostStore = true;
@@ -123,7 +123,7 @@ Describe containers using NixOS-style modules. There are a few options:
 ```nix
 
 {
-  docker-compose.services.webserver = { config, pkgs, ... }: {
+  services.webserver = { config, pkgs, ... }: {
 
     nixos.configuration = {config, pkgs, ...}: {
       boot.isContainer = true;
@@ -153,7 +153,7 @@ Describe containers using NixOS-style modules. There are a few options:
 
 ```nix
 {
-  docker-compose.services.webserver = { pkgs, ... }: {
+  services.webserver = { pkgs, ... }: {
     nixos.useSystemd = true;
     nixos.configuration.boot.tmpOnTmpfs = true;
     nixos.configuration.services.nginx.enable = true;
@@ -170,7 +170,7 @@ Describe containers using NixOS-style modules. There are a few options:
 
 ```nix
 {
-  docker-compose.services.postgres = {
+  services.postgres = {
     service.image = "postgres:10";
     service.volumes = [ "${toString ./.}/postgres-data:/var/lib/postgresql/data" ];
     service.environment.POSTGRES_PASSWORD = "mydefaultpass";

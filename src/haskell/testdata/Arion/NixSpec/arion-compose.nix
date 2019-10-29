@@ -1,5 +1,5 @@
 {
-  docker-compose.services.webserver = { pkgs, ... }: {
+  services.webserver = { pkgs, ... }: {
     nixos.useSystemd = true;
     nixos.configuration.boot.tmpOnTmpfs = true;
     nixos.configuration.services.nginx.enable = true;
