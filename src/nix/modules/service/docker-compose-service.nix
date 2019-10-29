@@ -11,11 +11,11 @@ let
   inherit (types) listOf nullOr attrsOf str either int bool;
 
   link = url: text:
-    ''<link xlink:href="${url}">${text}</link>'';
+    ''link:${url}[${text}]'';
   dockerComposeRef = fragment:
-    ''See <link xlink:href="https://docs.docker.com/compose/compose-file/#${fragment}">Docker Compose#${fragment}</link>'';
+    ''See ${link "https://docs.docker.com/compose/compose-file/#${fragment}" "Docker Compose#${fragment}"}'';
   dockerComposeKitchenSink = ''
-    Analogous to the <code>docker run</code> counterpart.
+    Analogous to the `docker run` counterpart.
 
     ${dockerComposeRef "domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir"}
   '';
@@ -33,7 +33,7 @@ in
     out.service = mkOption {
       type = attrsOf types.unspecified;
       description = ''
-        Raw input for the service in <code>docker-compose.yaml</code>.
+        Raw input for the service in `docker-compose.yaml`.
 
         You should not need to use this option. If anything is
         missing, please contribute the missing option.
@@ -47,7 +47,7 @@ in
     service.name = mkOption {
       type = str;
       description = ''
-        The name of the service - <code>&lt;name></code> in the composition-level <code>services.&lt;name></code>
+        The name of the service - `<name>` in the composition-level `services.<name>`
       '';
       readOnly = true;
     };
@@ -110,7 +110,7 @@ in
       default = [];
       description = ''
         See ${link "https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"
-        "<code>docker run --device</code> documentation"}
+        "`docker run --device` documentation"}
 
         ${dockerComposeRef "devices"}
       '';
@@ -201,11 +201,11 @@ in
       description = ''
         Enable/disable linux capabilities, or pick Docker's default.
 
-        Setting a capability to <code>true</code> means that it will be
-        "added". Setting it to <code>false</code> means that it will be "dropped".
+        Setting a capability to `true` means that it will be
+        "added". Setting it to `false` means that it will be "dropped".
         ${dockerComposeRef "cap_add-cap_drop"}
 
-        Omitted and <code>null</code> capabilities will therefore be set
+        Omitted and `null` capabilities will therefore be set
         according to Docker's ${
           link "https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities"
                "default list of capabilities."

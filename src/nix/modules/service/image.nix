@@ -40,7 +40,7 @@ in
     build.image = mkOption {
       type = nullOr package;
       description = ''
-        Docker image derivation to be <code>docker load</code>ed.
+        Docker image derivation to be `docker load`ed.
       '';
       internal = true;
     };
@@ -58,11 +58,11 @@ in
       type = bool;
       description = ''
         Whether to build this image with Nixpkgs'
-        <code>dockerTools.buildLayeredImage</code>
-        and then load it with <code>docker load</code>.
+        `dockerTools.buildLayeredImage`
+        and then load it with `docker load`.
 
-        By default, an image will be built with Nix unless <option>service.image</option>
-        is set. See also <option>image.name</option>, which defaults to
+        By default, an image will be built with Nix unless `service.image`
+        is set. See also `image.name`, which defaults to
         the service name.
       '';
     };
@@ -73,8 +73,8 @@ in
       description = ''
         A human readable name for the docker image.
 
-        Shows up in the <code>docker ps</code> output in the
-        <code>IMAGE</code> column, among other places.
+        Shows up in the `docker ps` output in the
+        `IMAGE` column, among other places.
       '';
     };
     image.contents = mkOption {
@@ -92,11 +92,11 @@ in
         been modeled in the Arion module system.
 
         This attribute set does not have an appropriate merge function.
-        Please use the specific <code>image</code> options instead.
+        Please use the specific `image` options instead.
 
         Run-time configuration of the container. A full list of the
-        options are available at in the <link xlink:href="https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions">Docker Image Specification
-        v1.2.0</link>.
+        options is available in the https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions[Docker Image Specification
+        v1.2.0].
       '';
     };
     image.command = mkOption {

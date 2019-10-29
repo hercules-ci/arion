@@ -1,0 +1,9 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash
+
+set -eu -o pipefail
+
+cd "$(dirname ${BASH_SOURCE[0]})"
+
+doc_options="$(nix-build nix -A doc-options)"
+cat "$doc_options" >docs/modules/ROOT/partials/NixOSOptions.adoc
