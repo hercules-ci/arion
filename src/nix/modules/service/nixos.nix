@@ -18,7 +18,7 @@ in
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useSystemd</code>, but the
+        One way to use this is to enable `nixos.useSystemd`, but the
         NixOS configuration can be used in other ways.
       '';
     };
@@ -27,11 +27,11 @@ in
       type = attrs;
       readOnly = true;
       description = ''
-        NixOS build products from <code>config.system.build</code>, such as <code>toplevel</code> and <code>etc</code>.
+        NixOS build products from `config.system.build`, such as `toplevel` and `etc`.
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useSystemd</code>, but the
+        One way to use this is to enable `nixos.useSystemd`, but the
         NixOS configuration can be used in other ways.
       '';
     };
@@ -44,7 +44,7 @@ in
 
         This option is unused by default, because not all images use NixOS.
 
-        One way to use this is to enable <code>nixos.useSystemd</code>, but the
+        One way to use this is to enable `nixos.useSystemd`, but the
         NixOS configuration can be used in other ways.
       '';
     };

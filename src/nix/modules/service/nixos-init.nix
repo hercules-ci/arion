@@ -13,7 +13,7 @@ in
       description = ''
         When enabled, call the NixOS systemd-based init system.
 
-        Configure NixOS with <code>nixos.configuration</code>.
+        Configure NixOS with the `nixos.configuration` option.
       '';
     };
   };

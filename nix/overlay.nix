@@ -19,8 +19,13 @@ in
 
   doc-options = import ../docs/options.nix {};
   doc-options-check = self.runCommand "doc-options-check" {} ''
-    diff --color -u ${../docs/modules/ROOT/partials/NixOSOptions.adoc} ${self.doc-options}
-    touch $out
+    if diff --color -u ${../docs/modules/ROOT/partials/NixOSOptions.adoc} ${self.doc-options}; then
+      touch $out
+    else
+      echo 1>&2 "The doc options have changed and need to be added."
+      echo 1>&2 "Please run ./update-options in the root of your arion clone."
+      exit 1
+    fi
   '';
   doc = self.stdenv.mkDerivation { 
     name = "arion-documentation"; 
