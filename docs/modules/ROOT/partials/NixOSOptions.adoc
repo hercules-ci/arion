@@ -179,6 +179,34 @@ Default::
 
 No Example:: {blank}
 
+== services.<name>.image.drv
+
+Docker image derivation to be `docker load`ed.
+
+By default, when `services.<name>.image.nixBuild` is enabled, this is
+the image produced using `services.<name>.image.command`,
+`services.<name>.image.contents`, and
+`services.<name>.image.rawConfig`.
+
+
+[discrete]
+=== details
+
+Type:: null or package
+Default::
++
+----
+{"_type":"literalExample","text":"pkgs.dockerTools.buildLayeredImage { ... };\n"}
+----
+
+
+Example::
++
+----
+{"_type":"literalExample","text":"let\n  myimage = pkgs.dockerTools.buildImage {\n    name = \"my-image\";\n    contents = [ pkgs.coreutils ];\n  };\nin\nconfig.services = {\n  myservice = {\n    image.drv = myimage;\n    # ...\n  };\n}\n"}
+----
+
+
 == services.<name>.image.name
 
 A human readable name for the docker image.

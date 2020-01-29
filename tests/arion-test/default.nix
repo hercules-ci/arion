@@ -31,6 +31,7 @@ in
       # Pre-build the image because we don't want to build the world
       # in the vm.
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/custom-image/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
       pkgs.stdenv
@@ -40,27 +41,23 @@ in
     $machine->fail("curl localhost:8000");
     $machine->succeed("docker --version");
 
-    subtest "minimal", sub {
-      $machine->succeed("cp -r ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
+    my $makeSubtest = sub {
+      my ( $subtestName, $exampleSrc, @codeRefs ) = @_;
+
+      subtest $subtestName => sub {
+        $machine->succeed("rm -rf work && cp -frT $exampleSrc work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
+        $machine->waitUntilSucceeds("curl localhost:8000");
+        $_->() for @codeRefs;
+        $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down");
+        $machine->waitUntilFails("curl localhost:8000");
+      };
     };
 
-    subtest "full-nixos", sub {
-      $machine->succeed("cp -r ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      # Also test exec with defaultExec
+    $makeSubtest->("minimal", "${../../examples/minimal}");
+    $makeSubtest->("custom-image", "${../../examples/custom-image}");
+    $makeSubtest->("full-nixos", "${../../examples/full-nixos}", sub {
       $machine->succeed("cd work && export NIX_PATH=nixpkgs='${pkgs.path}' && (echo 'nix run -f ~/h/arion arion -c arion exec webserver'; echo 'target=world; echo Hello \$target'; echo exit) | script /dev/null | grep 'Hello world'");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
-    };
-
-    subtest "nixos-unit", sub {
-      $machine->succeed("cp -r ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
-    };
+    });
+    $makeSubtest->("nixos-unit", "${../../examples/nixos-unit}");
   '';
 }

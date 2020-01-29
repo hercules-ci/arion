@@ -38,6 +38,7 @@ Arion allows to compose containers with different granularity:
   * <<NixOS: run only one systemd service>>
   * <<NixOS: run full OS>>
   * <<Docker image from DockerHub>>
+  * <<Docker image tar archive>>
 
 == Installation
 
@@ -177,6 +178,53 @@ Describe containers using NixOS-style modules. There are a few options:
   };
 }
 ```
+
+==== Docker image tar archive
+
+`examples/custom-image/arion-compose.nix`:
+
+```nix
+{ pkgs, ... }:
+
+let
+  webRoot = "/www";
+
+  webserverImage = pkgs.dockerTools.buildLayeredImage {
+    name = "a-webserver";
+
+    config = {
+      Entrypoint = [
+        "${pkgs.darkhttpd}/bin/darkhttpd" webRoot
+      ];
+
+      Volumes = {
+        "${webRoot}" = {};
+      };
+    };
+  };
+in {
+  config.services = {
+
+    webserver = {
+      image.drv = webserverImage;
+      service.command = [ "--port" "8000" ];
+      service.ports = [
+        "8000:8000" # host:container
+      ];
+      service.volumes = [
+        "${webRoot}:${pkgs.nix.doc}/share/doc/nix/manual"
+      ];
+    };
+  };
+}
+```
+
+Note that `config.services.<service>.image.drv` accepts any derivation providing a
+https://docs.docker.com/engine/reference/commandline/image_load/[`docker image load`]able
+tar archive; it is not limited to derivations created with
+https://nixos.org/nixpkgs/manual/#ssec-pkgs-dockerTools-buildImage[`buildImage`]
+or https://nixos.org/nixpkgs/manual/#ssec-pkgs-dockerTools-buildLayeredImage[`buildLayeredImage`]
+from https://nixos.org/nixpkgs/manual/#sec-pkgs-dockerTools[`pkgs.dockerTools`].
 
 === Run
 

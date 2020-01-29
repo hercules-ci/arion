@@ -41,6 +41,14 @@ in
       type = nullOr package;
       description = ''
         Docker image derivation to be `docker load`ed.
+
+        By default, when `services.<name>.image.nixBuild` is enabled, this is
+        the image produced using `services.<name>.image.command`,
+        `services.<name>.image.contents`, and
+        `services.<name>.image.rawConfig`.
+      '';
+      defaultText = lib.literalExample ''
+        pkgs.dockerTools.buildLayeredImage { ... };
       '';
       internal = true;
     };
@@ -105,9 +113,27 @@ in
       description = ''
       '';
     };
+    image.drv = mkOption {
+      type = nullOr package;
+      inherit (options.build.image) description defaultText;
+      example = lib.literalExample ''
+        let
+          myimage = pkgs.dockerTools.buildImage {
+            name = "my-image";
+            contents = [ pkgs.coreutils ];
+          };
+        in
+        config.services = {
+          myservice = {
+            image.drv = myimage;
+            # ...
+          };
+        }
+      '';
+    };
   };
   config = {
-    build.image = builtImage;
+    build.image = config.image.drv or builtImage;
     build.imageName = config.build.image.imageName;
     build.imageTag =
                  if config.build.image.imageTag != ""
