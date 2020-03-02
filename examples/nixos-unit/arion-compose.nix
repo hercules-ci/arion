@@ -28,6 +28,9 @@
         PATH='${config.systemd.services.nginx.environment.PATH}'
         echo nginx:x:${toString config.users.users.nginx.uid}:${toString config.users.groups.nginx.gid}:nginx web server user:/var/empty:/bin/sh >>/etc/passwd
         echo nginx:x:${toString config.users.groups.nginx.gid}:nginx >>/etc/group
+        echo 'nobody:x:65534:65534:Unprivileged account do not use:/var/empty:/run/current-system/sw/bin/nologin' >>/etc/passwd
+        echo 'nogroup:x:65534:' >>/etc/group
+        mkdir -p /run/nginx/ /var/spool/nginx/logs/
         ${config.systemd.services.nginx.runner}
       '';
     };
