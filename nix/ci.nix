@@ -1,7 +1,7 @@
 let
   sources = import ./sources.nix;
   lib = import (sources."nixpkgs" + "/lib");
-  inherit (import sources."project.nix" { inherit lib; }) dimension;
+  inherit (import (sources."project.nix" + "/lib/dimension.nix") { inherit lib; }) dimension;
 in
 
 dimension "Nixpkgs version" {
