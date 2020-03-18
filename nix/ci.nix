@@ -24,10 +24,10 @@ dimension "Nixpkgs version" {
       isReferenceNixpkgs = true;
       enableDoc = true;
     };
-    "nixos-unstable" = {
-      nixpkgsSource = "nixos-unstable";
-      enableDoc = true;
-    };
+    # "nixos-unstable" = {
+    #   nixpkgsSource = "nixos-unstable";
+    #   enableDoc = true;
+    # };
   } (
     _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true, nixosTestIsPerl ? false }:
 
