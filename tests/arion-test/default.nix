@@ -35,32 +35,62 @@ in
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
       pkgs.stdenv
     ];
+
+    virtualisation.memorySize = 512;
   };
   testScript = ''
-    $machine->fail("curl localhost:8000");
-    $machine->succeed("docker --version");
+    machine.fail("curl localhost:8000")
+    machine.succeed("docker --version")
 
-    subtest "minimal", sub {
-      $machine->succeed("cp -r ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
-    };
+    # Tests
+    #  - arion up
+    #  - arion down
+    #  - examples/minimal
+    with subtest("minimal"):
+        machine.succeed(
+            "rm -rf work && cp -frT ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
+        )
+        machine.wait_until_succeeds("curl localhost:8000")
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl localhost:8000")
 
-    subtest "full-nixos", sub {
-      $machine->succeed("cp -r ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      # Also test exec with defaultExec
-      $machine->succeed("cd work && export NIX_PATH=nixpkgs='${pkgs.path}' && (echo 'nix run -f ~/h/arion arion -c arion exec webserver'; echo 'target=world; echo Hello \$target'; echo exit) | script /dev/null | grep 'Hello world'");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
-    };
+    # Tests
+    #  - arion exec
+    #  - examples/full-nixos
+    with subtest("full-nixos"):
+        machine.succeed(
+            "rm -rf work && cp -frT ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
+        )
+        machine.wait_until_succeeds("curl localhost:8000")
 
-    subtest "nixos-unit", sub {
-      $machine->succeed("cp -r ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d");
-      $machine->waitUntilSucceeds("curl localhost:8000");
-      $machine->succeed("cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down && rm -rf work");
-      $machine->waitUntilFails("curl localhost:8000");
-    };
+        machine.succeed(
+            """
+            set -eux -o pipefail
+            cd work
+            export NIX_PATH=nixpkgs='${pkgs.path}'
+            echo 'target=world; echo Hello $target; exit' \
+              | script 'arion exec webserver' \
+              | grep 'Hello world'
+            """
+        ),
+
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl localhost:8000")
+
+    # Tests
+    #  - examples/nixos-unit
+    with subtest("nixos-unit"):
+        machine.succeed(
+            "rm -rf work && cp -frT ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
+        )
+        machine.wait_until_succeeds("curl localhost:8000")
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl localhost:8000")
   '';
 }

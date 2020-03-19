@@ -10,7 +10,7 @@ let
   tag = lib.head (lib.strings.splitString "-" (baseNameOf builtImage.outPath));
   name = "arion-base";
 
-  builtImage = pkgs.dockerTools.buildLayeredImage {
+  builtImage = pkgs.dockerTools.buildImage {
     inherit name;
     contents = pkgs.runCommand "minimal-contents" {} ''
         mkdir -p $out/bin $out/usr/bin

@@ -1,25 +1,35 @@
 let
   sources = import ./sources.nix;
   lib = import (sources."nixpkgs" + "/lib");
-  inherit (import sources."project.nix" { inherit lib; }) dimension;
+  inherit (import (sources."project.nix" + "/lib/dimension.nix") { inherit lib; }) dimension;
 in
 
 dimension "Nixpkgs version" {
     "nixos-19_03" = {
-      nixpkgsSource = "nixpkgs";
-      isReferenceNixpkgs = true;
+      # flyingcircus.io latest long-term support is based off 19.03
+      # https://flyingcircus.io/doc/
+      # It is nice to have some level of support for their platform,
+      # but we don't guarantee any support.
+      nixpkgsSource = "nixos-19.03";
       enableDoc = false;
+      nixosTestIsPerl = true;
     };
     "nixos-19_09" = {
       nixpkgsSource = "nixos-19.09";
+      enableDoc = false;
+      nixosTestIsPerl = true;
+    };
+    "nixos-20_03" = {
+      nixpkgsSource = "nixos-20.03";
+      isReferenceNixpkgs = true;
       enableDoc = true;
     };
-    "nixos-unstable" = {
-      nixpkgsSource = "nixos-unstable";
-      enableDoc = true;
-    };
+    # "nixos-unstable" = {
+    #   nixpkgsSource = "nixos-unstable";
+    #   enableDoc = true;
+    # };
   } (
-    _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true }:
+    _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true, nixosTestIsPerl ? false }:
 
 
       dimension "System" {
@@ -28,7 +38,10 @@ dimension "Nixpkgs version" {
       } (
         system: { isReferenceTarget ? false, enableNixOSTests ? true }:
           let
-            pkgs = import ./. { inherit system; nixpkgsSrc = sources.${nixpkgsSource}; };
+            pkgs = import ./. {
+              inherit system nixosTestIsPerl;
+              nixpkgsSrc = sources.${nixpkgsSource};
+            };
           in
           {
             inherit (pkgs) arion;
