@@ -11,10 +11,10 @@ import Protolude hiding (to)
 import qualified Data.Aeson as Aeson
 import           Arion.Aeson (decodeFile)
 import qualified System.Process as Process
+import qualified Data.Text as T
 
 import Control.Lens
 import Data.Aeson.Lens
-import Data.String
 import System.IO (withFile, IOMode(ReadMode))
 
 
@@ -57,4 +57,4 @@ loadImage imgPath = withFile (imgPath) ReadMode $ \fileHandle -> do
 dockerImages :: IO [TaggedImage]
 dockerImages = do
   let procSpec = Process.proc "docker" [ "images",  "--filter", "dangling=false", "--format", "{{.Repository}}:{{.Tag}}" ]
-  (map toS . lines) <$> Process.readCreateProcess procSpec ""
+  (map toS . T.lines . toS) <$> Process.readCreateProcess procSpec ""
