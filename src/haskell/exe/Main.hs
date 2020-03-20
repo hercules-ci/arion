@@ -17,8 +17,6 @@ import Control.Monad.Fail
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
-import Data.List.NonEmpty (NonEmpty(..))
-
 import System.Posix.User (getRealUserID)
 
 data CommonOptions =
