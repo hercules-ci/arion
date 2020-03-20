@@ -22,7 +22,6 @@ import           Paths_arion_compose
 import qualified Data.Text.IO                  as T
 
 import qualified Data.List.NonEmpty            as NE
-import           Data.List.NonEmpty             ( NonEmpty(..) )
 
 import           Control.Arrow                  ( (>>>) )
 import           System.IO.Temp                 ( withTempFile )

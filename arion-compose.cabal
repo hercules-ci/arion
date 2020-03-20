@@ -36,7 +36,7 @@ common common
                    , process
                    , temporary
                    , text
-                   , protolude
+                   , protolude >= 0.2
                    , unix
   ghc-options:     -Wall
 
