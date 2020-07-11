@@ -110,7 +110,8 @@ in
     build.image = builtImage;
     build.imageName = config.build.image.imageName;
     build.imageTag =
-                 if config.build.image.imageTag != ""
+                 if (config.build.image.imageTag or null) != null 
+                     && config.build.image.imageTag != ""
                  then config.build.image.imageTag
                  else lib.head (lib.strings.splitString "-" (baseNameOf config.build.image.outPath));
 
