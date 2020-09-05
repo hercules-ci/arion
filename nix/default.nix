@@ -1,5 +1,5 @@
 { sources ? import ./sources.nix
-, nixpkgsName ? "nixos-20.03"
+, nixpkgsName ? "nixos-unstable"
 , nixpkgsSrc ? sources.${nixpkgsName}
 , system ? builtins.currentSystem
 , nixosTestIsPerl ? false

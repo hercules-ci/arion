@@ -48,7 +48,7 @@ in
         haskellPkgs.ghcid
         super.docker-compose
         self.niv
-        self.releaser
+        # self.releaser
       ];
     };
   };
