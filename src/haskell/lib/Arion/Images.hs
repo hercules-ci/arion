@@ -15,8 +15,6 @@ import qualified Data.Text as T
 
 import Control.Lens
 import Data.Aeson.Lens
-import System.IO (withFile, IOMode(ReadMode))
-
 
 data Image = Image
   { image :: Text -- ^ file path
