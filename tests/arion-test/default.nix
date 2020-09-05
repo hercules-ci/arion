@@ -36,7 +36,7 @@ in
       pkgs.stdenv
     ];
 
-    virtualisation.memorySize = 512;
+    virtualisation.memorySize = 1024;
   };
   testScript = ''
     machine.fail("curl localhost:8000")
