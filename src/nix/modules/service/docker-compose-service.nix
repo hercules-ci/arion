@@ -8,7 +8,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf str either int bool;
+  inherit (types) attrs attrsOf bool either int list listOf nullOr oneOf path str;
 
   link = url: text:
     ''link:${url}[${text}]'';
@@ -82,7 +82,7 @@ in
       description = dockerComposeKitchenSink;
     };
     service.environment = mkOption {
-      type = attrsOf (either str int);
+      type = attrsOf (oneOf [ str path attrs int list bool null ]);
       default = {};
       description = dockerComposeRef "environment";
     };
