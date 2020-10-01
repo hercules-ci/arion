@@ -19,10 +19,15 @@
 {
   services.webserver = { config, pkgs, ... }: {
 
-    nixos.configuration = {config, pkgs, ...}: {
+    nixos.configuration = {config, lib, options, pkgs, ...}: {
       boot.isContainer = true;
-      services.nginx.enable = true;
-      services.nginx.virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
+      services.nginx = {
+        enable = true;
+        virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
+      } // lib.optionalAttrs (options?services.nginx.stateDir) {
+        # Work around a problem in NixOS 20.03
+        stateDir = "/var/lib/nginx";
+      };
       system.build.run-nginx = pkgs.writeScript "run-nginx" ''
         #!${pkgs.bash}/bin/bash
         PATH='${config.systemd.services.nginx.environment.PATH}'
@@ -30,8 +35,8 @@
         echo nginx:x:${toString config.users.groups.nginx.gid}:nginx >>/etc/group
         echo 'nobody:x:65534:65534:Unprivileged account do not use:/var/empty:/run/current-system/sw/bin/nologin' >>/etc/passwd
         echo 'nogroup:x:65534:' >>/etc/group
-        mkdir -p /var/log/nginx /run/nginx/ /var/cache/nginx
-        chown nginx /var/log/nginx /run/nginx/ /var/cache/nginx
+        mkdir -p /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp}
+        chown nginx /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp}
         ${config.systemd.services.nginx.runner}
       '';
     };
