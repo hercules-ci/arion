@@ -17,6 +17,8 @@ import Control.Monad.Fail
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
+import Data.Aeson(Value)
+
 import System.Posix.User (getRealUserID)
 
 data CommonOptions =
@@ -24,6 +26,7 @@ data CommonOptions =
     { files :: NonEmpty FilePath
     , pkgs :: Text
     , nixArgs :: [Text]
+    , prebuiltComposeFile :: Maybe FilePath
     }
   deriving (Show)
 
@@ -56,6 +59,10 @@ parseOptions = do
                     <> help "Causes Nix to print out a stack trace in case of Nix expression evaluation errors.")
     -- TODO --option support (https://github.com/pcapriotti/optparse-applicative/issues/284)
     userNixArgs <- many (T.pack <$> strOption (long "nix-arg" <> metavar "ARG" <> help "Pass an extra argument to nix. Example: --nix-arg --option --nix-arg substitute --nix-arg false"))
+    prebuiltComposeFile <- optional $ strOption
+               (  long "prebuilt-file"
+               <> metavar "JSONFILE"
+               <> help "Do not evaluate and use the prebuilt JSONFILE instead. Causes other evaluation-related options to be ignored." )
     pure $
       let nixArgs = userNixArgs <|> "--show-trace" <$ guard showTrace
       in CommonOptions{..}
@@ -135,8 +142,7 @@ runDC cmd (DockerComposeArgs args) _opts = do
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
-  ea <- defaultEvaluationArgs opts
-  Arion.Nix.withBuiltComposition ea $ \path -> do
+  withBuiltComposeFile opts $ \path -> do
     loadImages path
     DockerCompose.run DockerCompose.Args
       { files = [path]
@@ -145,12 +151,35 @@ runBuildAndDC cmd dopts opts = do
 
 runEvalAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runEvalAndDC cmd dopts opts = do
-  ea <- defaultEvaluationArgs opts
-  Arion.Nix.withEvaluatedComposition ea $ \path ->
+  withComposeFile opts $ \path ->
     DockerCompose.run DockerCompose.Args
       { files = [path]
       , otherArgs = [cmd] ++ unDockerComposeArgs dopts
       }
+
+withBuiltComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
+withBuiltComposeFile opts cont = case prebuiltComposeFile opts of
+  Just prebuilt -> do
+    cont prebuilt
+  Nothing -> do
+    args <- defaultEvaluationArgs opts
+    Arion.Nix.withBuiltComposition args cont
+
+withComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
+withComposeFile opts cont = case prebuiltComposeFile opts of
+  Just prebuilt -> do
+    cont prebuilt
+  Nothing -> do
+    args <- defaultEvaluationArgs opts
+    Arion.Nix.withEvaluatedComposition args cont
+
+getComposeValue :: CommonOptions -> IO Value
+getComposeValue opts = case prebuiltComposeFile opts of
+  Just prebuilt -> do
+    decodeFile prebuilt
+  Nothing -> do
+    args <- defaultEvaluationArgs opts
+    Arion.Nix.evaluateComposition args
 
 defaultEvaluationArgs :: CommonOptions -> IO EvaluationArgs
 defaultEvaluationArgs co = do
@@ -166,7 +195,7 @@ defaultEvaluationArgs co = do
 
 runCat :: CommonOptions -> IO ()
 runCat co = do
-  v <- Arion.Nix.evaluateComposition =<< defaultEvaluationArgs co
+  v <- getComposeValue co
   T.hPutStrLn stdout (pretty v)
 
 runRepl :: CommonOptions -> IO ()
@@ -229,8 +258,7 @@ runExec :: Bool -> Bool -> Maybe Text -> Bool -> Int -> [(Text, Text)] -> Maybe 
 runExec detach privileged user noTTY index envs workDir service commandAndArgs opts = do
   putErrText $ "Service: " <> service
 
-  ea <- defaultEvaluationArgs opts
-  Arion.Nix.withEvaluatedComposition ea $ \path -> do
+  withComposeFile opts $ \path -> do
     commandAndArgs'' <- case commandAndArgs of
       [] -> getDefaultExec path service
       x -> pure x
