@@ -21,6 +21,11 @@ dimension "Nixpkgs version" {
     };
     "nixos-20_03" = {
       nixpkgsSource = "nixos-20.03";
+      isReferenceNixpkgs = false;
+      enableDoc = true;
+    };
+    "nixos-20_09" = {
+      nixpkgsSource = "nixos-20.09";
       isReferenceNixpkgs = true;
       enableDoc = true;
     };
