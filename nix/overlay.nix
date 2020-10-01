@@ -46,6 +46,7 @@ in
       buildInputs = [
         haskellPkgs.cabal-install
         haskellPkgs.ghcid
+        haskellPkgs.haskell-language-server
         super.docker-compose
         self.niv
         # self.releaser
