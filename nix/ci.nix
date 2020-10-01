@@ -1,6 +1,6 @@
 let
   sources = import ./sources.nix;
-  lib = import (sources."nixpkgs" + "/lib");
+  lib = import (sources."nixos-20.03" + "/lib");
   inherit (import (sources."project.nix" + "/lib/dimension.nix") { inherit lib; }) dimension;
 in
 
@@ -21,13 +21,18 @@ dimension "Nixpkgs version" {
     };
     "nixos-20_03" = {
       nixpkgsSource = "nixos-20.03";
+      isReferenceNixpkgs = false;
+      enableDoc = true;
+    };
+    "nixos-20_09" = {
+      nixpkgsSource = "nixos-20.09";
       isReferenceNixpkgs = true;
       enableDoc = true;
     };
-    # "nixos-unstable" = {
-    #   nixpkgsSource = "nixos-unstable";
-    #   enableDoc = true;
-    # };
+    "nixos-unstable" = {
+      nixpkgsSource = "nixos-unstable";
+      enableDoc = true;
+    };
   } (
     _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true, nixosTestIsPerl ? false }:
 
