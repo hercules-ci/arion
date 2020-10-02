@@ -9,7 +9,12 @@ let
     (pkgs.writeText "dummy-config.json" (builtins.toJSON config.image.rawConfig))
   ];
 
-  builtImage = pkgs.dockerTools.buildLayeredImage {
+  buildOrStreamLayeredImage = args:
+    if pkgs.dockerTools?streamLayeredImage
+    then pkgs.dockerTools.streamLayeredImage args // { isExe = true; }
+    else pkgs.dockerTools.buildLayeredImage args;
+
+  builtImage = buildOrStreamLayeredImage {
     inherit (config.image)
       name
       contents
