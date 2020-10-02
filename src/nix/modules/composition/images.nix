@@ -16,13 +16,20 @@ let
     (let
       inherit (service) build;
     in {
-      image = build.image.outPath;
       imageName = build.imageName or service.image.name;
       imageTag =
                  if build.image.imageTag != ""
                  then build.image.imageTag
                  else lib.head (lib.strings.splitString "-" (baseNameOf build.image.outPath));
-    });
+    } // (if build.image.isExe or false
+        then {
+          imageExe = build.image.outPath;
+        }
+        else {
+          image = build.image.outPath;
+        }
+      )
+    );
 in
 {
   options = {

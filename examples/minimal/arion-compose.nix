@@ -12,6 +12,7 @@
         "8000:8000" # host:container
       ];
       service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
+      service.stop_signal = "SIGINT";
     };
   };
 }
