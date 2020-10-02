@@ -30,7 +30,7 @@ loadImages fp = do
 
   v <- decodeFile fp
 
-  loaded <- dockerImages
+  loaded <- getDockerImages
 
   let
     images :: [Image]
@@ -52,7 +52,7 @@ loadImage imgPath = withFile (imgPath) ReadMode $ \fileHandle -> do
       ExitFailure code -> panic $ "docker load (" <> show code <> ") failed for " <> toS imgPath
 
 
-dockerImages :: IO [TaggedImage]
-dockerImages = do
+getDockerImages :: IO [TaggedImage]
+getDockerImages = do
   let procSpec = Process.proc "docker" [ "images",  "--filter", "dangling=false", "--format", "{{.Repository}}:{{.Tag}}" ]
   (map toS . T.lines . toS) <$> Process.readCreateProcess procSpec ""
