@@ -19,9 +19,17 @@
       arion = import ./nix/arion.nix { inherit pkgs; };
     });
 
+    # Does not include the eval and build functions like you may expect from Nixpkgs.
     defaultPackage = lib.genAttrs systems (system:
       self.packages.${system}.arion
     );
+
+    lib = {
+      eval = import ./src/nix/eval-composition.nix;
+      build = args@{...}:
+        let composition = self.lib.eval args;
+        in composition.config.out.dockerComposeYaml;
+    };
 
   };
 }
