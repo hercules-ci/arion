@@ -9,14 +9,21 @@
       "x86_64-darwin"
       "x86_64-linux"
     ];
+    arionFromPkgs = pkgs: import ./nix/arion.nix { inherit pkgs; };
   in {
+
+    # The overlay is currently the recommended way to integrate arion,
+    # because its arion attribute behaves just like Nixpkgs.
+    overlay = final: prev: {
+      arion = arionFromPkgs final;
+    };
 
     packages = lib.genAttrs systems (system:
     let
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      arion = import ./nix/arion.nix { inherit pkgs; };
+      arion = arionFromPkgs pkgs;
     });
 
     # Does not include the eval and build functions like you may expect from Nixpkgs.
