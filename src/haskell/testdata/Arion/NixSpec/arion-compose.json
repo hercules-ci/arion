@@ -37,6 +37,7 @@
                 "imageTag": "<HASH>"
             }
         ],
+        "name": null,
         "serviceInfo": {
             "webserver": {
                 "defaultExec": [
