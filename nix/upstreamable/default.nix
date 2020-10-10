@@ -1,8 +1,14 @@
+args@
 { pkgs
 , lib
 , haskellPackages
 , haskell
 , runCommand
+
+  # Allow this expression file to be used more efficiently in situations where
+  # the sources are more readily available. Unpacking haskellPackages.arion-compose.src
+  # is not always the best choice for arion.eval.
+, evalSrc ? null
 }:
 
 let
@@ -57,14 +63,8 @@ let
   };
 
   # Unpacked sources for evaluation by `eval`
-  srcUnpacked = pkgs.stdenv.mkDerivation {
-    name = "arion-src";
-    inherit (arion-compose) src;
-    buildPhase = ''
-      cp -r $src $out
-    '';
-    installPhase = "";
-  };
+  evalSrc' = args.evalSrc or (runCommand "arion-src" {}
+    "mkdir $out; tar -C $out --strip-components=1 -xf ${arion-compose.src}");
 
   /* Function for evaluating a composition
 
@@ -73,7 +73,7 @@ let
      Returns the module system's `config` and `options` variables.
    */
   eval = args@{...}:
-    import (srcUnpacked + "/src/nix/eval-composition.nix")
+    import (evalSrc' + "/src/nix/eval-composition.nix")
       ({ inherit pkgs; } // args);
 
   /* Function to derivation of the docker compose yaml file

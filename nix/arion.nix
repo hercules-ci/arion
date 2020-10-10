@@ -9,4 +9,5 @@
 import ./upstreamable/default.nix {
   inherit pkgs lib haskell runCommand;
   haskellPackages = haskellPackages // { inherit arion-compose; };
+  evalSrc = ./..;
 }
