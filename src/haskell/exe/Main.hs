@@ -10,6 +10,7 @@ import           Arion.Aeson
 import           Arion.Images (loadImages)
 import qualified Arion.DockerCompose as DockerCompose
 import           Arion.Services (getDefaultExec)
+import           Arion.ExtendedInfo (loadExtendedInfoFromPath, ExtendedInfo(images, name))
 
 import Options.Applicative
 import Control.Monad.Fail
@@ -142,20 +143,24 @@ runDC cmd (DockerComposeArgs args) _opts = do
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
-  withBuiltComposeFile opts $ \path -> do
-    loadImages path
-    DockerCompose.run DockerCompose.Args
-      { files = [path]
-      , otherArgs = [cmd] ++ unDockerComposeArgs dopts
-      }
+  withBuiltComposeFile opts $ callDC cmd dopts True
 
 runEvalAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runEvalAndDC cmd dopts opts = do
-  withComposeFile opts $ \path ->
-    DockerCompose.run DockerCompose.Args
-      { files = [path]
-      , otherArgs = [cmd] ++ unDockerComposeArgs dopts
-      }
+  withComposeFile opts $ callDC cmd dopts False
+
+callDC :: Text -> DockerComposeArgs -> Bool -> FilePath -> IO ()
+callDC cmd dopts shouldLoadImages path = do
+  extendedInfo <- loadExtendedInfoFromPath path
+  when shouldLoadImages $ loadImages (images extendedInfo)
+  let firstOpts =
+        do
+          n <- toList (name extendedInfo)
+          ["--project-name", n]
+  DockerCompose.run DockerCompose.Args
+    { files = [path]
+    , otherArgs = firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
+    }
 
 withBuiltComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
 withBuiltComposeFile opts cont = case prebuiltComposeFile opts of

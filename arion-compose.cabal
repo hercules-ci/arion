@@ -49,6 +49,7 @@ library
   exposed-modules:     Arion.Nix
                        Arion.Aeson
                        Arion.DockerCompose
+                       Arion.ExtendedInfo
                        Arion.Images
                        Arion.Services
   other-modules:       Paths_arion_compose
