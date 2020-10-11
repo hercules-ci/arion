@@ -8,7 +8,7 @@ let
 in
 {
   options = {
-    name = mkOption {
+    project.name = mkOption {
       description = ''
         Name of the project.
 
@@ -19,6 +19,6 @@ in
     };
   };
   config = {
-    docker-compose.extended.name = config.name;
+    docker-compose.extended.project.name = config.project.name;
   };
 }

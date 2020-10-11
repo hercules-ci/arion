@@ -10,7 +10,7 @@ import           Arion.Aeson
 import           Arion.Images (loadImages)
 import qualified Arion.DockerCompose as DockerCompose
 import           Arion.Services (getDefaultExec)
-import           Arion.ExtendedInfo (loadExtendedInfoFromPath, ExtendedInfo(images, name))
+import           Arion.ExtendedInfo (loadExtendedInfoFromPath, ExtendedInfo(images, projectName))
 
 import Options.Applicative
 import Control.Monad.Fail
@@ -155,7 +155,7 @@ callDC cmd dopts shouldLoadImages path = do
   when shouldLoadImages $ loadImages (images extendedInfo)
   let firstOpts =
         do
-          n <- toList (name extendedInfo)
+          n <- toList (projectName extendedInfo)
           ["--project-name", n]
   DockerCompose.run DockerCompose.Args
     { files = [path]

@@ -70,26 +70,6 @@ No Default:: {blank}
 
 No Example:: {blank}
 
-== name
-
-Name of the project.
-
-See link:https://docs.docker.com/compose/reference/envvars/#compose_project_name[COMPOSE_PROJECT_NAME]
-
-
-[discrete]
-=== details
-
-Type:: null or string
-Default::
-+
-----
-null
-----
-
-
-No Example:: {blank}
-
 == out.dockerComposeYaml
 
 A derivation that produces a docker-compose.yaml file for this composition.
@@ -124,6 +104,26 @@ The text of out.dockerComposeYaml.
 Type:: string
 No Default:: {blank}
 Read Only:: {blank}
+No Example:: {blank}
+
+== project.name
+
+Name of the project.
+
+See link:https://docs.docker.com/compose/reference/envvars/#compose_project_name[COMPOSE_PROJECT_NAME]
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
 No Example:: {blank}
 
 == services

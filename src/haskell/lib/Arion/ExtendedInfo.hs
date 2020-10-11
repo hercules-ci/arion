@@ -23,7 +23,7 @@ data Image = Image
   } deriving (Eq, Show, Generic, Aeson.ToJSON, Aeson.FromJSON)
 
 data ExtendedInfo = ExtendedInfo {
-    name :: Maybe Text,
+    projectName :: Maybe Text,
     images :: [Image]
   } deriving (Eq, Show)
 
@@ -32,6 +32,6 @@ loadExtendedInfoFromPath fp = do
   v <- decodeFile fp
   pure ExtendedInfo {
     -- TODO: use aeson derived instance?
-    name = v ^? key "x-arion" . key "name" . _String,
+    projectName = v ^? key "x-arion" . key "project" . key "name" . _String,
     images = (v :: Aeson.Value) ^.. key "x-arion" . key "images" . _Array . traverse . _JSON
   }

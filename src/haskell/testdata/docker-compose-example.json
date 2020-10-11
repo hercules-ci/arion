@@ -30,7 +30,9 @@
         "imageTag": "xr4ljmz3qfcwlq9rl4mr4qdrzw93rl70"
       }
     ],
-    "name": null,
+    "project": {
+      "name": null
+    },
     "serviceInfo": {
       "webserver": {
         "defaultExec": [
