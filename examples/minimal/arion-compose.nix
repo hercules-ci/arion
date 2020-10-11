@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  config.project.name = "webapp";
   config.services = {
 
     webserver = {

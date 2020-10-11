@@ -106,6 +106,26 @@ No Default:: {blank}
 Read Only:: {blank}
 No Example:: {blank}
 
+== project.name
+
+Name of the project.
+
+See link:https://docs.docker.com/compose/reference/envvars/#compose_project_name[COMPOSE_PROJECT_NAME]
+
+
+[discrete]
+=== details
+
+Type:: null or string
+Default::
++
+----
+null
+----
+
+
+No Example:: {blank}
+
 == services
 
 An attribute set of service configurations. A service specifies how to run an image as a container.
