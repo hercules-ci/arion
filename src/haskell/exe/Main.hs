@@ -28,6 +28,9 @@ data CommonOptions =
     , pkgs :: Text
     , nixArgs :: [Text]
     , prebuiltComposeFile :: Maybe FilePath
+    , noAnsi :: Bool
+    , compatibility :: Bool
+    , logLevel :: Maybe Text
     }
   deriving (Show)
 
@@ -64,6 +67,11 @@ parseOptions = do
                (  long "prebuilt-file"
                <> metavar "JSONFILE"
                <> help "Do not evaluate and use the prebuilt JSONFILE instead. Causes other evaluation-related options to be ignored." )
+    noAnsi <- flag False True (long "no-ansi"
+                    <> help "Avoid ANSI control sequences")
+    compatibility <- flag False True (long "no-ansi"
+                    <> help "If set, Docker Compose will attempt to convert deploy keys in v3 files to their non-Swarm equivalent")
+    logLevel <- optional $ fmap T.pack $ strOption (long "log-level" <> metavar "LEVEL" <> help "Set log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)")
     pure $
       let nixArgs = userNixArgs <|> "--show-trace" <$ guard showTrace
       in CommonOptions{..}
@@ -143,24 +151,38 @@ runDC cmd (DockerComposeArgs args) _opts = do
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runBuildAndDC cmd dopts opts = do
-  withBuiltComposeFile opts $ callDC cmd dopts True
+  withBuiltComposeFile opts $ callDC cmd dopts opts True
 
 runEvalAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
 runEvalAndDC cmd dopts opts = do
-  withComposeFile opts $ callDC cmd dopts False
+  withComposeFile opts $ callDC cmd dopts opts False
 
-callDC :: Text -> DockerComposeArgs -> Bool -> FilePath -> IO ()
-callDC cmd dopts shouldLoadImages path = do
+callDC :: Text -> DockerComposeArgs -> CommonOptions -> Bool -> FilePath -> IO ()
+callDC cmd dopts opts shouldLoadImages path = do
   extendedInfo <- loadExtendedInfoFromPath path
   when shouldLoadImages $ loadImages (images extendedInfo)
-  let firstOpts =
-        do
-          n <- toList (projectName extendedInfo)
-          ["--project-name", n]
+  let firstOpts = projectArgs extendedInfo <> commonArgs opts
   DockerCompose.run DockerCompose.Args
     { files = [path]
     , otherArgs = firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
     }
+
+projectArgs :: ExtendedInfo -> [Text]
+projectArgs extendedInfo =
+  do
+    n <- toList (projectName extendedInfo)
+    ["--project-name", n]
+
+commonArgs :: CommonOptions -> [Text]
+commonArgs opts = do
+    guard (noAnsi opts)
+    ["--no-ansi"]
+  <> do
+    guard (compatibility opts)
+    ["--compatibility"]
+  <> do
+    l <- toList (logLevel opts)
+    ["--log-level", l]
 
 withBuiltComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
 withBuiltComposeFile opts cont = case prebuiltComposeFile opts of
@@ -260,12 +282,18 @@ orEmpty' :: (Alternative f, Monoid a) => f a -> f a
 orEmpty' m = fromMaybe mempty <$> optional m
 
 runExec :: Bool -> Bool -> Maybe Text -> Bool -> Int -> [(Text, Text)] -> Maybe Text -> Text -> [Text] -> CommonOptions -> IO ()
-runExec detach privileged user noTTY index envs workDir service commandAndArgs opts = do
-  putErrText $ "Service: " <> service
-
+runExec detach privileged user noTTY index envs workDir service commandAndArgs opts =
   withComposeFile opts $ \path -> do
+    extendedInfo <- loadExtendedInfoFromPath path
     commandAndArgs'' <- case commandAndArgs of
-      [] -> getDefaultExec path service
+      [] -> do
+        cmd <- getDefaultExec path service
+        case cmd of
+          [] -> do
+            putErrText "You must provide a command via service.defaultExec or on the command line."
+            exitFailure
+          _ ->
+            pure cmd
       x -> pure x
     let commandAndArgs' = case commandAndArgs'' of
           [] -> ["/bin/sh"]
@@ -285,7 +313,7 @@ runExec detach privileged user noTTY index envs workDir service commandAndArgs o
           ]
     DockerCompose.run DockerCompose.Args
       { files = [path]
-      , otherArgs = args
+      , otherArgs = projectArgs extendedInfo <> commonArgs opts <> args
       }
 
 main :: IO ()
