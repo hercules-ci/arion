@@ -244,13 +244,12 @@ Nope, it’s just Nix and Docker Compose under the hood.
 === What about garbage collection?
 
 Arion removes the need for garbage collecting docker images, delegating
-this task to Nix.
+this task to Nix when using `service.useHostStore`.
 
-Arion creates a garbage collection root and cleans it up after
-completing the command. This means that `arion up` without `-d` is safe
-with respect to garbage collection. A deployment that is more serious
-than local development must leave a GC root on the deployment host. This
-use case is not supported as of now.
+Arion creates a garbage collection root that it cleans up after completing
+the command. This means that `arion up -d` should not be used with `useHostStore`
+in production. Instead, disable `useHostStore`, which will use `dockerTools` to
+generate images that can be used in production.
 
 === Why is my container not running latest code?
 
