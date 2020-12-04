@@ -1,6 +1,6 @@
 # Revision history for Arion
 
-## Unreleased
+## 0.1.2.0 -- 2020-03-05
 
 * Support use of prebuilt `docker-compose.yaml`.
   Separates build and execution without duplicating evaluation.
