@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+* Support use of prebuilt `docker-compose.yaml`.
+  Separates build and execution without duplicating evaluation.
+
+* Avoid storing tarballs (wasting store space) by using
+  `dockerTools.streamLayeredImage` if available.
+
+* Project name is now configurable via the `project.name` option
+
+* Support --no-ansi, --compatibility, --log-level options
+
 ## 0.1.1.1 -- 2020-03-20
 
 * Fix ambiguous import of `lines`
