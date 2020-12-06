@@ -5,7 +5,7 @@ let
 
   sources = import ./sources.nix;
 
-  fakeRepo = src: super.runCommand "source" { inherit src; buildInputs = [super.git]; } ''
+  fakeRepo = src: super.runCommand "source" { inherit src; nativeBuildInputs = [super.git]; } ''
     cp -r --no-preserve=mode $src $out
     git init
     cp -r .git $out
@@ -29,7 +29,7 @@ in
   '';
   doc = self.stdenv.mkDerivation { 
     name = "arion-documentation"; 
-    buildInputs = [super.antora]; 
+    nativeBuildInputs = [super.antora];
     src = fakeRepo ../.;
     HOME = ".";
     buildPhase = "antora antora-playbook";
@@ -43,13 +43,13 @@ in
     haskellPkgs = super.haskellPackages.extend (import ./haskell-overlay.nix self super);
     shell = haskellPkgs.shellFor {
       packages = p: [p.arion-compose];
-      buildInputs = [
+      nativeBuildInputs = [
         haskellPkgs.cabal-install
         haskellPkgs.ghcid
         haskellPkgs.haskell-language-server
         super.docker-compose
         self.niv
-        # self.releaser
+        self.releaser
       ];
     };
   };

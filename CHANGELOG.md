@@ -1,6 +1,16 @@
 # Revision history for Arion
 
-## Unreleased
+## 0.1.2.0 -- 2020-03-05
+
+* Support use of prebuilt `docker-compose.yaml`.
+  Separates build and execution without duplicating evaluation.
+
+* Avoid storing tarballs (wasting store space) by using
+  `dockerTools.streamLayeredImage` if available.
+
+* Project name is now configurable via the `project.name` option
+
+* Support --no-ansi, --compatibility, --log-level options
 
 ## 0.1.1.1 -- 2020-03-20
 
