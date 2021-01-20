@@ -676,6 +676,28 @@ No Default:: {blank}
 
 No Example:: {blank}
 
+== services.<name>.service.labels
+
+See link:https://docs.docker.com/compose/compose-file/#labels[Docker Compose#labels]
+
+[discrete]
+=== details
+
+Type:: attribute set of strings
+Default::
++
+----
+{}
+----
+
+
+Example::
++
+----
+{"com.example.foo":"bar"}
+----
+
+
 == services.<name>.service.links
 
 See link:https://docs.docker.com/compose/compose-file/#links[Docker Compose#links]
