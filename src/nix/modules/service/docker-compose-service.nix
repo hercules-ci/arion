@@ -118,6 +118,7 @@ in
     service.labels = mkOption {
       type = attrsOf str;
       default = {};
+      example = { "com.example.foo" = "bar"; };
       description = dockerComposeRef "labels";
     };
     service.links = mkOption {
