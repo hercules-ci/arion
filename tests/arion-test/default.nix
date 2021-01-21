@@ -33,6 +33,7 @@ in
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/traefik/arion-compose.nix ]).config.out.dockerComposeYaml
       pkgs.stdenv
     ];
 
@@ -92,5 +93,19 @@ in
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
         machine.wait_until_fails("curl localhost:8000")
+
+    # Tests
+    # - examples/traefik
+    # - labels
+    with subtest("traefik"):
+        machine.succeed(
+            "rm -rf work && cp -frT ${../../examples/traefik} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
+        )
+        machine.wait_until_succeeds("curl nix-docs.localhost")
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl nix-docs.localhost")
+
   '';
 }
