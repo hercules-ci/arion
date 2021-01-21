@@ -40,7 +40,7 @@ in
     virtualisation.memorySize = 1024;
   };
   testScript = ''
-    machine.fail("curl localhost:8000")
+    machine.fail("curl --fail localhost:8000")
     machine.succeed("docker --version")
 
     # Tests
@@ -51,11 +51,11 @@ in
         machine.succeed(
             "rm -rf work && cp -frT ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
         )
-        machine.wait_until_succeeds("curl localhost:8000")
+        machine.wait_until_succeeds("curl --fail localhost:8000")
         machine.succeed(
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
-        machine.wait_until_fails("curl localhost:8000")
+        machine.wait_until_fails("curl --fail localhost:8000")
 
     # Tests
     #  - arion exec
@@ -64,7 +64,7 @@ in
         machine.succeed(
             "rm -rf work && cp -frT ${../../examples/full-nixos} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
         )
-        machine.wait_until_succeeds("curl localhost:8000")
+        machine.wait_until_succeeds("curl --fail localhost:8000")
 
         machine.succeed(
             """
@@ -80,7 +80,7 @@ in
         machine.succeed(
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
-        machine.wait_until_fails("curl localhost:8000")
+        machine.wait_until_fails("curl --fail localhost:8000")
 
     # Tests
     #  - examples/nixos-unit
@@ -88,11 +88,11 @@ in
         machine.succeed(
             "rm -rf work && cp -frT ${../../examples/nixos-unit} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
         )
-        machine.wait_until_succeeds("curl localhost:8000")
+        machine.wait_until_succeeds("curl --fail localhost:8000")
         machine.succeed(
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
-        machine.wait_until_fails("curl localhost:8000")
+        machine.wait_until_fails("curl --fail localhost:8000")
 
     # Tests
     # - examples/traefik
@@ -101,11 +101,10 @@ in
         machine.succeed(
             "rm -rf work && cp -frT ${../../examples/traefik} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
         )
-        machine.wait_until_succeeds("curl nix-docs.localhost")
+        machine.wait_until_succeeds("curl --fail nix-docs.localhost")
         machine.succeed(
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
-        machine.wait_until_fails("curl nix-docs.localhost")
-
+        machine.wait_until_fails("curl --fail nix-docs.localhost")
   '';
 }
