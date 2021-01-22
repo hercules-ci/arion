@@ -118,7 +118,12 @@ in
     service.labels = mkOption {
       type = attrsOf str;
       default = {};
-      example = { "com.example.foo" = "bar"; };
+      example = {
+        "com.example.foo" = "bar";
+        "traefik.enable" = "true";
+        "traefik.http.routers.my-service.rule" = "Host(`my-service.localhost`)";
+        "traefik.http.routers.my-service.entrypoints" = "web";
+      };
       description = dockerComposeRef "labels";
     };
     service.links = mkOption {

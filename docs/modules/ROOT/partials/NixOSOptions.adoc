@@ -694,7 +694,7 @@ Default::
 Example::
 +
 ----
-{"com.example.foo":"bar"}
+{"com.example.foo":"bar","traefik.enable":"true","traefik.http.routers.my-service.entrypoints":"web","traefik.http.routers.my-service.rule":"Host(`my-service.localhost`)"}
 ----
 
 
