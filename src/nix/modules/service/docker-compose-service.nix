@@ -115,6 +115,17 @@ in
         ${dockerComposeRef "devices"}
       '';
     };
+    service.labels = mkOption {
+      type = attrsOf str;
+      default = {};
+      example = {
+        "com.example.foo" = "bar";
+        "traefik.enable" = "true";
+        "traefik.http.routers.my-service.rule" = "Host(`my-service.localhost`)";
+        "traefik.http.routers.my-service.entrypoints" = "web";
+      };
+      description = dockerComposeRef "labels";
+    };
     service.links = mkOption {
       type = listOf str;
       default = [];
@@ -247,6 +258,8 @@ in
     inherit (config.service) extra_hosts;
   } // lib.optionalAttrs (config.service.hostname != null) {
     inherit (config.service) hostname;
+  } // lib.optionalAttrs (config.service.labels != {}) {
+    inherit (config.service) labels;
   } // lib.optionalAttrs (config.service.links != []) {
     inherit (config.service) links;
   } // lib.optionalAttrs (config.service.ports != []) {

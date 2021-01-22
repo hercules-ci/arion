@@ -1,5 +1,13 @@
 # Revision history for Arion
 
+## Next
+
+* Support `service.labels`, which is useful for autodiscovery among other things.
+
+* Add a tested example for Traefik with label-based routing.
+
+* Drop obsolete NixOS 19.09 and 20.03 support. It may still be usable there.
+
 ## 0.1.2.0 -- 2020-03-05
 
 * Support use of prebuilt `docker-compose.yaml`.
