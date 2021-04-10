@@ -115,6 +115,12 @@ in
         ${dockerComposeRef "devices"}
       '';
     };
+    service.dns = mkOption {
+      type = listOf str;
+      default = [];
+      example = [ "8.8.8.8" "8.8.4.4" ];
+      description = dockerComposeRef "dns";
+    };
     service.labels = mkOption {
       type = attrsOf str;
       default = {};
@@ -258,6 +264,8 @@ in
     inherit (config.service) extra_hosts;
   } // lib.optionalAttrs (config.service.hostname != null) {
     inherit (config.service) hostname;
+  } // lib.optionalAttrs (config.service.dns != []) {
+    inherit (config.service) dns;
   } // lib.optionalAttrs (config.service.labels != {}) {
     inherit (config.service) labels;
   } // lib.optionalAttrs (config.service.links != []) {

@@ -2,6 +2,8 @@
 
 ## Next
 
+* Support `service.dns`, for overriding the DNS servers used by containers.
+
 * Support `service.labels`, which is useful for autodiscovery among other things.
 
 * Add a tested example for Traefik with label-based routing.
