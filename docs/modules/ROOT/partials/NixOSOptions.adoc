@@ -525,6 +525,28 @@ Default::
 
 No Example:: {blank}
 
+== services.<name>.service.dns
+
+See link:https://docs.docker.com/compose/compose-file/#dns[Docker Compose#dns]
+
+[discrete]
+=== details
+
+Type:: list of strings
+Default::
++
+----
+[]
+----
+
+
+Example::
++
+----
+["8.8.8.8","8.8.4.4"]
+----
+
+
 == services.<name>.service.entrypoint
 
 See link:https://docs.docker.com/compose/compose-file/#entrypoint[Docker Compose#entrypoint]
