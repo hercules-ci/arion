@@ -58,6 +58,20 @@ in
         machine.wait_until_fails("curl --fail localhost:8000")
 
     # Tests
+    #  - examples/flake
+    # This _test_ doesn't work because flake-compat fetches the github
+    # tarballs without sha256 and/or Nix doesn't consult the store before
+    # downloading.
+    # See https://github.com/edolstra/flake-compat/pull/12
+    # with subtest("flake"):
+    #     machine.succeed(
+    #         "rm -rf work && cp -frT ''${../../examples/flake} work && cd work && NIX_PATH= arion up -d"
+    #     )
+    #     machine.wait_until_succeeds("curl --fail localhost:8000")
+    #     machine.succeed("cd work && NIX_PATH= arion down")
+    #     machine.wait_until_fails("curl --fail localhost:8000")
+
+    # Tests
     #  - arion exec
     #  - examples/full-nixos
     with subtest("full-nixos"):
