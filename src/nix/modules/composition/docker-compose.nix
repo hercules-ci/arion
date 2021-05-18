@@ -29,6 +29,20 @@ let
       config.service.name = name;
     };
 
+  json.type = with lib.types; let
+      valueType = nullOr (oneOf [
+        bool
+        int
+        float
+        str
+        path # extra
+        package # extra
+        (attrsOf valueType)
+        (listOf valueType)
+      ]) // {
+        description = "JSON value";
+      };
+    in valueType;
 in
 {
   imports = [
@@ -52,11 +66,11 @@ in
       readOnly = true;
     };
     docker-compose.raw = lib.mkOption {
-      type = lib.types.attrs;
+      type = json.type;
       description = "Attribute set that will be turned into the docker-compose.yaml file, using Nix's toJSON builtin.";
     };
     docker-compose.extended = lib.mkOption {
-      type = lib.types.attrs;
+      type = json.type;
       description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
     services = lib.mkOption {

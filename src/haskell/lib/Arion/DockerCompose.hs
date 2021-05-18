@@ -8,6 +8,7 @@ import           System.Process
 data Args = Args
   { files :: [FilePath]
   , otherArgs :: [Text]
+  , isPodman :: Bool
   }
 
 run :: Args -> IO ()
@@ -15,9 +16,9 @@ run args = do
   let fileArgs = files args >>= \f -> ["--file", f]
       allArgs  = fileArgs ++ map toS (otherArgs args)
 
-      procSpec = proc "docker-compose" allArgs
-
-  -- hPutStrLn stderr ("Running docker-compose with " <> show allArgs :: Text)
+      exeName = if isPodman args then "podman-compose" else "docker-compose"
+      procSpec = 
+        proc exeName allArgs
 
   withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
@@ -27,4 +28,4 @@ run args = do
       ExitSuccess -> pass
       ExitFailure 1 -> exitFailure
       ExitFailure {} -> do
-        throwIO $ FatalError $ "docker-compose failed with " <> show exitCode
+        throwIO $ FatalError $ toS exeName <> " failed with status " <> show exitCode

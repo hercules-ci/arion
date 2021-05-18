@@ -16,10 +16,10 @@ import Arion.ExtendedInfo (Image(..))
 type TaggedImage = Text
 
 -- | Subject to change
-loadImages :: [Image] -> IO ()
-loadImages requestedImages = do
+loadImages :: Bool -> [Image] -> IO ()
+loadImages isPodman requestedImages = do
 
-  loaded <- getDockerImages
+  loaded <- getDockerImages isPodman
 
   let
     isNew i =
@@ -28,23 +28,28 @@ loadImages requestedImages = do
       -- -- On podman, you automatically get a localhost prefix
         && ("localhost/" <> imageName i <> ":" <> imageTag i) `notElem` loaded
 
-  traverse_ loadImage . filter isNew $ requestedImages
+  traverse_ (loadImage isPodman) . filter isNew $ requestedImages
 
-loadImage :: Image -> IO ()
-loadImage Image { image = Just imgPath, imageName = name } =
+exeName :: IsString p => Bool -> p
+exeName _isPodman@True = "podman"
+exeName _isPodman@False = "docker"
+
+loadImage :: Bool -> Image -> IO ()
+loadImage isPodman Image { image = Just imgPath, imageName = name } =
   withFile (toS imgPath) ReadMode $ \fileHandle -> do
-  let procSpec = (Process.proc "docker" [ "load" ]) {
+  let procSpec = (Process.proc (exeName isPodman) [ "load" ]) {
           Process.std_in = Process.UseHandle fileHandle
         }
+  print procSpec
   Process.withCreateProcess procSpec $ \_in _out _err procHandle -> do
     e <- Process.waitForProcess procHandle
     case e of
       ExitSuccess -> pass
       ExitFailure code ->
-        panic $ "docker load failed with exit code " <> show code <> " for image " <> name <> " from path " <> imgPath
+        panic $ exeName isPodman <> " load failed with exit code " <> show code <> " for image " <> name <> " from path " <> imgPath
 
-loadImage Image { imageExe = Just imgExe, imageName = name } = do
-  let loadSpec = (Process.proc "docker" [ "load" ]) { Process.std_in = Process.CreatePipe }
+loadImage isPodman Image { imageExe = Just imgExe, imageName = name } = do
+  let loadSpec = (Process.proc (exeName isPodman) [ "load" ]) { Process.std_in = Process.CreatePipe }
   Process.withCreateProcess loadSpec $ \(Just inHandle) _out _err loadProcHandle -> do
     let streamSpec = Process.proc (toS imgExe) []
     Process.withCreateProcess streamSpec { Process.std_out = Process.UseHandle inHandle } $ \_ _ _ streamProcHandle ->
@@ -57,15 +62,15 @@ loadImage Image { imageExe = Just imgExe, imageName = name } = do
             Left _ -> pass
           loadExit <- wait loadExitAsync
           case loadExit of
-            ExitFailure code -> panic $ "docker load failed with exit code " <> show code <> " for image " <> name <> " produced by executable " <> imgExe
+            ExitFailure code -> panic $ exeName isPodman <> " load failed with exit code " <> show code <> " for image " <> name <> " produced by executable " <> imgExe
             _ -> pass
           pass
 
-loadImage Image { imageName = name } = do
+loadImage _isPodman Image { imageName = name } = do
   panic $ "image " <> name <> " doesn't specify an image file or imageExe executable"
 
 
-getDockerImages :: IO [TaggedImage]
-getDockerImages = do
-  let procSpec = Process.proc "docker" [ "images",  "--filter", "dangling=false", "--format", "{{.Repository}}:{{.Tag}}" ]
+getDockerImages :: Bool -> IO [TaggedImage]
+getDockerImages isPodman = do
+  let procSpec = Process.proc (exeName isPodman) [ "images",  "--filter", "dangling=false", "--format", "{{.Repository}}:{{.Tag}}" ]
   map toS . T.lines . toS <$> Process.readCreateProcess procSpec ""

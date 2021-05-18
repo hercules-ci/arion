@@ -10,7 +10,7 @@ import           Arion.Aeson
 import           Arion.Images (loadImages)
 import qualified Arion.DockerCompose as DockerCompose
 import           Arion.Services (getDefaultExec)
-import           Arion.ExtendedInfo (loadExtendedInfoFromPath, ExtendedInfo(images, projectName))
+import           Arion.ExtendedInfo (loadExtendedInfoFromPath, ExtendedInfo(images, projectName), technology, Technology(..))
 
 import Options.Applicative
 import Control.Monad.Fail
@@ -147,6 +147,7 @@ runDC cmd (DockerComposeArgs args) _opts = do
   DockerCompose.run DockerCompose.Args
     { files = []
     , otherArgs = [cmd] ++ args
+    , isPodman = True -- FIXME
     }
 
 runBuildAndDC :: Text -> DockerComposeArgs -> CommonOptions -> IO ()
@@ -160,11 +161,13 @@ runEvalAndDC cmd dopts opts = do
 callDC :: Text -> DockerComposeArgs -> CommonOptions -> Bool -> FilePath -> IO ()
 callDC cmd dopts opts shouldLoadImages path = do
   extendedInfo <- loadExtendedInfoFromPath path
-  when shouldLoadImages $ loadImages (images extendedInfo)
+  let is_podman = technology extendedInfo == Podman
+  when shouldLoadImages $ loadImages is_podman (images extendedInfo)
   let firstOpts = projectArgs extendedInfo <> commonArgs opts
   DockerCompose.run DockerCompose.Args
     { files = [path]
     , otherArgs = firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
+    , isPodman = is_podman
     }
 
 projectArgs :: ExtendedInfo -> [Text]
@@ -299,6 +302,7 @@ runExec detach privileged user noTTY index envs workDir service commandAndArgs o
           [] -> ["/bin/sh"]
           x -> x
   
+    let is_podman = technology extendedInfo == Podman
     let args = concat
           [ ["exec"]
           , ("--detach" <$ guard detach :: [Text])
@@ -314,6 +318,7 @@ runExec detach privileged user noTTY index envs workDir service commandAndArgs o
     DockerCompose.run DockerCompose.Args
       { files = [path]
       , otherArgs = projectArgs extendedInfo <> commonArgs opts <> args
+      , isPodman = is_podman
       }
 
 main :: IO ()

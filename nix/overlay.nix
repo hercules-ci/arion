@@ -48,6 +48,8 @@ in
         haskellPkgs.ghcid
         haskellPkgs.haskell-language-server
         super.docker-compose
+        super.podman
+        super.podman-compose
         self.niv
         self.releaser
       ];
