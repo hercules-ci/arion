@@ -6,11 +6,9 @@
 { config, lib, pkgs, ... }: 
 
 let
-
-  tag = lib.head (lib.strings.splitString "-" (baseNameOf builtImage.outPath));
   name = "arion-base";
 
-  builtImage = pkgs.dockerTools.buildImage {
+  imageExe = pkgs.dockerTools.streamLayeredImage {
     inherit name;
     contents = pkgs.runCommand "minimal-contents" {} ''
         mkdir -p $out/bin $out/usr/bin
@@ -19,6 +17,7 @@ let
       '';
     config = {};
   };
+  inherit (imageExe) imageTag;
 
 in
 
@@ -33,9 +32,9 @@ in
   };
 
   config = {
-    arionBaseImage = "${name}:${tag}";
+    arionBaseImage = "${name}:${imageTag}";
     build.imagesToLoad = lib.mkIf (lib.any (s: s.service.useHostStore) (lib.attrValues config.services)) [
-      { image = builtImage; imageName = name; imageTag = tag; }
+      { imageExe = imageExe; imageName = name; inherit imageTag; }
     ];  
   };
 }
