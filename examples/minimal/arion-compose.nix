@@ -4,6 +4,7 @@
   config.services = {
 
     webserver = {
+      image.enableRecommendedContents = true;
       service.useHostStore = true;
       service.command = [ "sh" "-c" ''
                   cd "$$WEB_ROOT"

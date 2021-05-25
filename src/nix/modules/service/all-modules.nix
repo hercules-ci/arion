@@ -5,6 +5,7 @@
   ./host-store.nix
   ./context.nix
   ./image.nix
+  ./image-recommended.nix
   ./nixos.nix
   ./nixos-init.nix
   ../lib/assert.nix
