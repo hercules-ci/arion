@@ -47,14 +47,21 @@ in
         haskellPkgs.cabal-install
         haskellPkgs.ghcid
         haskellPkgs.haskell-language-server
-        super.docker-compose
-        super.podman
-        super.podman-compose
+        self.docker-compose
+        self.podman
+        self.podman-compose
         self.niv
         self.releaser
       ];
     };
   };
+
+  podman-compose = super.podman-compose.overrideAttrs(o: {
+    src = ~/h/podman-compose;
+    # patches = (o.patches or []) ++ [
+    #   ./podman-compose-stop_signal.patch
+    # ];
+  });
 
   inherit (import (sources.niv) {}) niv;
   releaser = self.haskellPackages.callCabal2nix "releaser" sources.releaser {};

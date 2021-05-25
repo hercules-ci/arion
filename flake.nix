@@ -1,6 +1,8 @@
 {
   description = "Arion - use Docker Compose via Nix";
 
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
+
   outputs = { self, nixpkgs }:
   let
     lib = import (nixpkgs + "/lib");
