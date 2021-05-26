@@ -9,4 +9,5 @@
   ./nixos.nix
   ./nixos-init.nix
   ../lib/assert.nix
+  ./check-sys_admin.nix
 ]
