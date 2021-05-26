@@ -11,18 +11,6 @@
         "url": "https://github.com/nmattia/niv/archive/fad2a6cbfb2e7cdebb7cb0ad2f5cc91e2c9bc06b.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "nixos-19.03": {
-        "branch": "nixos-19.03",
-        "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
-        "homepage": "https://github.com/NixOS/nixpkgs",
-        "owner": "NixOS",
-        "repo": "nixpkgs-channels",
-        "rev": "34c7eb7545d155cc5b6f499b23a7cb1c96ab4d59",
-        "sha256": "11z6ajj108fy2q5g8y4higlcaqncrbjm3dnv17pvif6avagw4mcb",
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/34c7eb7545d155cc5b6f499b23a7cb1c96ab4d59.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "nixos-20.09": {
         "branch": "nixos-20.09",
         "description": "Nix Packages collection",

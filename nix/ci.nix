@@ -5,17 +5,6 @@ let
 in
 
 dimension "Nixpkgs version" {
-    "nixos-19_03" = {
-      # flyingcircus.io latest long-term support is based off 19.03
-      # https://flyingcircus.io/doc/
-      # It is nice to have some level of support for their platform,
-      # but we don't guarantee any support.
-      nixpkgsSource = "nixos-19.03";
-      enableDoc = false;
-      nixosTestIsPerl = true;
-      dockerSupportsSystemd = true;
-      nixosHasPodmanDockerSocket = false;
-    };
     "nixos-20_09" = {
       nixpkgsSource = "nixos-20.09";
       isReferenceNixpkgs = true;
@@ -29,7 +18,7 @@ dimension "Nixpkgs version" {
     };
   } (
     _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true,
-              nixosTestIsPerl ? false, dockerSupportsSystemd ? false, nixosHasPodmanDockerSocket ? true }:
+             dockerSupportsSystemd ? false, nixosHasPodmanDockerSocket ? true }:
 
 
       dimension "System" {
@@ -39,7 +28,7 @@ dimension "Nixpkgs version" {
         system: { isReferenceTarget ? false, enableNixOSTests ? true }:
           let
             pkgs = import ./. {
-              inherit system nixosTestIsPerl dockerSupportsSystemd nixosHasPodmanDockerSocket;
+              inherit system dockerSupportsSystemd nixosHasPodmanDockerSocket;
               nixpkgsSrc = sources.${nixpkgsSource};
             };
           in

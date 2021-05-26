@@ -1,11 +1,12 @@
-{ pkgs ? import ../pkgs.nix, nixosTestIsPerl ? false, arionTestingFlags ? {} }:
+{ pkgs ? import ../pkgs.nix, arionTestingFlags ? {} }:
 let
   inherit (pkgs) nixosTest recurseIntoAttrs arion;
 in
 
 recurseIntoAttrs {
 
-  test = if nixosTestIsPerl then nixosTest ./arion-test-perl else nixosTest ./arion-test;
+  test = nixosTest ./arion-test;
+
   testWithPodman =
     if arionTestingFlags.nixosHasPodmanDockerSocket
     then nixosTest (pkgs.callPackage ./arion-test { usePodman = true; })

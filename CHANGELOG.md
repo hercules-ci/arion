@@ -8,7 +8,7 @@
 
 * Add a tested example for Traefik with label-based routing.
 
-* Drop obsolete NixOS 19.09 and 20.03 support. It may still be usable there.
+* Drop obsolete NixOS 19.03, 19.09 and 20.03 from CI.
 
 ## 0.1.2.0 -- 2020-03-05
 
