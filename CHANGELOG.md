@@ -2,13 +2,28 @@
 
 ## Next
 
+### Changed
+
+* `useHostStore` now uses an image derived from the `image.*` options. You may
+  need to enable `enableRecommendedContents` because with this change, files
+  like `/bin/sh` aren't added by default anymore.
+
+* Drop obsolete NixOS 19.03, 19.09 and 20.03 from CI.
+
+### Added
+
+* NixOS-based containers can now run on Podman when it is configured to provide a docker socket. See the [installation docs](https://docs.hercules-ci.com/arion/#_nixos).
+
 * Support `service.dns`, for overriding the DNS servers used by containers.
 
 * Support `service.labels`, which is useful for autodiscovery among other things.
 
 * Add a tested example for Traefik with label-based routing.
 
-* Drop obsolete NixOS 19.03, 19.09 and 20.03 from CI.
+* Add a `flake.nix` and an experimental flake example
+
+* Add a warning when systemd `DynamicUser` is used but not available to the
+  container.
 
 ## 0.1.2.0 -- 2020-03-05
 
