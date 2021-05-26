@@ -39,6 +39,12 @@ Arion allows to compose containers with different granularity:
   * <<NixOS: run full OS>>
   * <<Docker image from DockerHub>>
 
+Full NixOS is supported on
+ * docker-compose + podman with docker socket (NixOS >= 21.05)
+ * docker-compose + docker, before cgroupsv2 (NixOS < 21.05)
+
+`podman-compose` support is currently WIP on a separate branch.
+
 == Installation
 
 === Nix
@@ -52,10 +58,17 @@ $ nix-env -iA arion -f https://github.com/hercules-ci/arion/tarball/master
 Add this module to your NixOS configuration:
 
 ```nix
-{ ... }: {
-  environment.systemPackages = [ (import (builtins.fetchTarball https://github.com/hercules-ci/arion/tarball/master) {}).arion ];
-  virtualisation.docker.enable = true;
-  users.extraUsers.myuser.extraGroups = ["docker"];
+{ pkgs, ... }: {
+  environment.systemPackages = [
+    pkgs.arion
+    pkgs.docker # docker CLI will use podman socket
+  ];
+  virtualisation.docker.enable = false;
+  virtualisation.podman.enable = true;
+  virtualisation.podman.dockerSocket.enable = true;
+
+  # Use your username instead of `myuser`
+  users.extraUsers.myuser.extraGroups = ["podman"];
 }
 ```
 
