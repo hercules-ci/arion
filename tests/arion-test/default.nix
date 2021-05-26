@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ usePodman ? false, pkgs, lib, ... }:
 
 let
   # To make some prebuilt derivations available in the vm
@@ -6,14 +6,26 @@ let
     inherit modules;
     inherit pkgs;
   };
+
+  inherit (lib)
+    optionalAttrs
+    optionalString
+    ;
+
+  haveSystemd = usePodman || pkgs.arionTestingFlags.dockerSupportsSystemd;
+
 in
 {
   name = "arion-test";
   machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
-    ];
-    virtualisation.docker.enable = true;
+    ] ++ lib.optional usePodman pkgs.docker;
+    virtualisation.docker.enable = !usePodman;
+    virtualisation.podman = optionalAttrs usePodman {
+      enable = true;
+      dockerSocket.enable = true;
+    };
     
     # no caches, because no internet
     nix.binaryCaches = lib.mkForce [];
@@ -38,6 +50,7 @@ in
     ];
 
     virtualisation.memorySize = 1024;
+    virtualisation.diskSize = 8000;
   };
   testScript = ''
     machine.fail("curl --fail localhost:8000")
@@ -71,6 +84,7 @@ in
     #     machine.succeed("cd work && NIX_PATH= arion down")
     #     machine.wait_until_fails("curl --fail localhost:8000")
 
+    ${optionalString haveSystemd ''
     # Tests
     #  - arion exec
     #  - examples/full-nixos
@@ -95,6 +109,7 @@ in
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
         machine.wait_until_fails("curl --fail localhost:8000")
+    ''}
 
     # Tests
     #  - examples/nixos-unit

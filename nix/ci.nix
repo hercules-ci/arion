@@ -13,18 +13,23 @@ dimension "Nixpkgs version" {
       nixpkgsSource = "nixos-19.03";
       enableDoc = false;
       nixosTestIsPerl = true;
+      dockerSupportsSystemd = true;
+      nixosHasPodmanDockerSocket = false;
     };
     "nixos-20_09" = {
       nixpkgsSource = "nixos-20.09";
       isReferenceNixpkgs = true;
       enableDoc = true;
+      dockerSupportsSystemd = true;
+      nixosHasPodmanDockerSocket = false;
     };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
       enableDoc = true;
     };
   } (
-    _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true, nixosTestIsPerl ? false }:
+    _name: { nixpkgsSource, isReferenceNixpkgs ? false, enableDoc ? true,
+              nixosTestIsPerl ? false, dockerSupportsSystemd ? false, nixosHasPodmanDockerSocket ? true }:
 
 
       dimension "System" {
@@ -34,7 +39,7 @@ dimension "Nixpkgs version" {
         system: { isReferenceTarget ? false, enableNixOSTests ? true }:
           let
             pkgs = import ./. {
-              inherit system nixosTestIsPerl;
+              inherit system nixosTestIsPerl dockerSupportsSystemd nixosHasPodmanDockerSocket;
               nixpkgsSrc = sources.${nixpkgsSource};
             };
           in
