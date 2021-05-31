@@ -1,6 +1,15 @@
 { pkgs, lib, config, options, ... }:
 let
-  inherit (lib) types mkOption;
+  inherit (lib)
+    functionArgs
+    mkOption
+    optionalAttrs
+    types
+    warn
+    ;
+  inherit (pkgs)
+    dockerTools
+    ;
   inherit (types) attrsOf listOf nullOr package str unspecified bool;
 
   # TODO: dummy-config is a useless layer. Nix 2.3 will let us inspect
@@ -9,15 +18,37 @@ let
     (pkgs.writeText "dummy-config.json" (builtins.toJSON config.image.rawConfig))
   ];
 
+  includeStorePathsWarningAndDefault = lib.warn ''
+    You're using a version of Nixpkgs that doesn't support the includeStorePaths
+    parameter in dockerTools.streamLayeredImage. Without this, Arion's
+    useHostStore does not achieve the intended speedup.
+  '' {};
+
   buildOrStreamLayeredImage = args:
-    if pkgs.dockerTools?streamLayeredImage
-    then pkgs.dockerTools.streamLayeredImage args // { isExe = true; }
-    else pkgs.dockerTools.buildLayeredImage args;
+    let
+      args_base = builtins.intersectAttrs
+        {
+          name = null; tag = null; contents = null; config = null;
+          created = null; extraCommands = null; maxLayers = null;
+        }
+        args;
+      acceptedArgs = functionArgs dockerTools.streamLayeredImage;
+      args_no_store = lib.optionalAttrs (!(args.includeStorePaths or true)) (
+        if acceptedArgs ? includeStorePaths
+        then { inherit (args) includeStorePaths; }
+        else includeStorePathsWarningAndDefault
+      );
+      args_streamLayered = args_base // args_no_store;
+    in
+      if dockerTools?streamLayeredImage
+      then dockerTools.streamLayeredImage args_streamLayered // { isExe = true; }
+      else dockerTools.buildLayeredImage args_base;
 
   builtImage = buildOrStreamLayeredImage {
     inherit (config.image)
       name
       contents
+      includeStorePaths
       ;
     config = config.image.rawConfig;
     maxLayers = 100;
@@ -87,6 +118,15 @@ in
       default = [];
       description = ''
          Top level paths in the container.
+      '';
+    };
+    image.includeStorePaths = mkOption {
+      type = bool;
+      default = true;
+      internal = true;
+      description = ''
+        Include all referenced store paths. You generally want this in your
+        image, unless you load store paths via some other means, like useHostStore = true;
       '';
     };
     image.rawConfig = mkOption {

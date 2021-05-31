@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ usePodman ? false, pkgs, lib, ... }:
 
 let
   # To make some prebuilt derivations available in the vm
@@ -6,14 +6,26 @@ let
     inherit modules;
     inherit pkgs;
   };
+
+  inherit (lib)
+    optionalAttrs
+    optionalString
+    ;
+
+  haveSystemd = usePodman || pkgs.arionTestingFlags.dockerSupportsSystemd;
+
 in
 {
   name = "arion-test";
   machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
-    ];
-    virtualisation.docker.enable = true;
+    ] ++ lib.optional usePodman pkgs.docker;
+    virtualisation.docker.enable = !usePodman;
+    virtualisation.podman = optionalAttrs usePodman {
+      enable = true;
+      dockerSocket.enable = true;
+    };
     
     # no caches, because no internet
     nix.binaryCaches = lib.mkForce [];
@@ -38,6 +50,7 @@ in
     ];
 
     virtualisation.memorySize = 1024;
+    virtualisation.diskSize = 8000;
   };
   testScript = ''
     machine.fail("curl --fail localhost:8000")
@@ -58,6 +71,44 @@ in
         machine.wait_until_fails("curl --fail localhost:8000")
 
     # Tests
+    #  - running same image again doesn't require a `docker load`
+    with subtest("docker load only once"):
+        # We assume image loading relies on the `docker images` and `docker load` commands, so this should fail
+        machine.fail(
+            "export REAL_DOCKER=$(which docker); rm -rf work && cp -frT ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' PATH=\"${pkgs.writeScriptBin "docker" ''
+              #!${pkgs.runtimeShell} -eu
+              echo 1>&2 "This failure is expected. Args were" "$@"
+              echo "$@" >/tmp/docker-args
+              exit 1
+            ''}/bin:$PATH\" arion up -d"
+        )
+        machine.succeed(
+            "export REAL_DOCKER=$(which docker); rm -rf work && cp -frT ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' PATH=\"${pkgs.writeScriptBin "docker" ''
+              #!${pkgs.runtimeShell} -eu
+              case $1 in
+                load)
+                  echo 1>&2 "arion must not docker load when upping the same deployment for the second time"
+                  exit 1
+                  ;;
+                images)
+                  echo 1>&2 "execing docker to list images"
+                  exec $REAL_DOCKER "$@"
+                  ;;
+                *)
+                  echo 1>&2 "Unknown docker invocation. This may be a shortcoming of this docker mock."
+                  echo 1>&2 "Invocation: docker" "$@"
+                  ;;
+              esac
+            ''}/bin:$PATH\" arion up -d"
+        )
+        machine.wait_until_succeeds("curl --fail localhost:8000")
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl --fail localhost:8000")
+
+
+    # Tests
     #  - examples/flake
     # This _test_ doesn't work because flake-compat fetches the github
     # tarballs without sha256 and/or Nix doesn't consult the store before
@@ -71,6 +122,7 @@ in
     #     machine.succeed("cd work && NIX_PATH= arion down")
     #     machine.wait_until_fails("curl --fail localhost:8000")
 
+    ${optionalString haveSystemd ''
     # Tests
     #  - arion exec
     #  - examples/full-nixos
@@ -95,6 +147,7 @@ in
             "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
         )
         machine.wait_until_fails("curl --fail localhost:8000")
+    ''}
 
     # Tests
     #  - examples/nixos-unit

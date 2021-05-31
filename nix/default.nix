@@ -2,7 +2,8 @@
 , nixpkgsName ? "nixos-unstable"
 , nixpkgsSrc ? sources.${nixpkgsName}
 , system ? builtins.currentSystem
-, nixosTestIsPerl ? false
+, dockerSupportsSystemd ? false
+, nixosHasPodmanDockerSocket ? true
 , ...
 }:
 
@@ -11,8 +12,11 @@ import nixpkgsSrc ({
   config = {
   };
   overlays = [
-    # all the packages are defined there:
-    (_: _: { inherit nixosTestIsPerl; })
+    (_: _: {
+      arionTestingFlags = {
+        inherit dockerSupportsSystemd nixosHasPodmanDockerSocket;
+      };
+    })
     (import ./overlay.nix)
   ];
   inherit system;

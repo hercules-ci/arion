@@ -199,6 +199,25 @@ Default::
 
 No Example:: {blank}
 
+== services.<name>.image.enableRecommendedContents
+
+Add the `/bin/sh` and `/usr/bin/env` symlinks and some lightweight
+files.
+
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+false
+----
+
+
+No Example:: {blank}
+
 == services.<name>.image.name
 
 A human readable name for the docker image.

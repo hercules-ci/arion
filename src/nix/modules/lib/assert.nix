@@ -3,14 +3,15 @@
 # based on nixpkgs/nixos/modules/system/activation/top-level.nix
 
 let
-  inherit (lib) filter concatStringsSep types mkOption;
-
-  # lib.showWarnings since 19.09
-  showWarnings = warnings: res: lib.fold (w: x: lib.warn w x) res warnings;
-  warn = msg: builtins.trace "[1;31mwarning: ${msg}[0m";
+  inherit (lib)
+    concatStringsSep
+    filter
+    mkOption
+    showWarnings
+    types
+    ;
 
   # Handle assertions and warnings
-
   failedAssertions = map (x: x.message) (filter (x: !x.assertion) config.assertions);
 
   assertWarn = if failedAssertions != []

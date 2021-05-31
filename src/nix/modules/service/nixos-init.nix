@@ -24,7 +24,13 @@ in
       ../nixos/default-shell.nix
       (pkgs.path + "/nixos/modules/profiles/minimal.nix")
     ];
-    image.command = [ "${config.nixos.build.toplevel}/init" ];
+    image.command = [ "/usr/sbin/init" ];
+    image.contents = [
+      (pkgs.runCommand "root-init" {} ''
+        mkdir -p $out/usr/sbin
+        ln -s ${config.nixos.build.toplevel}/init $out/usr/sbin/init
+      '')
+    ];
     service.environment.container = "docker";
     service.environment.PATH = "/usr/bin:/run/current-system/sw/bin/";
     service.volumes = [
