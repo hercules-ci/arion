@@ -22,7 +22,11 @@ loadImages requestedImages = do
   loaded <- getDockerImages
 
   let
-    isNew i = (imageName i <> ":" <> imageTag i) `notElem` loaded
+    isNew i = 
+      -- On docker, the image name is unmodified
+      (imageName i <> ":" <> imageTag i) `notElem` loaded
+      -- -- On podman, you automatically get a localhost prefix
+        && ("localhost/" <> imageName i <> ":" <> imageTag i) `notElem` loaded
 
   traverse_ loadImage . filter isNew $ requestedImages
 
