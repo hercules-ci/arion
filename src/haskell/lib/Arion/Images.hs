@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Arion.Images 
+module Arion.Images
   ( loadImages
   ) where
 
@@ -22,7 +22,7 @@ loadImages requestedImages = do
   loaded <- getDockerImages
 
   let
-    isNew i = 
+    isNew i =
       -- On docker, the image name is unmodified
       (imageName i <> ":" <> imageTag i) `notElem` loaded
       -- -- On podman, you automatically get a localhost prefix
@@ -31,19 +31,19 @@ loadImages requestedImages = do
   traverse_ loadImage . filter isNew $ requestedImages
 
 loadImage :: Image -> IO ()
-loadImage (Image { image = Just imgPath, imageName = name }) =
+loadImage Image { image = Just imgPath, imageName = name } =
   withFile (toS imgPath) ReadMode $ \fileHandle -> do
   let procSpec = (Process.proc "docker" [ "load" ]) {
           Process.std_in = Process.UseHandle fileHandle
         }
   Process.withCreateProcess procSpec $ \_in _out _err procHandle -> do
-    e <- Process.waitForProcess procHandle 
+    e <- Process.waitForProcess procHandle
     case e of
       ExitSuccess -> pass
       ExitFailure code ->
         panic $ "docker load failed with exit code " <> show code <> " for image " <> name <> " from path " <> imgPath
 
-loadImage (Image { imageExe = Just imgExe, imageName = name }) = do
+loadImage Image { imageExe = Just imgExe, imageName = name } = do
   let loadSpec = (Process.proc "docker" [ "load" ]) { Process.std_in = Process.CreatePipe }
   Process.withCreateProcess loadSpec $ \(Just inHandle) _out _err loadProcHandle -> do
     let streamSpec = Process.proc (toS imgExe) []
@@ -61,11 +61,11 @@ loadImage (Image { imageExe = Just imgExe, imageName = name }) = do
             _ -> pass
           pass
 
-loadImage (Image { imageName = name }) = do
+loadImage Image { imageName = name } = do
   panic $ "image " <> name <> " doesn't specify an image file or imageExe executable"
 
 
 getDockerImages :: IO [TaggedImage]
 getDockerImages = do
   let procSpec = Process.proc "docker" [ "images",  "--filter", "dangling=false", "--format", "{{.Repository}}:{{.Tag}}" ]
-  (map toS . T.lines . toS) <$> Process.readCreateProcess procSpec ""
+  map toS . T.lines . toS <$> Process.readCreateProcess procSpec ""
