@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                arion-compose
-version: 0.1.2.0
+version: 0.1.3.0
 synopsis:            Run docker-compose with help from Nix/NixOS
 description:         Arion is a tool for building and running applications that consist of multiple docker containers using NixOS modules. It has special support for docker images that are built with Nix, for a smooth development experience and improved performance.
 homepage:            https://github.com/hercules-ci/arion#readme

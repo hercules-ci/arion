@@ -1,6 +1,6 @@
 # Revision history for Arion
 
-## Next
+## 0.1.3.0 -- 2020-05-03
 
 ### Changed
 
@@ -24,6 +24,8 @@
 
 * Add a warning when systemd `DynamicUser` is used but not available to the
   container.
+
+* CI with NixOS 21.05
 
 ## 0.1.2.0 -- 2020-03-05
 
@@ -51,3 +53,4 @@
 ## 0.1.0.0 -- 2019-10-04
 
 * First released version. Released on an unsuspecting world.
+
