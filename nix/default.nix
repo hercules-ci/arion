@@ -1,5 +1,5 @@
 { sources ? import ./sources.nix
-, nixpkgsName ? "nixos-unstable"
+, nixpkgsName ? "nixos-unstable" # match ./ci.nix isReferenceNixpkgs
 , nixpkgsSrc ? sources.${nixpkgsName}
 , system ? builtins.currentSystem
 , dockerSupportsSystemd ? false

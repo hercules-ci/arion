@@ -7,7 +7,6 @@ in
 dimension "Nixpkgs version" {
     "nixos-20_09" = {
       nixpkgsSource = "nixos-20.09";
-      isReferenceNixpkgs = true;
       enableDoc = true;
       dockerSupportsSystemd = true;
       nixosHasPodmanDockerSocket = false;
@@ -18,6 +17,7 @@ dimension "Nixpkgs version" {
     };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
+      isReferenceNixpkgs = true; # match ./default.nix
       enableDoc = true;
     };
   } (
