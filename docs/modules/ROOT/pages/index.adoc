@@ -61,11 +61,18 @@ Add this module to your NixOS configuration:
 { pkgs, ... }: {
   environment.systemPackages = [
     pkgs.arion
-    pkgs.docker # docker CLI will use podman socket
+
+     # Do install the docker CLI to talk to podman.
+     # Not needed when virtualisation.docker.enable = true;
+    pkgs.docker-client
   ];
+
+  # Arion works with Docker, but for NixOS-based containers, you need Podman
+  # since NixOS 21.05.
   virtualisation.docker.enable = false;
   virtualisation.podman.enable = true;
   virtualisation.podman.dockerSocket.enable = true;
+  virtualisation.podman.defaultNetwork.dnsname.enable = true;
 
   # Use your username instead of `myuser`
   users.extraUsers.myuser.extraGroups = ["podman"];
@@ -125,8 +132,6 @@ Describe containers using NixOS-style modules. There are a few options:
     };
   };
 }
-
-
 ```
 
 ==== NixOS: run only one systemd service
@@ -134,7 +139,6 @@ Describe containers using NixOS-style modules. There are a few options:
 `examples/nixos-unit/arion-compose.nix`:
 
 ```nix
-
 {
   services.webserver = { config, pkgs, ... }: {
 
@@ -157,7 +161,6 @@ Describe containers using NixOS-style modules. There are a few options:
     ];
   };
 }
-
 ```
 
 ==== NixOS: run full OS
@@ -220,10 +223,10 @@ development environments while working on
 https://www.hercules-ci.com[Hercules CI]. (It was also born out of
 ancient Greek deities disguised as horses. More on that later.)
 
-If you do want to use Arion for production environments, you’ll probably
-want to either build normal container images or manage garbage
-collection roots if you control the deployment host. Neither scenario is
-made easier by arion at this time.
+Arion can be used for simple single host deployments, using Docker's TLS
+client verification, or https://search.nixos.org/options?channel=unstable&show=virtualisation.podman.networkSocket.enable&query=virtualisation.podman[`virtualisation.podman.networkSocket` options].
+Remote deployments do not support `useHostStore`, although an SSH-based deployment method could support this.
+Docker Swarm is not currently supported.
 
 Arion has run successfully on Linux distributions other than NixOS, but we only perform CI for Arion on NixOS.
 
@@ -254,6 +257,8 @@ container.
 
 Nope, it’s just Nix and Docker Compose under the hood.
 
+It does xref:hercules-ci-effects:ROOT:reference/nix-functions/runArion.adoc[integrate] nicely though.
+
 === What about garbage collection?
 
 Arion removes the need for garbage collecting docker images, delegating
@@ -266,8 +271,9 @@ generate images that can be used in production.
 
 === Why is my container not running latest code?
 
-Restart it with `arion restart <name>` or if you've changed the image rebuild
-them using `arion up -d --always-recreate-deps <name>`.
+Rebuild the image using `arion up -d --always-recreate-deps <name>` or simply `arion up -d`.
+
+Like `docker-compose restart`, `arion restart` does not update the image before starting.
 
 === What is messing with my environment variables?
 
@@ -278,11 +284,11 @@ reference a script from `pkgs.writeScript` or escape the dollar sign as
 
 === Why name it ``Arion``?
 
-Arion comes from Greek mythology. Poseidon, the god of ~Docker~ the seas
+Arion comes from Greek mythology. Poseidon, the god of Docker -- I mean the seas --
 had his eye on Demeter. Demeter tried to trick him by disguising as a
 horse, but Poseidon saw through the deception and they had Arion.
 
 So Arion is a super fast divine horse; the result of some weird mixing.
 Also it talks.
 
-(And we feel morally obliged to name our stuff after Greek mythology)
+(And we felt morally obliged to name our stuff after Greek mythology)

@@ -12,6 +12,10 @@ dimension "Nixpkgs version" {
       dockerSupportsSystemd = true;
       nixosHasPodmanDockerSocket = false;
     };
+    "nixos-21_05" = {
+      nixpkgsSource = "nixos-21.05";
+      enableDoc = true;
+    };
     "nixos-unstable" = {
       nixpkgsSource = "nixos-unstable";
       enableDoc = true;
