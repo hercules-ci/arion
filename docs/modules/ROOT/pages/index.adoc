@@ -205,6 +205,48 @@ $ arion logs -f
 
 You can go to `examples/*/` and run these commands to give it a quick try.
 
+=== Inspect the config
+
+While developing an arion project, you can make use of `arion repl`, which launches
+a `nix repl` on the project configuration.
+
+```
+$ arion repl
+Launching a repl for you. To get started:
+
+To see deployment-wide configuration
+  type config. and use tab completion
+To bring the top-level Nixpkgs attributes into scope
+  type :a (config._module.args.pkgs) // { inherit config; }
+
+Welcome to Nix. Type :? for help.
+
+Loading '../../src/nix/eval-composition.nix'...
+Added 5 variables.
+
+nix-repl> config.services.webserver.service.command
+[ "sh" "-c" "cd \"$$WEB_ROOT\"\n/nix/store/66fbv9mmx1j4hrn9y06kcp73c3yb196r-python3-3.8.9/bin/python -m http.server\n" ]
+
+nix-repl>
+
+```
+
+== Build with Nix
+
+You can build a project with `nix-build` using an expression like
+
+```nix
+arion.build { modules = [ ./arion-compose.nix ]; pkgs = import ./arion-pkgs.nix; }
+```
+
+If you deploy with xref:hercules-ci-effects:ROOT:reference/nix-functions/runArion.adoc[integrate],
+and your `pkgs` variable is equivalent to `import ./arion-pkgs.nix`, you can use:
+
+```nix
+let
+  deployment = pkgs.effects.runArion { /* ... */ });
+in deployment.prebuilt
+```
 
 == Project Status
 
