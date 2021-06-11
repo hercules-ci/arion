@@ -205,16 +205,6 @@ $ arion logs -f
 
 You can go to `examples/*/` and run these commands to give it a quick try.
 
-== A full featured Nix command example
-
-To see how Arion can be used in a project, have a look at
-https://github.com/nix-community/todomvc-nix/tree/master/deploy/arion[todomvc-nix].
-
-```bash
-$ git clone https://github.com/nix-community/todomvc-nix
-$ cd todomvc-nix/deploy/arion
-$ arion up
-```
 
 == Project Status
 
