@@ -239,7 +239,7 @@ You can build a project with `nix-build` using an expression like
 arion.build { modules = [ ./arion-compose.nix ]; pkgs = import ./arion-pkgs.nix; }
 ```
 
-If you deploy with xref:hercules-ci-effects:ROOT:reference/nix-functions/runArion.adoc[integrate],
+If you deploy with xref:hercules-ci-effects:ROOT:reference/nix-functions/runArion.adoc[runArion],
 and your `pkgs` variable is equivalent to `import ./arion-pkgs.nix`, you can use:
 
 ```nix
