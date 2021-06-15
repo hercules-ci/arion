@@ -1,4 +1,6 @@
 {
+  deployment.technology = "podman";
+
   services.webserver = { pkgs, lib, ... }: {
     nixos.useSystemd = true;
     nixos.configuration.boot.tmpOnTmpfs = true;

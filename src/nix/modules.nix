@@ -4,4 +4,7 @@
     ./modules/composition/images.nix
     ./modules/composition/service-info.nix
     ./modules/composition/composition.nix
+    ./modules/composition/deployment.nix
+    ./modules/composition/deployment/docker.nix
+    ./modules/composition/deployment/podman.nix
 ]

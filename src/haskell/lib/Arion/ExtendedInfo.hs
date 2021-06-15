@@ -22,9 +22,13 @@ data Image = Image
   , imageTag :: Text
   } deriving (Eq, Show, Generic, Aeson.ToJSON, Aeson.FromJSON)
 
+data Technology = Docker | Podman
+  deriving (Eq, Show)
+
 data ExtendedInfo = ExtendedInfo {
     projectName :: Maybe Text,
-    images :: [Image]
+    images :: [Image],
+    technology :: Technology
   } deriving (Eq, Show)
 
 loadExtendedInfoFromPath :: FilePath -> IO ExtendedInfo
@@ -33,5 +37,10 @@ loadExtendedInfoFromPath fp = do
   pure ExtendedInfo {
     -- TODO: use aeson derived instance?
     projectName = v ^? key "x-arion" . key "project" . key "name" . _String,
-    images = (v :: Aeson.Value) ^.. key "x-arion" . key "images" . _Array . traverse . _JSON
+    images = (v :: Aeson.Value) ^.. key "x-arion" . key "images" . _Array . traverse . _JSON,
+    technology =
+      case v ^? key "x-arion" . key "technology" . _String of
+        Just "podman" -> Podman
+        Just "docker" -> Docker
+        _ -> panic "Unknown x-arion.technology" -- Shouldn't happen
   }
