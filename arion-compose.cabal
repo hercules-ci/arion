@@ -24,6 +24,10 @@ data-files:          nix/*.nix
 -- all data is verbatim from some sources
 data-dir:            src
 
+source-repository head
+  type: git
+  location: https://github.com/hercules-ci/arion
+
 common common
   build-depends:     base >=4.12.0.0 && <4.15
                    , aeson
