@@ -2,7 +2,7 @@ self: super: hself: hsuper:
 {
   arion-compose = import ./haskell-arion-compose.nix { pkgs = self; haskellPackages = hself; };
   arion-compose-checked =
-              let pkg = super.haskell.lib.buildStrictly hself.arion-compose;
+              let pkg = /* super.haskell.lib.buildStrictly  currently broken in nixos-unstable */ hself.arion-compose;
                   checked = super.haskell.lib.overrideCabal pkg (o: {
                     postConfigure = ''${o.postConfigure or ""}
                       if ! ${hsuper.cabal-install}/bin/cabal check;
