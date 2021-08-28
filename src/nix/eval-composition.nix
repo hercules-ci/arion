@@ -33,5 +33,5 @@ in
   composition // {
     # throw in lib and pkgs for repl convenience
     inherit lib;
-    inherit (composition.config._module.args) pkgs;
+    inherit (composition._module.args) pkgs;
   }
