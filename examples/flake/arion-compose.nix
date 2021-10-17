@@ -4,6 +4,7 @@
   config.services = {
 
     webserver = {
+      image.contents = with pkgs; [ bash ];
       service.useHostStore = true;
       service.command = [ "sh" "-c" ''
                   cd "$$WEB_ROOT"
