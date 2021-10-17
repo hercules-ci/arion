@@ -1,10 +1,20 @@
 { pkgs, ... }:
-{
+let 
+    sh = pkgs.stdenv.mkDerivation {
+        name = "sh";
+        phases = [ "installPhase" ];
+
+        installPhase = ''
+            mkdir -p "$out"/bin
+            ln -s ${pkgs.bash}/bin/sh "$out"/bin/sh
+        '';
+    };
+in{
   config.project.name = "webapp";
   config.services = {
 
     webserver = {
-      image.contents = with pkgs; [ bash ];
+      image.contents = [ sh ];
       service.useHostStore = true;
       service.command = [ "sh" "-c" ''
                   cd "$$WEB_ROOT"
