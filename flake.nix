@@ -38,5 +38,7 @@
         in composition.config.out.dockerComposeYaml;
     };
 
+    nixosModules.arion = ./nixos-module.nix;
+
   };
 }

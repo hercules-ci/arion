@@ -1,0 +1,68 @@
+= Deployment with Arion
+
+Arion projects can be deployed in Nix-like or Docker-like ways.
+
+== Docker images
+
+When you disable `useHostStore`, arion will build images, which can be deployed
+to any Docker host, including non-NixOS hosts.
+
+=== Remote Docker socket
+
+NOTE: Access to a Docker socket is equivalent to root access on the host.
+
+Docker supports authentication via TLS client certificates.
+
+The xref:hercules-ci-effects:ROOT:reference/nix-functions/runArion.adoc[runArion Effect] uses this technique.
+
+Because this technique works with a single Docker host, it does not need a registry.
+
+=== Upload to registry
+
+You can either use `arion push` or write custom push logic using the `arion cat`
+command, the `eval` function on the `arion` package, or the `lib.eval` function
+on the flake to retrieve the images defined in a project.
+
+== NixOS module
+
+Arion projects can be deployed as part of a NixOS configuration. This ties the
+project revision to the system configuration revision, which can be good or bad
+thing, depending on your deployment strategy. At a low level, a benefit is that
+no store paths need to be copied locally and remote NixOS deployments can use
+Nix's copy-closure algorithm for efficient transfers, and transparent binary
+caches rather than an inherently stateful Docker registry solution.
+
+Extend your NixOS configuration by adding the configuration elements to an
+existing configuration. You could create a new module file for it, if your
+choice of `imports` allows it.
+
+NOTE: This deployment method does NOT use an `arion-pkgs.nix` file, but reuses
+      the host `pkgs`.
+
+```nix
+{
+  imports = [
+    # Pick one of:
+    #  - niv
+    ((import ./nix/sources.nix).arion + "/nixos-module.nix")
+    #  - flakes (where arion is a flake input)
+    arion.nixosModules.arion
+    #  - other
+    arionPath + "/nixos-module.nix")
+  ];
+
+  virtualisation.arion = {
+    backend = "podman-socket"; # or "docker"
+    projects.example.settings = {
+      # Specify you project here, or import it from a file.
+      # NOTE: This does NOT use ./arion-pkgs.nix, but defaults to NixOS' pkgs.
+      imports = [ ./arion-compose.nix ];
+    };
+  };
+}
+```
+
+See also:
+
+ - xref:hercules-ci-effects:ROOT:reference/nix-functions/runNixOS.adoc[runNixOS Effect]
+ - xref:hercules-ci-effects:ROOT:reference/nix-functions/runNixOps2.adoc[runNixOps2 Effect]

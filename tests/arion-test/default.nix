@@ -8,11 +8,14 @@ let
   };
 
   inherit (lib)
+    concatMapStringsSep
     optionalAttrs
     optionalString
     ;
 
   haveSystemd = usePodman || pkgs.arionTestingFlags.dockerSupportsSystemd;
+
+  concatPathLines = paths: concatMapStringsSep "\n" (x: "${x}") paths;
 
 in
 {
@@ -39,7 +42,8 @@ in
     nix.useSandbox = false;
 
     virtualisation.writableStore = true;
-    virtualisation.pathsInNixDB = [
+    # Switch to virtualisation.additionalPaths when dropping all NixOS <= 21.05.
+    environment.etc."extra-paths-for-test".text = concatPathLines [
       # Pre-build the image because we don't want to build the world
       # in the vm.
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml

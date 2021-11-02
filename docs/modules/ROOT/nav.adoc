@@ -1,2 +1,3 @@
 * xref:index.adoc[Getting Started]
 * xref:options.adoc[Arion Options]
+* xref:deployment.adoc[Deployment]
