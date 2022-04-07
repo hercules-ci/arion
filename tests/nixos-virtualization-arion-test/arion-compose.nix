@@ -53,7 +53,7 @@
       })
     ];
     image.command = [
-      "${pkgs.zookeeper.override { jre = pkgs.jdk8_headless; }}/bin/zkServer.sh"
+      "${pkgs.zookeeper}/bin/zkServer.sh"
       "--config"
       "${./zookeeper}"
       "start-foreground"
