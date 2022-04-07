@@ -30,7 +30,7 @@ recurseIntoAttrs {
 
   testWithPodman =
     if arionTestingFlags.nixosHasPodmanDockerSocket
-    then nixosTest (pkgs.callPackage ./arion-test { usePodman = true; })
+    then nixosTest (import ./arion-test { usePodman = true; inherit pkgs lib; })
     else {};
 
   testBuild = arion.build {
