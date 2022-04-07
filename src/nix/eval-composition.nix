@@ -12,7 +12,6 @@ let
   inherit (pkgs) lib;
 
   composition = lib.evalModules {
-    check = true;
     modules = builtinModules ++ modules;
   };
 
@@ -24,6 +23,7 @@ let
     _file = ./eval-composition.nix;
     key = ./eval-composition.nix;
     config._module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
+    config._module.args.check = true;
     config.host.nixStorePrefix = hostNixStorePrefix;
     config.host.uid = lib.toInt uid;
   };
