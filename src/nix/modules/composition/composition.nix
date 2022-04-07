@@ -8,6 +8,9 @@ let
 in
 {
   options = {
+    _module.args = mkOption {
+      internal = true;
+    };
     project.name = mkOption {
       description = ''
         Name of the project.
