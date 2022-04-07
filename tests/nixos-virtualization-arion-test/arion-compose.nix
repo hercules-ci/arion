@@ -18,6 +18,7 @@
     # ];
     service.ports = [ "9092:9092" ];
     service.depends_on = [ "zookeeper" ];
+    image.name = "localhost/kafka";
     image.contents = [
       (pkgs.runCommand "root" { } ''
         mkdir -p $out/bin
@@ -41,6 +42,7 @@
     #     # volume.nocopy = true;
     #   }
     # ];
+    image.name = "localhost/zookeeper";
     image.contents = [
       (pkgs.buildEnv {
         name = "root";
