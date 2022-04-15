@@ -41,6 +41,9 @@ let
           echo 1>&2 "docker compose file: $ARION_PREBUILT"
           arion --prebuilt-file "$ARION_PREBUILT" up
         '';
+        preStop = ''
+          arion --prebuilt-file "$ARION_PREBUILT" down
+        '';
       };
     };
   };
