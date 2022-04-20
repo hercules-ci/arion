@@ -279,7 +279,7 @@ configuration that makes the Docker Compose file do the things it needs
 to do.
 
 One of the more interesting built-in modules is the
-link:src/nix/modules/service/host-store.nix[host-store.nix module] which
+https://github.com/hercules-ci/arion/blob/master/src/nix/modules/service/host-store.nix[host-store.nix module] which
 performs the bind mounts to make the host Nix store available in the
 container.
 
