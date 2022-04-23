@@ -9,7 +9,7 @@
                 "PATH": "/usr/bin:/run/current-system/sw/bin/",
                 "container": "docker"
             },
-            "image": "webserver:<HASH>",
+            "image": "localhost/webserver:<HASH>",
             "ports": [
                 "8000:80"
             ],
@@ -32,7 +32,7 @@
         "images": [
             {
                 "imageExe": "<STOREPATH>",
-                "imageName": "webserver",
+                "imageName": "localhost/webserver",
                 "imageTag": "<HASH>"
             }
         ],
