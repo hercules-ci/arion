@@ -25,7 +25,8 @@ loadImages requestedImages = do
     isNew i =
       -- On docker, the image name is unmodified
       (imageName i <> ":" <> imageTag i) `notElem` loaded
-      -- -- On podman, you automatically get a localhost prefix
+      -- On podman, you used to automatically get a localhost prefix
+      -- however, since NixOS 22.05, this expected to be part of the name instead
         && ("localhost/" <> imageName i <> ":" <> imageTag i) `notElem` loaded
 
   traverse_ loadImage . filter isNew $ requestedImages

@@ -8,10 +8,12 @@ let
     options = eval.options;
   };
 
-in (pkgs.writeText "agent-options" ''
+in (pkgs.runCommand "agent-options.adoc" { } ''
+  cat >$out <<EOF
   = Arion options
 
-  ${options.optionsAsciiDoc}
+  EOF
+  cat ${options.optionsAsciiDoc} >>$out
 '').overrideAttrs (o: {
   # Work around https://github.com/hercules-ci/hercules-ci-agent/issues/168
   allowSubstitutes = true;

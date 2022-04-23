@@ -104,8 +104,8 @@ in
     };
     image.name = mkOption {
       type = str;
-      default = config.service.name;
-      defaultText = lib.literalExpression or lib.literalExample "config.service.name";
+      default = "localhost/" + config.service.name;
+      defaultText = lib.literalExpression or lib.literalExample ''"localhost/" + config.service.name'';
       description = ''
         A human readable name for the docker image.
 

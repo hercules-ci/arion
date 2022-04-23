@@ -20,7 +20,7 @@ let
 in
 {
   name = "arion-test";
-  machine = { pkgs, lib, ... }: {
+  nodes.machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
     ] ++ lib.optional usePodman pkgs.docker;

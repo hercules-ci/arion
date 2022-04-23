@@ -36,15 +36,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixos-unstable": {
-        "branch": "master",
+        "branch": "lib-modules-allow-disable-_modules.args-docs-internal",
         "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
         "homepage": "https://github.com/NixOS/nixpkgs",
-        "owner": "NixOS",
+        "owner": "hercules-ci",
         "repo": "nixpkgs",
-        "rev": "f8232491252438cd70b93554e31fe8238a573636",
-        "sha256": "019bz8dxp9d30ghmi9v0inn0p7mj3mia69lkh5cyivhhp1i0cs5i",
+        "rev": "35f40b20607428901e8edace7d4643d4ac11e876",
+        "sha256": "0w1ivhzszggq2j4fxbhdppvzj07zkginfnqdpkl6mdzvpwhy8f0d",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/f8232491252438cd70b93554e31fe8238a573636.tar.gz",
+        "url": "https://github.com/hercules-ci/nixpkgs/archive/35f40b20607428901e8edace7d4643d4ac11e876.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz",
         "version": ""
     },

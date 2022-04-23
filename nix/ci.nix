@@ -41,7 +41,10 @@ dimension "Nixpkgs version" {
           } // lib.optionalAttrs enableNixOSTests {
             inherit (pkgs) tests;
           } // lib.optionalAttrs enableDoc {
-            inherit (pkgs) doc doc-options doc-options-check;
+            inherit (pkgs) 
+              # FIXME: nixpkgs antora packaging is broken
+              # doc
+              doc-options doc-options-check;
           } // lib.optionalAttrs isReferenceTarget {
             inherit (pkgs.arion-project.haskellPkgs) arion-compose-checked;
           }

@@ -6,6 +6,12 @@ let
   inherit (pkgs.haskell.lib) overrideCabal addBuildTools;
 in
   overrideCabal (addBuildTools (haskellPackages.callCabal2nix "arion-compose" ./.. {}) [pkgs.nix]) (o: o // {
+    src = pkgs.lib.sourceByRegex ../. [
+      ".*[.]cabal"
+      "LICENSE"
+      "src/?.*"
+      "README.asciidoc"
+    ];
     preCheck = ''
       export NIX_LOG_DIR=$TMPDIR
       export NIX_STATE_DIR=$TMPDIR

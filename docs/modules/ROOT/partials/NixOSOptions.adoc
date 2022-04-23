@@ -233,7 +233,7 @@ Type:: string
 Default::
 +
 ----
-{"_type":"literalExpression","text":"config.service.name"}
+{"_type":"literalExpression","text":"\"localhost/\" + config.service.name"}
 ----
 
 
