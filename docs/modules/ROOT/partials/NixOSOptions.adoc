@@ -514,7 +514,7 @@ See link:https://docs.docker.com/compose/compose-file/#depends_on[Docker Compose
 [discrete]
 === details
 
-Type:: list of strings or attribute set of attribute set of stringss
+Type:: list of strings or attribute set of submodules
 Default::
 +
 ----

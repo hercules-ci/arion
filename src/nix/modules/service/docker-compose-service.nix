@@ -8,7 +8,7 @@
 
 let
   inherit (lib) mkOption types;
-  inherit (types) listOf nullOr attrsOf str either int bool;
+  inherit (types) listOf nullOr attrsOf str either int bool submodule enum;
 
   link = url: text:
     ''link:${url}[${text}]'';
@@ -100,10 +100,20 @@ in
       default = null;
       description = dockerComposeRef "container_name";
     };
-    service.depends_on = mkOption {
-      type = either (listOf str) (attrsOf (attrsOf str));
-      default = [];
-      description = dockerComposeRef "depends_on";
+    service.depends_on =
+      let conditionsModule = {
+            options = {
+              condition = mkOption {
+                type = enum ["service_started" "service_healthy" "service_completed_successfully"];
+                description = dockerComposeRef "depends_on";
+                default = "service_started";
+              };
+            };
+          };
+       in mkOption {
+         type = either (listOf str) (attrsOf (submodule conditionsModule));
+         default = [];
+         description = dockerComposeRef "depends_on";
     };
     service.healthcheck.test = mkOption {
       type = nullOr (listOf str);
