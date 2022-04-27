@@ -707,6 +707,28 @@ Default::
 
 No Example:: {blank}
 
+== services.<name>.service.healthcheck.start_period
+
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
+
+[discrete]
+=== details
+
+Type:: string
+Default::
++
+----
+"0s"
+----
+
+
+Example::
++
+----
+"30s"
+----
+
+
 == services.<name>.service.healthcheck.test
 
 See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]

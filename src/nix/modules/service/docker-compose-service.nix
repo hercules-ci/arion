@@ -123,6 +123,12 @@ in
       example = "10s";
       description = dockerComposeRef "healthcheck";
     };
+    service.healthcheck.start_period = mkOption {
+      type = str;
+      default = "0s";
+      example = "30s";
+      description = dockerComposeRef "healthcheck";
+    };
     service.healthcheck.retries = mkOption {
       type = int;
       default = 3;
