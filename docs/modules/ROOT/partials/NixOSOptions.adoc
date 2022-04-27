@@ -514,7 +514,7 @@ See link:https://docs.docker.com/compose/compose-file/#depends_on[Docker Compose
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of strings or attribute set of attribute set of stringss
 Default::
 +
 ----
@@ -667,6 +667,89 @@ Default::
 
 
 No Example:: {blank}
+
+== services.<name>.service.healthcheck.interval
+
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
+
+[discrete]
+=== details
+
+Type:: string
+Default::
++
+----
+"30s"
+----
+
+
+Example::
++
+----
+"1m"
+----
+
+
+== services.<name>.service.healthcheck.retries
+
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
+
+[discrete]
+=== details
+
+Type:: signed integer
+Default::
++
+----
+3
+----
+
+
+No Example:: {blank}
+
+== services.<name>.service.healthcheck.test
+
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
+
+[discrete]
+=== details
+
+Type:: null or list of strings
+Default::
++
+----
+null
+----
+
+
+Example::
++
+----
+["CMD","pg_isready"]
+----
+
+
+== services.<name>.service.healthcheck.timeout
+
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
+
+[discrete]
+=== details
+
+Type:: string
+Default::
++
+----
+"30s"
+----
+
+
+Example::
++
+----
+"10s"
+----
+
 
 == services.<name>.service.hostStoreAsReadOnly
 

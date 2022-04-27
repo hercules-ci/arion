@@ -1,5 +1,15 @@
 # Revision history for Arion
 
+## Next
+
+### Changed
+
+* Healthcheck-based dependencies in `service.depends_on`.
+
+### Added
+
+* Support `service.healthcheck` for defining custom healthchecks.
+
 ## 0.1.3.0 -- 2020-05-03
 
 ### Changed

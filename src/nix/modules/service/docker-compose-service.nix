@@ -101,9 +101,32 @@ in
       description = dockerComposeRef "container_name";
     };
     service.depends_on = mkOption {
-      type = listOf str;
+      type = either (listOf str) (attrsOf (attrsOf str));
       default = [];
       description = dockerComposeRef "depends_on";
+    };
+    service.healthcheck.test = mkOption {
+      type = nullOr (listOf str);
+      default = null;
+      example = [ "CMD" "pg_isready" ];
+      description = dockerComposeRef "healthcheck";
+    };
+    service.healthcheck.interval = mkOption {
+      type = str;
+      default = "30s";
+      example = "1m";
+      description = dockerComposeRef "healthcheck";
+    };
+    service.healthcheck.timeout = mkOption {
+      type = str;
+      default = "30s";
+      example = "10s";
+      description = dockerComposeRef "healthcheck";
+    };
+    service.healthcheck.retries = mkOption {
+      type = int;
+      default = 3;
+      description = dockerComposeRef "healthcheck";
     };
     service.devices = mkOption {
       type = listOf str;
@@ -250,6 +273,8 @@ in
     inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
+  } // lib.optionalAttrs (config.service.healthcheck.test != null) {
+    inherit (config.service) healthcheck;
   } // lib.optionalAttrs (config.service.devices != []) {
     inherit (config.service) devices;
   } // lib.optionalAttrs (config.service.entrypoint != null) {
