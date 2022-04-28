@@ -4,7 +4,7 @@
    the user-facing options service.image, service.volumes, etc.
 
  */
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, options, ... }:
 
 let
   inherit (lib) mkOption types;
@@ -114,35 +114,47 @@ in
          type = either (listOf str) (attrsOf (submodule conditionsModule));
          default = [];
          description = dockerComposeRef "depends_on";
-    };
-    service.healthcheck.test = mkOption {
-      type = nullOr (listOf str);
-      default = null;
-      example = [ "CMD" "pg_isready" ];
-      description = dockerComposeRef "healthcheck";
-    };
-    service.healthcheck.interval = mkOption {
-      type = str;
-      default = "30s";
-      example = "1m";
-      description = dockerComposeRef "healthcheck";
-    };
-    service.healthcheck.timeout = mkOption {
-      type = str;
-      default = "30s";
-      example = "10s";
-      description = dockerComposeRef "healthcheck";
-    };
-    service.healthcheck.start_period = mkOption {
-      type = str;
-      default = "0s";
-      example = "30s";
-      description = dockerComposeRef "healthcheck";
-    };
-    service.healthcheck.retries = mkOption {
-      type = int;
-      default = 3;
-      description = dockerComposeRef "healthcheck";
+       };
+    service.healthcheck = mkOption {
+      type = submodule ({ config, options, ...}: {
+        options = {
+          _out = mkOption {
+            internal = true;
+            default = lib.optionalAttrs (options.test.highestPrio < 1500) {
+              inherit (config) test interval timeout start_period retries;
+            };
+          };
+          test = mkOption {
+            type = nullOr (listOf str);
+            default = null;
+            example = [ "CMD" "pg_isready" ];
+            description = dockerComposeRef "healthcheck";
+          };
+          interval = mkOption {
+            type = str;
+            default = "30s";
+            example = "1m";
+            description = dockerComposeRef "healthcheck";
+          };
+          timeout = mkOption {
+            type = str;
+            default = "30s";
+            example = "10s";
+            description = dockerComposeRef "healthcheck";
+          };
+          start_period = mkOption {
+            type = str;
+            default = "0s";
+            example = "30s";
+            description = dockerComposeRef "healthcheck";
+          };
+          retries = mkOption {
+            type = int;
+            default = 3;
+            description = dockerComposeRef "healthcheck";
+          };
+        };
+      });
     };
     service.devices = mkOption {
       type = listOf str;
@@ -289,8 +301,8 @@ in
     inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
     inherit (config.service) depends_on;
-  } // lib.optionalAttrs (config.service.healthcheck.test != null) {
-    inherit (config.service) healthcheck;
+  } // lib.optionalAttrs (options.service.healthcheck.highestPrio < 1500) {
+    healthcheck = config.service.healthcheck._out;
   } // lib.optionalAttrs (config.service.devices != []) {
     inherit (config.service) devices;
   } // lib.optionalAttrs (config.service.entrypoint != null) {

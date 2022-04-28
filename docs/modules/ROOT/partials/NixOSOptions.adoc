@@ -668,6 +668,18 @@ Default::
 
 No Example:: {blank}
 
+== services.<name>.service.healthcheck
+
+None
+
+[discrete]
+=== details
+
+Type:: submodule
+No Default:: {blank}
+
+No Example:: {blank}
+
 == services.<name>.service.healthcheck.interval
 
 See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
