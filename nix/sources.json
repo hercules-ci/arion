@@ -41,10 +41,10 @@
         "homepage": "https://github.com/NixOS/nixpkgs",
         "owner": "hercules-ci",
         "repo": "nixpkgs",
-        "rev": "35f40b20607428901e8edace7d4643d4ac11e876",
-        "sha256": "0w1ivhzszggq2j4fxbhdppvzj07zkginfnqdpkl6mdzvpwhy8f0d",
+        "rev": "14aa201b658f43546b00153bb2ada7206ba8dd26",
+        "sha256": "0xn43gdn3rfys1d8ni3y6x7vxyc263qsbhfsjwc5x7pcd3dfrcjw",
         "type": "tarball",
-        "url": "https://github.com/hercules-ci/nixpkgs/archive/35f40b20607428901e8edace7d4643d4ac11e876.tar.gz",
+        "url": "https://github.com/hercules-ci/nixpkgs/archive/14aa201b658f43546b00153bb2ada7206ba8dd26.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz",
         "version": ""
     },
