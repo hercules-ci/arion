@@ -23,16 +23,16 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/0cfe5377e8993052f9b0dd56d058f8008af45bd9.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "nixos-21.05": {
-        "branch": "nixos-21.05",
+    "nixos-22.05": {
+        "branch": "nixos-22.05",
         "description": "Nix Packages collection",
         "homepage": null,
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "297970378b9437541c065f3fef26871397edd2d4",
-        "sha256": "1q5dnylr4w1xqn3qxx7hn0pn01pcwdmsy70cjs01dn8b50ppc93g",
+        "rev": "a634c8f6c1fbf9b9730e01764999666f3436f10a",
+        "sha256": "1d40v43x972li5fg7jadxkj341li41mf2cl6vv7xi6j80rkq45q4",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/297970378b9437541c065f3fef26871397edd2d4.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/a634c8f6c1fbf9b9730e01764999666f3436f10a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixos-unstable": {
