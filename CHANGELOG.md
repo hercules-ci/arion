@@ -5,6 +5,7 @@
 ### Changed
 
 * Healthcheck-based dependencies in `service.depends_on`.
+* The `project.name` option is now mandatory.
 
 ### Added
 

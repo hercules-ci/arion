@@ -37,7 +37,7 @@
             }
         ],
         "project": {
-            "name": null
+            "name": "unit-test-data"
         },
         "serviceInfo": {
             "webserver": {
