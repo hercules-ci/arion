@@ -5,13 +5,6 @@ let
 in
 
 dimension "Nixpkgs version" {
-    # avoid bitrotting the docker support (as opposed to podman)
-    "nixos-20_09" = {
-      nixpkgsSource = "nixos-20.09";
-      enableDoc = true;
-      dockerSupportsSystemd = true;
-      nixosHasPodmanDockerSocket = false;
-    };
     "nixos-22_05" = {
       nixpkgsSource = "nixos-22.05";
       enableDoc = true;

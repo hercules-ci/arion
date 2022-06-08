@@ -2,6 +2,11 @@
 
 ## Next
 
+### Removed
+
+ - NixOS 20.09 support. Its docker-compose does not support the
+   `networks.<name>.name` option, which is important in later versions.
+
 ### Changed
 
 * Healthcheck-based dependencies in `service.depends_on`.
