@@ -1,4 +1,5 @@
 {
+    "networks": {},
     "services": {
         "webserver": {
             "command": [
