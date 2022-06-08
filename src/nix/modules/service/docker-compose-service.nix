@@ -10,10 +10,11 @@ let
   inherit (lib) mkOption types;
   inherit (types) listOf nullOr attrsOf str either int bool submodule enum;
 
-  link = url: text:
-    ''link:${url}[${text}]'';
-  dockerComposeRef = fragment:
-    ''See ${link "https://docs.docker.com/compose/compose-file/#${fragment}" "Docker Compose#${fragment}"}'';
+  inherit (import ../../lib.nix { inherit lib; })
+    link
+    dockerComposeRef
+    ;
+
   dockerComposeKitchenSink = ''
     Analogous to the `docker run` counterpart.
 
