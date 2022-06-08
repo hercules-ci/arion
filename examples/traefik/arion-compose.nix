@@ -9,7 +9,7 @@
 
  */
 { lib, pkgs, ... }: {
-
+  config.project.name = "traefik";
   config.services = {
     traefik = {
       image.command = [

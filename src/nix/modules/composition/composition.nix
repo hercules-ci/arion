@@ -16,9 +16,10 @@ in
         Name of the project.
 
         See ${link "https://docs.docker.com/compose/reference/envvars/#compose_project_name" "COMPOSE_PROJECT_NAME"}
+
+        This is not optional, because getting the project name from a directory name tends to produce different results for different repo checkout location names.
       '';
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
     };
   };
   config = {

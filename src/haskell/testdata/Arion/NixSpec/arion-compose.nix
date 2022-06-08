@@ -1,4 +1,5 @@
 {
+  project.name = "unit-test-data";
   services.webserver = { pkgs, ... }: {
     nixos.useSystemd = true;
     nixos.configuration.boot.tmpOnTmpfs = true;
