@@ -1,5 +1,9 @@
 {
-    "networks": {},
+    "networks": {
+        "default": {
+            "name": "unit-test-data"
+        }
+    },
     "services": {
         "webserver": {
             "command": [

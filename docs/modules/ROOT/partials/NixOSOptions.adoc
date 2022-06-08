@@ -24,6 +24,30 @@ No Default:: {blank}
 
 No Example:: {blank}
 
+== enableDefaultNetwork
+
+Whether to define the default network:
+
+```nix
+networks.default = {
+  name = config.project.name;
+};
+```
+
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+true
+----
+
+
+No Example:: {blank}
+
 == host.nixStorePrefix
 
 Prefixes store paths on the host, allowing the Nix store to be
@@ -79,12 +103,7 @@ See link:https://docs.docker.com/compose/compose-file/#networks-top-level-elemen
 === details
 
 Type:: lazy attribute set of submodules
-Default::
-+
-----
-{}
-----
-
+No Default:: {blank}
 
 No Example:: {blank}
 

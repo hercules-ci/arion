@@ -21,12 +21,30 @@ in
       description = ''
         ${dockerComposeRef "networks-top-level-element"}
       '';
-      default = {};
+    };
+    enableDefaultNetwork = mkOption {
+      type = types.bool;
+      description = ''
+        Whether to define the default network:
+
+        ```nix
+        networks.default = {
+          name = config.project.name;
+        };
+        ```
+      '';
+      default = true;
     };
   };
 
 
   config = {
+
+    networks = optionalAttrs config.enableDefaultNetwork {
+      default = {
+        name = config.project.name;
+      };
+    };
 
     docker-compose.raw.networks =
       lib.mapAttrs (k: v: v.out) config.networks;
