@@ -17,6 +17,7 @@
  */
 
 {
+  project.name = "nixos-unit";
   services.webserver = { config, pkgs, ... }: {
 
     nixos.configuration = {config, lib, options, pkgs, ...}: {

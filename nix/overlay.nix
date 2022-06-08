@@ -49,6 +49,7 @@ in
         haskellPkgs.haskell-language-server
         super.docker-compose
         self.niv
+        self.nixpkgs-fmt
         self.releaser
       ];
     };

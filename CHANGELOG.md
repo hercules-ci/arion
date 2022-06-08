@@ -2,13 +2,23 @@
 
 ## Next
 
+### Removed
+
+ - NixOS 20.09 support. Its docker-compose does not support the
+   `networks.<name>.name` option, which is important in later versions.
+
 ### Changed
 
 * Healthcheck-based dependencies in `service.depends_on`.
+* The `project.name` option is now mandatory.
 
 ### Added
 
 * Support `service.healthcheck` for defining custom healthchecks.
+* Arion now declares a `networks.default` by default, with `name` set to
+  `project.name`. This improves compatibility with container runtimes by
+  copying pre-existing behavior. Most users will want to keep using this
+  behavior, but it can be disabled with `enableDefaultNetwork`.
 
 ## 0.1.3.0 -- 2020-05-03
 

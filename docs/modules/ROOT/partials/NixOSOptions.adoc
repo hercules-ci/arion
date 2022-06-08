@@ -24,6 +24,30 @@ No Default:: {blank}
 
 No Example:: {blank}
 
+== enableDefaultNetwork
+
+Whether to define the default network:
+
+```nix
+networks.default = {
+  name = config.project.name;
+};
+```
+
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+true
+----
+
+
+No Example:: {blank}
+
 == host.nixStorePrefix
 
 Prefixes store paths on the host, allowing the Nix store to be
@@ -70,6 +94,164 @@ No Default:: {blank}
 
 No Example:: {blank}
 
+== networks
+
+See link:https://docs.docker.com/compose/compose-file/#networks-top-level-element[Docker Compose#networks-top-level-element]
+
+
+[discrete]
+=== details
+
+Type:: lazy attribute set of submodules
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.attachable
+
+See link:https://docs.docker.com/compose/compose-file/#attachable[Docker Compose#attachable]
+
+
+[discrete]
+=== details
+
+Type:: boolean
+No Default:: {blank}
+
+Example::
++
+----
+true
+----
+
+
+== networks.<name>.driver
+
+`"none"`, `"host"`, or a platform-specific value.
+See link:https://docs.docker.com/compose/compose-file/#driver[Docker Compose#driver]
+
+
+[discrete]
+=== details
+
+Type:: string
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.driver_opts
+
+See link:https://docs.docker.com/compose/compose-file/#driver_opts[Docker Compose#driver_opts]
+
+
+[discrete]
+=== details
+
+Type:: lazy attribute set of raw values
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.enable_ipv6
+
+Whether we've entered the 21st century yet.
+
+See link:https://docs.docker.com/compose/compose-file/#enable_ipv6[Docker Compose#enable_ipv6]
+
+
+[discrete]
+=== details
+
+Type:: boolean
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.external
+
+When `true`, don't create or destroy the network, but assume that it
+exists.
+
+See link:https://docs.docker.com/compose/compose-file/#external[Docker Compose#external]
+
+
+[discrete]
+=== details
+
+Type:: boolean
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.internal
+
+Achieves "external isolation".
+
+See link:https://docs.docker.com/compose/compose-file/#internal[Docker Compose#internal]
+
+
+[discrete]
+=== details
+
+Type:: boolean
+Default::
++
+----
+false
+----
+
+
+No Example:: {blank}
+
+== networks.<name>.ipam
+
+Manage IP addresses.
+
+See link:https://docs.docker.com/compose/compose-file/#ipam[Docker Compose#ipam]
+
+
+[discrete]
+=== details
+
+Type:: raw value
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.labels
+
+Metadata.
+
+See link:https://docs.docker.com/compose/compose-file/#labels[Docker Compose#labels]
+
+
+[discrete]
+=== details
+
+Type:: attribute set of strings
+No Default:: {blank}
+
+No Example:: {blank}
+
+== networks.<name>.name
+
+Set a custom name for the network.
+
+It shares a namespace with other projects' networks. `name` is used as-is.
+
+Note the `default` network's default `name` is set to `project.name` by Arion.
+
+See link:https://docs.docker.com/compose/compose-file/#name[Docker Compose#name]
+
+
+[discrete]
+=== details
+
+Type:: string
+No Default:: {blank}
+
+No Example:: {blank}
+
 == out.dockerComposeYaml
 
 A derivation that produces a docker-compose.yaml file for this composition.
@@ -112,17 +294,14 @@ Name of the project.
 
 See link:https://docs.docker.com/compose/reference/envvars/#compose_project_name[COMPOSE_PROJECT_NAME]
 
+This is not optional, because getting the project name from a directory name tends to produce different results for different repo checkout location names.
+
 
 [discrete]
 === details
 
-Type:: null or string
-Default::
-+
-----
-null
-----
-
+Type:: string
+No Default:: {blank}
 
 No Example:: {blank}
 

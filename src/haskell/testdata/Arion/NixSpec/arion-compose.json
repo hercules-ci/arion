@@ -1,4 +1,9 @@
 {
+    "networks": {
+        "default": {
+            "name": "unit-test-data"
+        }
+    },
     "services": {
         "webserver": {
             "command": [
@@ -37,7 +42,7 @@
             }
         ],
         "project": {
-            "name": null
+            "name": "unit-test-data"
         },
         "serviceInfo": {
             "webserver": {
