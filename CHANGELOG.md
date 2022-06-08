@@ -10,6 +10,10 @@
 ### Added
 
 * Support `service.healthcheck` for defining custom healthchecks.
+* Arion now declares a `networks.default` by default, with `name` set to
+  `project.name`. This improves compatibility with container runtimes by
+  copying pre-existing behavior. Most users will want to keep using this
+  behavior, but it can be disabled with `enableDefaultNetwork`.
 
 ## 0.1.3.0 -- 2020-05-03
 
