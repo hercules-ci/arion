@@ -60,7 +60,7 @@ parseOptions = do
           <> help "Use Nix expression EXPR to get the Nixpkgs attrset used for bootstrapping \
                    \and evaluating the configuration." )
     showTrace <- flag False True (long "show-trace"
-                    <> help "Causes Nix to print out a stack trace in case of Nix expression evaluation errors.")
+                    <> help "Causes Nix to print out a stack trace in case of Nix expression evaluation errors. Specify before command.")
     -- TODO --option support (https://github.com/pcapriotti/optparse-applicative/issues/284)
     userNixArgs <- many (T.pack <$> strOption (long "nix-arg" <> metavar "ARG" <> help "Pass an extra argument to nix. Example: --nix-arg --option --nix-arg substitute --nix-arg false"))
     prebuiltComposeFile <- optional $ strOption

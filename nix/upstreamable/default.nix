@@ -79,9 +79,7 @@ let
   /* Function to derivation of the docker compose yaml file
      NOTE: The output will change: https://github.com/hercules-ci/arion/issues/82
 
-    This function is particularly useful on CI. On Nixpkgs >= 20.09 this will
-    not store the image tarballs but executables to produce them reliably via
-    streamLayeredImage.
+     This function is particularly useful on CI.
    */
   build = args@{...}:
     let composition = eval args;
