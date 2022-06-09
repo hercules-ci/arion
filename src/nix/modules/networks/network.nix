@@ -112,7 +112,7 @@ in
       lib.mapAttrs
         (k: opt: opt.value)
         (lib.filterAttrs
-          (k: opt: builtins.trace k builtins.trace opt builtins.trace "" opt.isDefined)
+          (k: opt: opt.isDefined)
           {
             inherit (options)
               driver
