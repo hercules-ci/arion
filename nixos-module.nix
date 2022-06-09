@@ -22,7 +22,7 @@ let
 
           See <link xlink:href="https://docs.hercules-ci.com/arion/options/">https://docs.hercules-ci.com/arion/options/</link>.
         '';
-        type = arionSettingsType;
+        type = arionSettingsType name;
         visible = "shallow";
       };
       _systemd = mkOption { internal = true; };
@@ -45,8 +45,8 @@ let
     };
   };
 
-  arionSettingsType =
-    (cfg.package.eval { modules = [ ]; }).type or (
+  arionSettingsType = name:
+    (cfg.package.eval { modules = [ { project.name = lib.mkDefault name; } ]; }).type or (
       throw "lib.evalModules did not produce a type. Please upgrade Nixpkgs to nixos-unstable or >=nixos-21.11"
     );
 
