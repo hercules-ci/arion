@@ -1,6 +1,12 @@
 # Revision history for Arion
 
-## Next
+## Next 2.x
+
+### BREAKING
+
+* The NixOS module now sets the default project name
+* The NixOS module now sets the default network name to the project name (commonly referred to as `<name>` in the option path)
+* The `project.name` option is now mandatory for projects that aren't deployed with the NixOS module.
 
 ### Removed
 
@@ -10,7 +16,6 @@
 ### Changed
 
 * Healthcheck-based dependencies in `service.depends_on`.
-* The `project.name` option is now mandatory.
 
 ### Added
 
