@@ -40,6 +40,7 @@ Arion allows to compose containers with different granularity:
   * <<Docker image from DockerHub>>
 
 Full NixOS is supported on
+
  * docker-compose + podman with docker socket (NixOS >= 21.05)
  * docker-compose + docker, before cgroupsv2 (NixOS < 21.05)
 
