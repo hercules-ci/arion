@@ -27,8 +27,8 @@ let
       };
       _systemd = mkOption { internal = true; };
     };
-    config = {
-      _systemd.services."arion-${name}" = {
+    config =
+      let config = {
         wantedBy = [ "multi-user.target" ];
         after = [ "sockets.target" ];
 
@@ -37,12 +37,17 @@ let
           cfg.docker.client.package
         ];
         environment.ARION_PREBUILT = config.settings.out.dockerComposeYaml;
+        # environment.DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/docker.sock";
         script = ''
           echo 1>&2 "docker compose file: $ARION_PREBUILT"
           arion --prebuilt-file "$ARION_PREBUILT" up
         '';
       };
-    };
+    in
+      if cfg.backend == "docker-rootless" then
+        { _systemd.user.services."arion-${name}" = config; }
+      else
+        { _systemd.services."arion-${name}" = config; };
   };
 
   arionSettingsType = name:
@@ -57,14 +62,14 @@ in
   options = {
     virtualisation.arion = {
       backend = mkOption {
-        type = types.enum [ "podman-socket" "docker" ];
+        type = types.enum [ "podman-socket" "docker" "docker-rootless" ];
         description = ''
           Which container implementation to use.
         '';
       };
       package = mkOption {
         type = types.package;
-        
+
         default = (import ./. { inherit pkgs; }).arion;
         description = ''
           Arion package to use. This will provide <literal>arion</literal>
@@ -103,6 +108,15 @@ in
       })
       (mkIf (cfg.backend == "docker") {
         virtualisation.docker.enable = true;
+        virtualisation.arion.docker.client.package = pkgs.docker;
+      })
+      (mkIf (cfg.backend == "docker-rootless") {
+        virtualisation = {
+          docker.rootless = {
+            enable = true;
+            setSocketVariable = true;
+          };
+        };
         virtualisation.arion.docker.client.package = pkgs.docker;
       })
     ]
