@@ -28,7 +28,7 @@ let
       _systemd = mkOption { internal = true; };
     };
     config =
-      let config = {
+      let service = {
         wantedBy = [ "multi-user.target" ];
         after = [ "sockets.target" ];
 
@@ -37,7 +37,7 @@ let
           cfg.docker.client.package
         ];
         environment.ARION_PREBUILT = config.settings.out.dockerComposeYaml;
-        # environment.DOCKER_HOST = "unix://$XDG_RUNTIME_DIR/docker.sock";
+        environment.DOCKER_HOST = mkIf (cfg.backend == "docker-rootless") "unix:///run/user/1000/docker.sock";
         script = ''
           echo 1>&2 "docker compose file: $ARION_PREBUILT"
           arion --prebuilt-file "$ARION_PREBUILT" up
@@ -45,9 +45,9 @@ let
       };
     in
       if cfg.backend == "docker-rootless" then
-        { _systemd.user.services."arion-${name}" = config; }
+        { _systemd.user.services."arion-${name}" = service; }
       else
-        { _systemd.services."arion-${name}" = config; };
+        { _systemd.services."arion-${name}" = service; };
   };
 
   arionSettingsType = name:
