@@ -62,7 +62,7 @@ in
   options = {
     virtualisation.arion = {
       backend = mkOption {
-        type = types.enum [ "podman-socket" "docker" "docker-rootless" ];
+        type = types.enum [ "podman-socket" "docker" ];
         description = ''
           Which container implementation to use.
         '';
