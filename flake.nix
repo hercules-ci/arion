@@ -2,7 +2,7 @@
   description = "Arion - use Docker Compose via Nix";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/14aa201b658f43546b00153bb2ada7206ba8dd26"; # TODO nixos-unstable
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     haskell-flake.url = "github:srid/haskell-flake";
     flake-parts.url = "github:hercules-ci/flake-parts/easyOverlay"; # TODO merge
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -16,8 +16,7 @@
         ./docs/flake-module.nix
         ./tests/flake-module.nix
       ];
-      # FIXME use: systems = inputs.nixpkgs.lib.systems.flakeExposed;
-      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
       perSystem = { config, self', inputs', pkgs, system, final, ... }:
         let h = pkgs.haskell.lib.compose; in
         {

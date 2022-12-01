@@ -102,7 +102,7 @@ See link:https://docs.docker.com/compose/compose-file/#networks-top-level-elemen
 [discrete]
 === details
 
-Type:: lazy attribute set of submodules
+Type:: lazy attribute set of (submodule)
 No Default:: {blank}
 
 No Example:: {blank}
@@ -147,7 +147,7 @@ See link:https://docs.docker.com/compose/compose-file/#driver_opts[Docker Compos
 [discrete]
 === details
 
-Type:: lazy attribute set of raw values
+Type:: lazy attribute set of raw value
 No Default:: {blank}
 
 No Example:: {blank}
@@ -228,7 +228,7 @@ See link:https://docs.docker.com/compose/compose-file/#labels[Docker Compose#lab
 [discrete]
 === details
 
-Type:: attribute set of strings
+Type:: attribute set of string
 No Default:: {blank}
 
 No Example:: {blank}
@@ -271,7 +271,7 @@ The text of out.dockerComposeYaml.
 [discrete]
 === details
 
-Type:: attribute set of unspecifieds
+Type:: attribute set of unspecified value
 No Default:: {blank}
 Read Only:: {blank}
 No Example:: {blank}
@@ -312,7 +312,7 @@ An attribute set of service configurations. A service specifies how to run an im
 [discrete]
 === details
 
-Type:: attribute set of submodules
+Type:: attribute set of (submodule)
 No Default:: {blank}
 
 No Example:: {blank}
@@ -350,7 +350,7 @@ No Example:: {blank}
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -368,7 +368,7 @@ Top level paths in the container.
 [discrete]
 === details
 
-Type:: list of packages
+Type:: list of package
 Default::
 +
 ----
@@ -453,7 +453,7 @@ v1.2.0].
 [discrete]
 === details
 
-Type:: attribute set of unspecifieds
+Type:: attribute set of unspecified value
 Default::
 +
 ----
@@ -494,7 +494,7 @@ NixOS configuration can be used in other ways.
 [discrete]
 === details
 
-Type:: list of unspecifieds or unspecified convertible to it
+Type:: (list of unspecified value) or unspecified value convertible to it
 Default::
 +
 ----
@@ -554,7 +554,7 @@ It will be inserted in `x-arion.serviceInfo.<service.name>`.
 [discrete]
 === details
 
-Type:: attribute set of unspecifieds
+Type:: attribute set of unspecified value
 Default::
 +
 ----
@@ -578,7 +578,7 @@ escape hatch for some.
 [discrete]
 === details
 
-Type:: attribute set of unspecifieds
+Type:: attribute set of unspecified value
 No Default:: {blank}
 
 No Example:: {blank}
@@ -618,7 +618,7 @@ according to Docker's link:https://docs.docker.com/engine/reference/run/#runtime
 [discrete]
 === details
 
-Type:: attribute set of null or booleans
+Type:: attribute set of (null or boolean)
 Default::
 +
 ----
@@ -640,7 +640,7 @@ See link:https://docs.docker.com/compose/compose-file/#command[Docker Compose#co
 [discrete]
 === details
 
-Type:: null or unspecified
+Type:: null or unspecified value
 Default::
 +
 ----
@@ -676,7 +676,7 @@ Container program and arguments to invoke when calling
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -693,7 +693,7 @@ See link:https://docs.docker.com/compose/compose-file/#depends_on[Docker Compose
 [discrete]
 === details
 
-Type:: list of strings or attribute set of submodules
+Type:: (list of string) or attribute set of (submodule)
 Default::
 +
 ----
@@ -713,7 +713,7 @@ See link:https://docs.docker.com/compose/compose-file/#devices[Docker Compose#de
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -730,7 +730,7 @@ See link:https://docs.docker.com/compose/compose-file/#dns[Docker Compose#dns]
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -769,7 +769,7 @@ See link:https://docs.docker.com/compose/compose-file/#env_file[Docker Compose#e
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -786,7 +786,7 @@ See link:https://docs.docker.com/compose/compose-file/#environment[Docker Compos
 [discrete]
 === details
 
-Type:: attribute set of string or signed integers
+Type:: attribute set of (string or signed integer)
 Default::
 +
 ----
@@ -803,7 +803,7 @@ See link:https://docs.docker.com/compose/compose-file/#expose[Docker Compose#exp
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -820,7 +820,7 @@ See link:https://docs.docker.com/compose/compose-file/#external_links[Docker Com
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -837,7 +837,7 @@ See link:https://docs.docker.com/compose/compose-file/#extra_hosts[Docker Compos
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -849,7 +849,7 @@ No Example:: {blank}
 
 == services.<name>.service.healthcheck
 
-None
+See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compose#healthcheck]
 
 [discrete]
 === details
@@ -927,7 +927,7 @@ See link:https://docs.docker.com/compose/compose-file/#healthcheck[Docker Compos
 [discrete]
 === details
 
-Type:: null or list of strings
+Type:: null or (list of string)
 Default::
 +
 ----
@@ -1020,7 +1020,7 @@ See link:https://docs.docker.com/compose/compose-file/#labels[Docker Compose#lab
 [discrete]
 === details
 
-Type:: attribute set of strings
+Type:: attribute set of string
 Default::
 +
 ----
@@ -1042,7 +1042,7 @@ See link:https://docs.docker.com/compose/compose-file/#links[Docker Compose#link
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -1089,7 +1089,7 @@ See link:https://docs.docker.com/compose/compose-file/#networks[Docker Compose#n
 [discrete]
 === details
 
-Type:: null or list of strings
+Type:: null or (list of string)
 Default::
 +
 ----
@@ -1109,7 +1109,7 @@ See link:https://docs.docker.com/compose/compose-file/#ports[Docker Compose#port
 [discrete]
 === details
 
-Type:: list of unspecifieds
+Type:: list of unspecified value
 Default::
 +
 ----
@@ -1180,7 +1180,7 @@ See link:https://docs.docker.com/compose/compose-file/#sysctls[Docker Compose#sy
 [discrete]
 === details
 
-Type:: attribute set of string or signed integers
+Type:: attribute set of (string or signed integer)
 Default::
 +
 ----
@@ -1197,7 +1197,7 @@ See link:https://docs.docker.com/compose/compose-file/#tmpfs[Docker Compose#tmpf
 [discrete]
 === details
 
-Type:: list of strings
+Type:: list of string
 Default::
 +
 ----
@@ -1288,7 +1288,7 @@ See link:https://docs.docker.com/compose/compose-file/#volumes[Docker Compose#vo
 [discrete]
 === details
 
-Type:: list of unspecifieds
+Type:: list of unspecified value
 Default::
 +
 ----

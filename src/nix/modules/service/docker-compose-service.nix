@@ -117,6 +117,7 @@ in
          description = dockerComposeRef "depends_on";
        };
     service.healthcheck = mkOption {
+      description = dockerComposeRef "healthcheck";
       type = submodule ({ config, options, ...}: {
         options = {
           _out = mkOption {
