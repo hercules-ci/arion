@@ -1,4 +1,4 @@
-{ usePodman ? false, pkgs, lib, ... }:
+{ usePodman ? false, pkgs, lib ? pkgs.lib, ... }:
 
 let
   # To make some prebuilt derivations available in the vm

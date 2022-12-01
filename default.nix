@@ -1,6 +1,11 @@
-{ pkgs ? import ./nix {}
+let flake = import ./nix/compat.nix;
+in
+{ pkgs ? import flake.inputs.nixpkgs { }
 , haskellPackages ? pkgs.haskellPackages
 }:
+let
+  pkgsWithArion = pkgs.extend flake.overlays.default;
+in
 {
-  arion = import ./nix/arion.nix { inherit pkgs haskellPackages; };
+  inherit (pkgsWithArion) arion;
 }
