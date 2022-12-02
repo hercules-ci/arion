@@ -1,16 +1,16 @@
 # Revision history for Arion
 
-## Next 2.x
+## 0.2.0.0 -- 2022-12-02
 
 ### BREAKING
+
+* The `project.name` option is now mandatory for projects that aren't deployed with the NixOS module.
 
 * The NixOS module now sets the default network name to the project name (commonly referred to as `<name>` in the option path).
   If this is not desired, for instance if you need the projects to be on the same network, set `networks.default.name` in each of them.
 
 * The NixOS module now sets the default project name. You can still set your own value with the `project.name` option.
   If you did not set one, docker compose heuristically determined the name to be `store`, so you may want to set `project.name = "store"` or prepare to rename the network manually.
-
-* The `project.name` option is now mandatory for projects that aren't deployed with the NixOS module.
 
 ### Removed
 
