@@ -2,7 +2,7 @@
   description = "Arion - use Docker Compose via Nix";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/haskell-updates";
     haskell-flake.url = "github:srid/haskell-flake";
     flake-parts.url = "github:hercules-ci/flake-parts/easyOverlay"; # TODO merge
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
