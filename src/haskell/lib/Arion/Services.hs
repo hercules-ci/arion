@@ -9,6 +9,7 @@ import Prelude()
 import Protolude hiding (to)
 
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Key as AK
 import           Arion.Aeson (decodeFile)
 
 import Control.Lens
@@ -20,4 +21,4 @@ getDefaultExec fp service = do
 
   v <- decodeFile fp
 
-  pure ((v :: Aeson.Value) ^.. key "x-arion" . key "serviceInfo" . key service . key "defaultExec" . _Array . traverse . _String)
+  pure ((v :: Aeson.Value) ^.. key "x-arion" . key "serviceInfo" . key (AK.fromText service) . key "defaultExec" . _Array . traverse . _String)

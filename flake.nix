@@ -1,44 +1,90 @@
 {
   description = "Arion - use Docker Compose via Nix";
 
-  outputs = { self, nixpkgs }:
-  let
-    lib = import (nixpkgs + "/lib");
-    systems = [
-      "aarch64-linux"
-      "x86_64-darwin"
-      "x86_64-linux"
-    ];
-    arionFromPkgs = pkgs: import ./nix/arion.nix { inherit pkgs; };
-  in {
-
-    # The overlay is currently the recommended way to integrate arion,
-    # because its arion attribute behaves just like Nixpkgs.
-    overlay = final: prev: {
-      arion = arionFromPkgs final;
-    };
-
-    packages = lib.genAttrs systems (system:
-    let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in
-    {
-      arion = arionFromPkgs pkgs;
-    });
-
-    # Does not include the eval and build functions like you may expect from Nixpkgs.
-    defaultPackage = lib.genAttrs systems (system:
-      self.packages.${system}.arion
-    );
-
-    lib = {
-      eval = import ./src/nix/eval-composition.nix;
-      build = args@{...}:
-        let composition = self.lib.eval args;
-        in composition.config.out.dockerComposeYaml;
-    };
-
-    nixosModules.arion = ./nixos-module.nix;
-
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/haskell-updates";
+    haskell-flake.url = "github:srid/haskell-flake";
+    flake-parts.url = "github:hercules-ci/flake-parts/easyOverlay"; # TODO merge
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   };
+
+  outputs = inputs@{ self, flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit self; } ({ config, lib, extendModules, ... }: {
+      imports = [
+        inputs.haskell-flake.flakeModule
+        inputs.flake-parts.flakeModules.easyOverlay
+        ./docs/flake-module.nix
+        ./tests/flake-module.nix
+      ];
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
+      perSystem = { config, self', inputs', pkgs, system, final, ... }:
+        let h = pkgs.haskell.lib.compose; in
+        {
+          overlayAttrs = {
+            inherit (config.packages) arion;
+            arionTestingFlags = {
+              dockerSupportsSystemd = false;
+            };
+          };
+          packages.default = config.packages.arion;
+          packages.overlay-test = final.arion;
+          packages.arion = import ./nix/arion.nix { inherit pkgs; };
+          haskellProjects.haskell-package = {
+            # not autodetected: https://github.com/srid/haskell-flake/issues/49
+            packages.arion-compose.root = ./.;
+
+            overrides =
+              self: super: {
+                arion-compose =
+                  lib.pipe super.arion-compose [
+                    (h.addBuildTools [ pkgs.nix ])
+                    (h.overrideCabal (o: {
+                      src = pkgs.lib.sourceByRegex ./. [
+                        ".*[.]cabal"
+                        "LICENSE"
+                        "src/?.*"
+                        "README.asciidoc"
+                        "CHANGELOG.md"
+                      ];
+                      preCheck = ''
+                        export NIX_LOG_DIR=$TMPDIR
+                        export NIX_STATE_DIR=$TMPDIR
+                        export NIX_PATH=nixpkgs=${pkgs.path}
+                      '';
+                    }))
+                  ];
+              };
+          };
+          devShells.default = config.devShells.haskell-package.overrideAttrs (o: {
+            nativeBuildInputs = o.nativeBuildInputs or [ ] ++ [
+              pkgs.docker-compose
+              pkgs.nixpkgs-fmt
+              config.haskellProjects.haskell-package.haskellPackages.releaser
+            ];
+          });
+        };
+      flake = {
+        debug = { inherit inputs config lib; };
+
+        defaultPackage =
+          lib.mapAttrs
+            (ps: lib.warn "arion.defaultPackage has been removed in favor of arion.packages.\${system}.default"
+              ps.default)
+            config.flake.packages;
+
+        lib = {
+          eval = import ./src/nix/eval-composition.nix;
+          build = args@{ ... }:
+            let composition = self.lib.eval args;
+            in composition.config.out.dockerComposeYaml;
+        };
+        nixosModules.arion = ./nixos-module.nix;
+        herculesCI.ciSystems = [
+          # "aarch64-darwin"
+          # "aarch64-linux"
+          "x86_64-darwin"
+          "x86_64-linux"
+        ];
+      };
+    });
 }

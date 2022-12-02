@@ -31,7 +31,7 @@ source-repository head
 
 common common
   build-depends:     base >=4.12.0.0 && <4.17
-                   , aeson
+                   , aeson >=2
                    , aeson-pretty
                    , async
                    , bytestring
