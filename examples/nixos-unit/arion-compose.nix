@@ -36,8 +36,8 @@
         echo nginx:x:${toString config.users.groups.nginx.gid}:nginx >>/etc/group
         echo 'nobody:x:65534:65534:Unprivileged account do not use:/var/empty:/run/current-system/sw/bin/nologin' >>/etc/passwd
         echo 'nogroup:x:65534:' >>/etc/group
-        mkdir -p /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp}
-        chown nginx /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp}
+        mkdir -p /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp} /tmp/nginx_client_body
+        chown nginx /var/log/nginx /run/nginx/ /var/cache/nginx /var/lib/nginx/{,logs,proxy_temp,client_body_temp,fastcgi_temp,scgi_temp,uwsgi_temp} /tmp/nginx_client_body
         ${config.systemd.services.nginx.runner}
       '';
     };
