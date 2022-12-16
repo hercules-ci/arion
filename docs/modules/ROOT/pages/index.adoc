@@ -113,75 +113,20 @@ Describe containers using NixOS-style modules. There are a few options:
 
 ==== Minimal: Plain command using nixpkgs
 
-`examples/minimal/arion-compose.nix`:
-
-```nix
-{ pkgs, ... }:
-{
-  config.services = {
-
-    webserver = {
-      service.useHostStore = true;
-      service.command = [ "sh" "-c" ''
-                  cd "$$WEB_ROOT"
-                  ${pkgs.python3}/bin/python -m http.server
-                '' ];
-      service.ports = [
-        "8000:8000" # host:container
-      ];
-      service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
-    };
-  };
-}
-```
-
-==== NixOS: run only one systemd service
-
-`examples/nixos-unit/arion-compose.nix`:
-
-```nix
-{
-  services.webserver = { config, pkgs, ... }: {
-
-    nixos.configuration = {config, pkgs, ...}: {
-      boot.isContainer = true;
-      services.nginx.enable = true;
-      services.nginx.virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
-      system.build.run-nginx = pkgs.writeScript "run-nginx" ''
-        #!${pkgs.bash}/bin/bash
-        PATH='${config.systemd.services.nginx.environment.PATH}'
-        echo nginx:x:${toString config.users.users.nginx.uid}:${toString config.users.groups.nginx.gid}:nginx web server user:/var/empty:/bin/sh >>/etc/passwd
-        echo nginx:x:${toString config.users.groups.nginx.gid}:nginx >>/etc/group
-        ${config.systemd.services.nginx.runner}
-      '';
-    };
-    service.command = [ config.nixos.build.run-nginx ];
-    service.useHostStore = true;
-    service.ports = [
-      "8000:80" # host:container
-    ];
-  };
-}
-```
+`examples/minimal/arion-compose.nix`
+[,nix]
+----
+include::example$minimal/arion-compose.nix[]
+----
 
 ==== NixOS: run full OS
 
 `examples/full-nixos/arion-compose.nix`:
 
-```nix
-{
-  services.webserver = { pkgs, ... }: {
-    nixos.useSystemd = true;
-    nixos.configuration.boot.tmpOnTmpfs = true;
-    nixos.configuration.services.nginx.enable = true;
-    nixos.configuration.services.nginx.virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
-    service.useHostStore = true;
-    service.ports = [
-      "8000:80" # host:container
-    ];
-  };
-}
-```
+[,nix]
+----
+include::example$full-nixos/arion-compose.nix[]
+----
 
 ==== Docker image from DockerHub
 
@@ -194,6 +139,11 @@ Describe containers using NixOS-style modules. There are a few options:
   };
 }
 ```
+
+==== NixOS: run only one systemd service
+
+Running individual units from NixOS is possible using an experimental script.
+See `examples/nixos-unit/arion-compose.nix`.
 
 === Run
 
