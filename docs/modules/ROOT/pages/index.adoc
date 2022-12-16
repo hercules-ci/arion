@@ -116,7 +116,7 @@ Describe containers using NixOS-style modules. There are a few options:
 `examples/minimal/arion-compose.nix`
 [,nix]
 ----
-include::example$minimal/arion-compose.nix[]
+include::arion:ROOT:example$minimal/arion-compose.nix[]
 ----
 
 ==== NixOS: run full OS
@@ -125,7 +125,7 @@ include::example$minimal/arion-compose.nix[]
 
 [,nix]
 ----
-include::example$full-nixos/arion-compose.nix[]
+include::arion:ROOT:example$full-nixos/arion-compose.nix[]
 ----
 
 ==== Docker image from DockerHub
