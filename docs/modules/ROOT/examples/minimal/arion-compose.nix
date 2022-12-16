@@ -1,0 +1,1 @@
+../../../../../examples/minimal/arion-compose.nix

@@ -1,0 +1,1 @@
+../../../../../examples/full-nixos/arion-compose.nix
