@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
-  config.project.name = "webapp";
-  config.services = {
+  project.name = "webapp";
+  services = {
 
     webserver = {
       image.enableRecommendedContents = true;
