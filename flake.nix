@@ -9,7 +9,7 @@
   };
 
   outputs = inputs@{ self, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit self; } ({ config, lib, extendModules, ... }: {
+    flake-parts.lib.mkFlake { inherit inputs; } ({ config, lib, extendModules, ... }: {
       imports = [
         inputs.haskell-flake.flakeModule
         inputs.flake-parts.flakeModules.easyOverlay
