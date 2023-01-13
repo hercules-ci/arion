@@ -20,7 +20,7 @@ in
     service.hostStoreAsReadOnly = mkOption {
       type = types.bool;
       default = true;
-      description = "Adds a ':ro' (read-only) access mode to the host nix store bind mount.";
+      description = "Adds a `:ro` (read-only) access mode to the host nix store bind mount.";
     };
     service.useHostNixDaemon = mkOption {
       type = types.bool;

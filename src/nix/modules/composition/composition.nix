@@ -3,7 +3,7 @@ let
   inherit (lib) types mkOption;
 
   link = url: text:
-    ''link:${url}[${text}]'';
+    ''[${text}](${url})'';
 
 in
 {

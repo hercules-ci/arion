@@ -23,9 +23,9 @@
         stored at an alternate location without altering the format of
         store paths.
 
-        For example: instead of mounting the host's /nix/store as the
-        container's /nix/store, this will mount /mnt/foo/nix/store
-        as the container's /nix/store.
+        For example: instead of mounting the host's `/nix/store` as the
+        container's `/nix/store`, this will mount `/mnt/foo/nix/store`
+        as the container's `/nix/store`.
       '';
     };
 

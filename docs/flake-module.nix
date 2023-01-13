@@ -1,20 +1,31 @@
 {
-  perSystem = { config, pkgs, ... }:
-    let
-      doc-options = import ./options.nix { };
+  perSystem = { config, pkgs, lib, ... }: {
+    packages.generated-option-doc-arion =
+      # TODO: use the render pipeline in flake-parts,
+      #       which has support for things like {options}`foo`.
+      let
+        eval = lib.evalModules {
+          modules = import ../src/nix/modules.nix;
+        };
+      in
+      (pkgs.nixosOptionsDoc
+        {
+          options = eval.options;
+        }).optionsCommonMark;
 
-    in
-    {
-      packages.doc-options = pkgs.callPackage ./options.nix { };
-
-      checks.doc-options = pkgs.runCommand "doc-options-check" { } ''
-        if diff --color -u ${./modules/ROOT/partials/NixOSOptions.adoc} ${config.packages.doc-options}; then
-          touch $out
-        else
-          echo 1>&2 "The doc options have changed and need to be added."
-          echo 1>&2 "Please run ./update-options in the root of your arion clone."
-          exit 1
-        fi
-      '';
-    };
+    packages.generated-antora-files =
+      pkgs.runCommand "generated-antora-files"
+        {
+          nativeBuildInputs = [ pkgs.pandoc ];
+          doc_arion = config.packages.generated-option-doc-arion;
+        }
+        # TODO: use the render pipeline in flake-parts,
+        #       which has support for things like {options}`foo`.
+        ''
+          mkdir -p $out/modules/ROOT/partials
+          pandoc --from=markdown --to=asciidoc \
+            < $doc_arion \
+            > $out/modules/ROOT/partials/arion-options.adoc
+        '';
+  };
 }
