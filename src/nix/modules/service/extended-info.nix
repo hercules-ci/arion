@@ -12,7 +12,7 @@ in
       type = attrsOf unspecified;
       description = ''
         Information about a service to include in the Docker Compose file,
-        but that will not be used by the `docker-compose`> command
+        but that will not be used by the `docker-compose` command
         itself.
 
         It will be inserted in `x-arion.serviceInfo.<service.name>`.

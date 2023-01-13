@@ -76,18 +76,18 @@ in
     build.image = mkOption {
       type = nullOr package;
       description = ''
-        Docker image derivation to be `docker load`ed.
+        Docker image derivation to be `docker load`-ed.
       '';
       internal = true;
     };
     build.imageName = mkOption {
       type = str;
-      description = "Derived from build.image";
+      description = "Derived from `build.image`";
       internal = true;
     };
     build.imageTag = mkOption {
       type = str;
-      description = "Derived from build.image";
+      description = "Derived from `build.image`";
       internal = true;
     };
     image.nixBuild = mkOption {
@@ -126,7 +126,7 @@ in
       internal = true;
       description = ''
         Include all referenced store paths. You generally want this in your
-        image, unless you load store paths via some other means, like useHostStore = true;
+        image, unless you load store paths via some other means, like `useHostStore = true`;
       '';
     };
     image.rawConfig = mkOption {
@@ -140,8 +140,8 @@ in
         Please use the specific `image` options instead.
 
         Run-time configuration of the container. A full list of the
-        options is available in the https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions[Docker Image Specification
-        v1.2.0].
+        options is available in the [Docker Image Specification
+        v1.2.0](https://github.com/moby/moby/blob/master/image/spec/v1.2.md#image-json-field-descriptions).
       '';
     };
     image.command = mkOption {

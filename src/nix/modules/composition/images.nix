@@ -36,7 +36,7 @@ in
     build.imagesToLoad = lib.mkOption {
       type = listOf unspecified;
       internal = true;
-      description = "List of dockerTools image derivations.";
+      description = "List of `dockerTools` image derivations.";
     };
   };
   config = {
