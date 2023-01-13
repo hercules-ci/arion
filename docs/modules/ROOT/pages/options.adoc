@@ -1,5 +1,1 @@
-// To update option descriptions
-//  - use git grep or github search
-//  - or browse through src/nix/modules
-
-include::partial$NixOSOptions.adoc[]
+include::partial$arion-options.adoc[]

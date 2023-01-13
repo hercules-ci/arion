@@ -1,9 +1,0 @@
-#!/usr/bin/env nix-shell
-#!nix-shell -i bash -p jq
-
-set -eu -o pipefail
-
-cd "$(dirname ${BASH_SOURCE[0]})"
-
-doc_options="$(nix build .#doc-options --json | jq -r .[].outputs.out)"
-cat "$doc_options" >docs/modules/ROOT/partials/NixOSOptions.adoc
