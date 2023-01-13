@@ -1,1 +1,3 @@
+# Arion Options
+
 include::partial$arion-options.adoc[]
