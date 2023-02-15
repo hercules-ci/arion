@@ -46,7 +46,7 @@ let
   };
 
   arionSettingsType = name:
-    (cfg.package.eval { modules = [ { project.name = lib.mkDefault name; } ]; }).type or (
+    (cfg.package.eval { modules = [{ project.name = lib.mkDefault name; }]; }).type or (
       throw "lib.evalModules did not produce a type. Please upgrade Nixpkgs to nixos-unstable or >=nixos-21.11"
     );
 
@@ -64,7 +64,7 @@ in
       };
       package = mkOption {
         type = types.package;
-        
+
         default = (import ./. { inherit pkgs; }).arion;
         description = ''
           Arion package to use. This will provide <literal>arion</literal>
@@ -97,7 +97,7 @@ in
         virtualisation.docker.enable = false;
         virtualisation.podman.enable = true;
         virtualisation.podman.dockerSocket.enable = true;
-        virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
+        virtualisation.podman.defaultNetwork.dnsname.enable = true;
 
         virtualisation.arion.docker.client.package = pkgs.docker-client;
       })
