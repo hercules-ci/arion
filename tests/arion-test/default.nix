@@ -31,15 +31,7 @@ in
     };
     
     # no caches, because no internet
-    nix.binaryCaches = lib.mkForce [];
-
-    # FIXME: Sandbox seems broken with current version of NixOS test
-    #        w/ writable store. Error:
-    #        machine# error: linking '/nix/store/7r8z2zvhwda85pgpdn5hzzz6hs1njklc-stdenv-linux.drv.chroot/nix/store/6v3y7s4q4wd16hsw393gjpxvcf9159bv-patch-shebangs.sh' to '/nix/store/6v3y7s4q4wd16hsw393gjpxvcf9159bv-patch-shebangs.sh': Operation not permitted
-    #
-    #        There should be no reason why arion can't run without
-    #        sandboxing, so please re-enable.
-    nix.useSandbox = false;
+    nix.settings.substituters = lib.mkForce [];
 
     virtualisation.writableStore = true;
     # Switch to virtualisation.additionalPaths when dropping all NixOS <= 21.05.
