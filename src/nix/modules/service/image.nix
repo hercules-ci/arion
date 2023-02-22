@@ -30,6 +30,7 @@ let
         {
           name = null; tag = null; contents = null; config = null;
           created = null; extraCommands = null; maxLayers = null;
+          fakeRootCommands = null;
         }
         args;
       acceptedArgs = functionArgs dockerTools.streamLayeredImage;
@@ -67,6 +68,8 @@ let
           ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
         done;
       '';
+
+    fakeRootCommands = config.image.fakeRootCommands;
   };
 
   priorityIsDefault = option: option.highestPrio >= (lib.mkDefault true).priority;
@@ -118,6 +121,15 @@ in
       default = [];
       description = ''
          Top level paths in the container.
+      '';
+    };
+    image.fakeRootCommands = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Commands that build the root of the container in the current working directory.
+
+        See [`dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage).
       '';
     };
     image.includeStorePaths = mkOption {
