@@ -63,6 +63,11 @@ in
       type = lib.types.attrsOf (lib.types.submodule service);
       description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
+    docker-compose.volumes = lib.mkOption {
+      type = lib.types.anything;
+      description = "A attribute set of volume configurations.";
+      default = {};
+    };
   };
   config = {
     out.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.out.dockerComposeYamlText;
@@ -73,6 +78,7 @@ in
       version = "3.4";
       services = lib.mapAttrs (k: c: c.out.service) config.services;
       x-arion = config.docker-compose.extended;
+      volumes = config.docker-compose.volumes;
     };
   };
 }
