@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, options, pkgs, ... }:
 let
   inherit (lib)
     attrValues
@@ -97,7 +97,10 @@ in
         virtualisation.docker.enable = false;
         virtualisation.podman.enable = true;
         virtualisation.podman.dockerSocket.enable = true;
-        virtualisation.podman.defaultNetwork.dnsname.enable = true;
+        virtualisation.podman.defaultNetwork = 
+          if options?virtualisation.podman.defaultNetwork.settings
+          then { settings.dns_enabled = true; } # since 2023-01 https://github.com/NixOS/nixpkgs/pull/199965
+          else { dnsname.enable = true; }; # compat <2023
 
         virtualisation.arion.docker.client.package = pkgs.docker-client;
       })
