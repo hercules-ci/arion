@@ -64,7 +64,7 @@ in
       description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
     docker-compose.volumes = lib.mkOption {
-      type = lib.types.anything;
+      type = lib.types.attrsOf (lib.types.submodule service.volumes);
       description = "A attribute set of volume configurations.";
       default = {};
     };
