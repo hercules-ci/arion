@@ -234,6 +234,15 @@ in
         ${dockerComposeRef "ports"}
       '';
     };
+    service.profiles = mkOption {
+      type = listOf types.str;
+      default = [];
+      description = ''
+        Profiles
+
+        ${dockerComposeRef "profiles"}
+      '';
+    };
     service.expose = mkOption {
       type = listOf str;
       default = [];
@@ -327,6 +336,8 @@ in
     inherit (config.service) links;
   } // lib.optionalAttrs (config.service.ports != []) {
     inherit (config.service) ports;
+  } // lib.optionalAttrs (config.service.profiles != []) {
+    inherit (config.service) profiles;
   } // lib.optionalAttrs (config.service.privileged != null) {
     inherit (config.service) privileged;
   } // lib.optionalAttrs (config.service.network_mode != null) {
