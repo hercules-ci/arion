@@ -1,5 +1,5 @@
 status = [
-  "ci/hercules/derivations",
+  "ci/hercules/onPush/default",
   "ci/hercules/evaluation",
 ]
 delete_merged_branches = true
