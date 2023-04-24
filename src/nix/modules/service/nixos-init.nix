@@ -37,9 +37,15 @@ in
       "/sys/fs/cgroup:/sys/fs/cgroup:ro"
     ];
     service.tmpfs = [
-      "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
-      "/run/wrappers" # noexec breaks this intentionally
-    ] ++ lib.optional (config.nixos.evaluatedConfig.boot.tmpOnTmpfs) "/tmp:exec,mode=777";
+      let
+        useTmpfs = # suppress option rename trace message, it was done in 23.05 release
+          if (config.nixos.evaluatedConfig.boot.tmp != null) then config.nixos.evaluatedConfig.boot.tmp.useTmpfs
+          else config.nixos.evaluatedConfig.boot.tmpOnTmpfs;
+      in
+      [
+        "/run" # noexec is fine because exes should be symlinked from elsewhere anyway
+        "/run/wrappers" # noexec breaks this intentionally
+      ] ++ lib.optional (useTmpfs) "/tmp:exec,mode=777";
 
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;
