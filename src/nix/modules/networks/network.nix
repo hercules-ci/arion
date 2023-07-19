@@ -7,7 +7,7 @@ let
     types
     ;
   inherit (import ../../lib.nix { inherit lib; })
-    dockerComposeRef
+    networkRef
     ;
 in
 {
@@ -15,21 +15,21 @@ in
     driver = mkOption {
       description = ''
         `"none"`, `"host"`, or a platform-specific value.
-        ${dockerComposeRef "driver"}
+        ${networkRef "driver"}
       '';
       type = types.str;
     };
 
     driver_opts = mkOption {
       description = ''
-        ${dockerComposeRef "driver_opts"}
+        ${networkRef "driver_opts"}
       '';
       type = types.lazyAttrsOf types.raw or types.unspecified;
     };
 
     attachable = mkOption {
       description = ''
-        ${dockerComposeRef "attachable"}
+        ${networkRef "attachable"}
       '';
       type = types.bool;
       example = true;
@@ -39,7 +39,7 @@ in
       description = ''
         Whether we've entered the 21st century yet.
         
-        ${dockerComposeRef "enable_ipv6"}
+        ${networkRef "enable_ipv6"}
       '';
       type = types.bool;
     };
@@ -49,7 +49,7 @@ in
       description = ''
         Manage IP addresses.
 
-        ${dockerComposeRef "ipam"}
+        ${networkRef "ipam"}
       '';
       type = types.raw or types.unspecified;
     };
@@ -58,7 +58,7 @@ in
       description = ''
         Achieves "external isolation".
 
-        ${dockerComposeRef "internal"}
+        ${networkRef "internal"}
       '';
       defaultText = false;
       type = types.bool;
@@ -68,7 +68,7 @@ in
       description = ''
         Metadata.
 
-        ${dockerComposeRef "labels"}
+        ${networkRef "labels"}
       '';
       # no list support, because less expressive wrt overriding
       type = types.attrsOf types.str;
@@ -79,7 +79,7 @@ in
         When `true`, don't create or destroy the network, but assume that it
         exists.
 
-        ${dockerComposeRef "external"}
+        ${networkRef "external"}
       '';
       type = types.bool;
     };
@@ -92,7 +92,7 @@ in
 
         Note the `default` network's default `name` is set to `project.name` by Arion.
 
-        ${dockerComposeRef "name"}
+        ${networkRef "name"}
       '';
       type = types.str;
     };
