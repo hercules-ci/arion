@@ -260,7 +260,7 @@ in
             _out = mkOption {
               internal = true;
               readOnly = true;
-              default = lib.mapAttrs (k: opt: opt.value) (lib.filterAttrs (_: opt: opt.isDefined) { inherit (options) aliases ipv4_address ipv6_address; });
+              default = lib.mapAttrs (k: opt: opt.value) (lib.filterAttrs (_: opt: opt.isDefined) { inherit (options) aliases ipv4_address ipv6_address link_local_ips priority; });
             };
             aliases = mkOption {
               type = listOf str;
@@ -274,6 +274,14 @@ in
             ipv6_address = mkOption {
               type = str;
               description = serviceRef "ipv4_address-ipv6_address";
+            };
+            link_local_ips = mkOption {
+              type = listOf str;
+              description = serviceRef "link_local_ips";
+            };
+            priority = mkOption {
+              type = int;
+              description = serviceRef "priority";
             };
           };
         });
