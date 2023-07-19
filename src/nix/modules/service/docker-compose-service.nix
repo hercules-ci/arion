@@ -253,11 +253,36 @@ in
       default = null;
       description = serviceRef "network_mode";
     };
-    service.networks = mkOption {
-      type = nullOr (listOf types.str);
-      default = null;
-      description = serviceRef "networks";
-    };
+    service.networks =
+      let
+        networksModule = submodule ({ config, options, ...}: {
+          options = {
+            _out = mkOption {
+              internal = true;
+              readOnly = true;
+              default = lib.mapAttrs (k: opt: opt.value) (lib.filterAttrs (_: opt: opt.isDefined) { inherit (options) aliases ipv4_address ipv6_address; });
+            };
+            aliases = mkOption {
+              type = listOf str;
+              description = serviceRef "aliases";
+              default = [ ];
+            };
+            ipv4_address = mkOption {
+              type = str;
+              description = serviceRef "ipv4_address-ipv6_address";
+            };
+            ipv6_address = mkOption {
+              type = str;
+              description = serviceRef "ipv4_address-ipv6_address";
+            };
+          };
+        });
+      in
+      mkOption {
+        type = either (listOf str) (attrsOf networksModule);
+        default = [];
+        description = serviceRef "networks";
+      };
     service.stop_signal = mkOption {
       type = nullOr str;
       default = null;
@@ -337,8 +362,10 @@ in
     inherit (config.service) privileged;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
-  } // lib.optionalAttrs (config.service.networks != null) {
-    inherit (config.service) networks;
+  } // lib.optionalAttrs (config.service.networks != [] && config.service.networks != {}) {
+    networks =
+      if (builtins.isAttrs config.service.networks) then builtins.mapAttrs (_: v: v._out) config.service.networks
+      else config.service.networks;
   } // lib.optionalAttrs (config.service.restart != null) {
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.stop_signal != null) {
