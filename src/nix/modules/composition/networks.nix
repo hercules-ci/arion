@@ -7,7 +7,7 @@ let
     types
     ;
   inherit (import ../../lib.nix { inherit lib; })
-    dockerComposeRef
+    link
     ;
 in
 {
@@ -19,7 +19,7 @@ in
         ];
       });
       description = ''
-        ${dockerComposeRef "networks-top-level-element"}
+        See ${link "https://docs.docker.com/compose/compose-file/06-networks/" "Docker Compose Networks"}
       '';
     };
     enableDefaultNetwork = mkOption {
