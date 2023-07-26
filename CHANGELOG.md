@@ -1,5 +1,18 @@
 # Revision history for Arion
 
+## 0.2.1.0 -- 2023-07-26
+
+### Added
+
+* `service.networks` now supports attribute set values with various options, thanks to @pedorich-n.
+* `docker-compose.volumes` can now be specified in multiple modules, thanks to @qaifshaikh.
+* `image.fakeRootCommands` for making modifications to the image that aren't "add a link farm".
+
+### Fixed
+
+* Regular maintenance fixes, including one by olebedev
+
+
 ## 0.2.0.0 -- 2022-12-02
 
 ### BREAKING
