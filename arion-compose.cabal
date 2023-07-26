@@ -30,7 +30,7 @@ source-repository head
   location: https://github.com/hercules-ci/arion
 
 common common
-  build-depends:     base >=4.12.0.0 && <4.17
+  build-depends:     base >=4.12.0.0 && <4.99
                    , aeson >=2
                    , aeson-pretty
                    , async
