@@ -163,17 +163,19 @@ in
       '';
     };
   };
-  config = {
-    build.image = builtImage;
-    build.imageName = config.build.image.imageName;
-    build.imageTag =
-                 if config.build.image.imageTag != ""
-                 then config.build.image.imageTag
-                 else lib.head (lib.strings.splitString "-" (baseNameOf config.build.image.outPath));
-
-    service.image = lib.mkDefault "${config.build.imageName}:${config.build.imageTag}";
-    image.rawConfig.Cmd = config.image.command;
-
-    image.nixBuild = lib.mkDefault (priorityIsDefault options.service.image);
-  };
+  config = lib.mkMerge [{
+      build.image = builtImage;
+      build.imageName = config.build.image.imageName;
+      build.imageTag =
+                   if config.build.image.imageTag != ""
+                   then config.build.image.imageTag
+                   else lib.head (lib.strings.splitString "-" (baseNameOf config.build.image.outPath));
+      image.rawConfig.Cmd = config.image.command;
+      image.nixBuild = lib.mkDefault (priorityIsDefault options.service.image);
+    }
+    ( lib.mkIf (config.service.build.context == null)
+    {
+      service.image = lib.mkDefault "${config.build.imageName}:${config.build.imageTag}";
+    })
+  ];
 }
