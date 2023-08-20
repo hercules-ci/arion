@@ -86,7 +86,8 @@ in
       description = serviceRef "environment";
     };
     service.image = mkOption {
-      type = str;
+      type = nullOr str;
+      default = null;
       description = serviceRef "image";
     };
     service.command = mkOption {
@@ -328,8 +329,9 @@ in
       volumes
       environment
       sysctls
-      image
       ;
+  } // lib.optionalAttrs (config.service.image != null) {
+    inherit (config.service) image;
   } // lib.optionalAttrs (config.service.build.context != null) {
     inherit (config.service) build;
   } // lib.optionalAttrs (cap_add != []) {
