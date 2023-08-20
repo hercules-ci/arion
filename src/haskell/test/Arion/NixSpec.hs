@@ -13,19 +13,34 @@ import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
 
 spec :: Spec
-spec = describe "evaluateComposition" $ it "matches an example" $ do
-  x <- Arion.Nix.evaluateComposition EvaluationArgs
-    { evalUid      = 123
-    , evalModules  = NEL.fromList
-                       ["src/haskell/testdata/Arion/NixSpec/arion-compose.nix"]
-    , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
-    , evalWorkDir  = Nothing
-    , evalMode     = ReadOnly
-    , evalUserArgs = ["--show-trace"]
-    }
-  let actual = pretty x
-  expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
-  censorPaths actual `shouldBe` censorPaths expected
+spec = describe "evaluateComposition" $ do
+  it "matches an example" $ do
+    x <- Arion.Nix.evaluateComposition EvaluationArgs
+      { evalUid      = 123
+      , evalModules  = NEL.fromList
+                         ["src/haskell/testdata/Arion/NixSpec/arion-compose.nix"]
+      , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
+      , evalWorkDir  = Nothing
+      , evalMode     = ReadOnly
+      , evalUserArgs = ["--show-trace"]
+      }
+    let actual = pretty x
+    expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
+    censorPaths actual `shouldBe` censorPaths expected
+
+  it "matches an build.context example" $ do
+    x <- Arion.Nix.evaluateComposition EvaluationArgs
+      { evalUid      = 1234
+      , evalModules  = NEL.fromList
+                         ["src/haskell/testdata/Arion/NixSpec/arion-context-compose.nix"]
+      , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
+      , evalWorkDir  = Nothing
+      , evalMode     = ReadOnly
+      , evalUserArgs = ["--show-trace"]
+      }
+    let actual = pretty x
+    expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-context-compose.json"
+    censorPaths actual `shouldBe` censorPaths expected
 
 censorPaths :: Text -> Text
 censorPaths = censorImages . censorStorePaths
