@@ -9,3 +9,5 @@ import qualified Arion.NixSpec
 spec :: Spec
 spec = do
   describe "Arion.Nix" Arion.NixSpec.spec
+  describe "Arion.Nix" Arion.NixSpec.contextSpec
+

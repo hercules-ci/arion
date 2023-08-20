@@ -1,0 +1,41 @@
+{
+    "networks": {
+        "default": {
+            "name": "unit-test-data"
+        }
+    },
+    "services": {
+        "webserver": {
+            "build": {
+                "context": "<STOREPATH>"
+            },
+            "environment": {},
+            "ports": [
+                "8080:80"
+            ],
+            "sysctls": {},
+            "volumes": []
+        }
+    },
+    "version": "3.4",
+    "volumes": {},
+    "x-arion": {
+        "images": [
+            {
+                "imageExe": "<STOREPATH>",
+                "imageName": "localhost/webserver",
+                "imageTag": "<HASH>"
+            }
+        ],
+        "project": {
+            "name": "unit-test-data"
+        },
+        "serviceInfo": {
+            "webserver": {
+                "defaultExec": [
+                    "/bin/sh"
+                ]
+            }
+        }
+    }
+}
