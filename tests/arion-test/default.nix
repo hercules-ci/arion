@@ -29,7 +29,7 @@ in
       enable = true;
       dockerSocket.enable = true;
     };
-    
+
     # no caches, because no internet
     nix.settings.substituters = lib.mkForce [];
 

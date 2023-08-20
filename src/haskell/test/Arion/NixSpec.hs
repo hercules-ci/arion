@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Arion.NixSpec
   ( spec
+    , contextSpec
   )
 where
 
@@ -25,6 +26,21 @@ spec = describe "evaluateComposition" $ it "matches an example" $ do
     }
   let actual = pretty x
   expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
+  censorPaths actual `shouldBe` censorPaths expected
+
+contextSpec :: Spec
+contextSpec = describe "evaluateComposition" $ it "matches an build.context example" $ do
+  x <- Arion.Nix.evaluateComposition EvaluationArgs
+    { evalUid      = 1234
+    , evalModules  = NEL.fromList
+                       ["src/haskell/testdata/Arion/NixSpec/arion-context-compose.nix"]
+    , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
+    , evalWorkDir  = Nothing
+    , evalMode     = ReadOnly
+    , evalUserArgs = ["--show-trace"]
+    }
+  let actual = pretty x
+  expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-context-compose.json"
   censorPaths actual `shouldBe` censorPaths expected
 
 censorPaths :: Text -> Text
