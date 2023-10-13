@@ -13,23 +13,15 @@ let
 
   addDetails = serviceName: service:
     builtins.addErrorContext "while evaluating the image for service ${serviceName}"
-    (let
-      inherit (service) build;
-    in {
-      imageName = build.imageName or service.image.name;
-      imageTag =
-                 if build.image.imageTag != ""
-                 then build.image.imageTag
-                 else lib.head (lib.strings.splitString "-" (baseNameOf build.image.outPath));
-    } // (if build.image.isExe or false
-        then {
-          imageExe = build.image.outPath;
+      (
+        let
+          imageAttrName = "image${lib.optionalString (service.image.tarball.isExe or false) "Exe"}";
+        in
+        {
+          inherit (service.image.tarball) imageName imageTag;
+          ${imageAttrName} = service.image.tarball.outPath;
         }
-        else {
-          image = build.image.outPath;
-        }
-      )
-    );
+      );
 in
 {
   options = {
@@ -40,6 +32,26 @@ in
     };
   };
   config = {
+    assertions =
+      let
+        assertionsForRepoTagComponent = component: attrName:
+          lib.mapAttrsToList
+            (name: value: {
+              assertion = lib.types.nonEmptyStr.check value.${attrName};
+              message = lib.replaceStrings [ "\n" ] [ " " ] ''
+                Unable to infer the ${component} of the image associated with
+                config.services.${name}.  Please set
+                config.services.${name}.image.${attrName} to a non-empty
+                string.
+              '';
+            })
+            serviceImages;
+
+        nameAssertions = assertionsForRepoTagComponent "name" "imageName";
+        tagAssertions = assertionsForRepoTagComponent "tag" "imageTag";
+      in
+      nameAssertions ++ tagAssertions;
+
     build.imagesToLoad = lib.attrValues serviceImages;
     docker-compose.extended.images = config.build.imagesToLoad;
   };

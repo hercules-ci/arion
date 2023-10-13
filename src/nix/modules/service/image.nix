@@ -21,6 +21,7 @@ let
     bool
     coercedTo
     listOf
+    nonEmptyStr
     nullOr
     oneOf
     package
@@ -35,14 +36,42 @@ let
     (pkgs.writeText "dummy-config.json" (builtins.toJSON config.image.rawConfig))
   ];
 
+  # Neither image names nor tags can can be empty strings; setting either to an
+  # empty string will cause `docker load` to croak with the error message
+  # "invalid reference format".
+  fallbackImageRepoTagComponent = component: fallback:
+    if nonEmptyStr.check component
+    then component
+    else fallback;
+  fallbackImageName = fallbackImageRepoTagComponent config.image.name;
+  fallbackImageTag = fallbackImageRepoTagComponent config.image.tag;
+
   # Shim for `services.<name>.image.tarball` definitions that refer to
   # arbitrary paths and not `dockerTools`-produced derivations.
-  dummyImagePackage = outPath: {
-    inherit outPath;
-    type = "derivation";
-    imageName = config.image.name;
-    imageTag = if config.image.tag == null then "" else config.image.tag;
-  };
+  dummyImagePackage = outPath:
+    let
+      tarballSuffix = ".tar.gz";
+      repoTagSeparator = "-";
+      baseName = baseNameOf outPath;
+      baseNameNoExtension = lib.strings.removeSuffix tarballSuffix baseName;
+      baseNameComponents = lib.strings.splitString repoTagSeparator baseNameNoExtension;
+      fallbacks =
+        if ((lib.isStorePath outPath) && (lib.hasSuffix tarballSuffix baseName) && (lib.hasInfix repoTagSeparator baseName))
+        then {
+          imageName = lib.concatStringsSep repoTagSeparator (lib.tail baseNameComponents);
+          imageTag = lib.head baseNameComponents;
+        }
+        else {
+          imageName = null;
+          imageTag = null;
+        };
+    in
+    {
+      inherit outPath;
+      type = "derivation";
+      imageName = fallbackImageName fallbacks.imageName;
+      imageTag = fallbackImageTag fallbacks.imageTag;
+    };
 
   # Type matching the essential attributes of derivations produced by
   # `dockerTools` builder functions.
@@ -99,11 +128,11 @@ let
 
   builtImage = buildOrStreamLayeredImage {
     inherit (config.image)
-      name
       tag
       contents
       includeStorePaths
       ;
+    name = fallbackImageName ("localhost/" + config.service.name);
     config = config.image.rawConfig;
     maxLayers = 100;
 
@@ -129,33 +158,6 @@ let
 in
 {
   options = {
-    build.image = mkOption {
-      type = nullOr package;
-      description = ''
-        Docker image derivation to be `docker load`-ed.
-
-        By default, when `services.<name>.image.nixBuild` is enabled, this is
-        the image produced using `services.<name>.image.command`,
-        `services.<name>.image.contents`, and
-        `services.<name>.image.rawConfig`.
-      '';
-      defaultText = lib.literalExample ''
-        pkgs.dockerTools.buildLayeredImage {
-          # ...
-        };
-      '';
-      internal = true;
-    };
-    build.imageName = mkOption {
-      type = str;
-      description = "Derived from `build.image`";
-      internal = true;
-    };
-    build.imageTag = mkOption {
-      type = str;
-      description = "Derived from `build.image`";
-      internal = true;
-    };
     image.nixBuild = mkOption {
       type = bool;
       description = ''
@@ -169,9 +171,8 @@ in
       '';
     };
     image.name = mkOption {
-      type = str;
-      default = "localhost/" + config.service.name;
-      defaultText = lib.literalExpression or lib.literalExample ''"localhost/" + config.service.name'';
+      type = nullOr str;
+      default = null;
       description = ''
         A human readable name for the Docker image.
 
@@ -264,6 +265,11 @@ in
         builder functions, or a Docker image tarball at some arbitrary
         location.
 
+        By default, when `services.<name>.image.nixBuild` is enabled, this is
+        the image produced using `services.<name>.image.command`,
+        `services.<name>.image.contents`, and
+        `services.<name>.image.rawConfig`.
+
         ::: {.note}
         Using this option causes Arion to ignore most other options in the
         {option}`services.<name>.image` namespace. The exceptions are
@@ -272,35 +278,20 @@ in
         is not a derivation with the attributes `imageName` and `imageTag`.
         :::
       '';
-      example = lib.literalExample or lib.literalExpression ''
-        let
-          myimage = pkgs.dockerTools.buildImage {
-            name = "my-image";
-            contents = [ pkgs.coreutils ];
-          };
-        in
-        config.services = {
-          myservice = {
-            image.tarball = myimage;
-            # ...
-          };
-        }
+      example = lib.literalExpression ''
+        pkgs.dockerTools.buildLayeredImage {
+          # ...
+        };
       '';
     };
   };
   config = lib.mkMerge [{
-      build.image = config.image.tarball;
-      build.imageName = config.build.image.imageName;
-      build.imageTag =
-                   if config.build.image.imageTag != ""
-                   then config.build.image.imageTag
-                   else lib.head (lib.strings.splitString "-" (baseNameOf config.build.image.outPath));
       image.rawConfig.Cmd = config.image.command;
       image.nixBuild = lib.mkDefault (priorityIsDefault options.service.image);
     }
     ( lib.mkIf (config.service.build.context == null)
     {
-      service.image = lib.mkDefault "${config.build.imageName}:${config.build.imageTag}";
+      service.image = lib.mkDefault "${config.image.tarball.imageName}:${config.image.tarball.imageTag}";
     })
   ];
 }
