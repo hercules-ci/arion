@@ -31,6 +31,10 @@
           modules = [ ../examples/minimal/arion-compose.nix ];
         };
 
+        testModuleOptions = import ./module-options-arion-test {
+          inherit lib;
+          pkgs = final;
+        };
       };
     };
 }
