@@ -39,7 +39,7 @@ in
     service.tmpfs = [
       "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
       "/run/wrappers" # noexec breaks this intentionally
-    ] ++ lib.optional (config.nixos.evaluatedConfig.boot.tmpOnTmpfs) "/tmp:exec,mode=777";
+    ] ++ lib.optional (config.nixos.evaluatedConfig.boot.tmp.useTmpfs) "/tmp:exec,mode=777";
 
     service.stop_signal = "SIGRTMIN+3";
     service.tty = true;
