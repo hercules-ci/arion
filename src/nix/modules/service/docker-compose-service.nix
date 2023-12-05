@@ -297,6 +297,11 @@ in
       default = null;
       description = serviceRef "stop_signal";
     };
+    service.stop_grace_period = mkOption {
+      type = nullOr str;
+      default = null;
+      description = serviceRef "stop_grace_period";
+    };
     service.sysctls = mkOption {
       type = attrsOf (either str int);
       default = {};
@@ -380,6 +385,8 @@ in
     inherit (config.service) restart;
   } // lib.optionalAttrs (config.service.stop_signal != null) {
     inherit (config.service) stop_signal;
+  } // lib.optionalAttrs (config.service.stop_grace_period != null) {
+    inherit (config.service) stop_grace_period;
   } // lib.optionalAttrs (config.service.tmpfs != []) {
     inherit (config.service) tmpfs;
   } // lib.optionalAttrs (config.service.tty != null) {

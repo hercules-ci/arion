@@ -45,10 +45,10 @@ NOTE: This deployment method does NOT use an `arion-pkgs.nix` file, but reuses
     # Pick one of:
     #  - niv
     ((import ./nix/sources.nix).arion + "/nixos-module.nix")
-    #  - flakes (where arion is a flake input)
+    #  - or flakes (where arion is a flake input)
     arion.nixosModules.arion
-    #  - other
-    arionPath + "/nixos-module.nix")
+    #  - or other: copy commit hash of arion and replace HASH in:
+    (builtins.fetchTarball "https://github.com/hercules-ci/arion/archive/HASH.tar.gz") + "/nixos-module.nix")
   ];
 
   virtualisation.arion = {

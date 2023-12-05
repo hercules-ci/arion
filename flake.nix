@@ -6,12 +6,15 @@
     haskell-flake.url = "github:srid/haskell-flake/0.1.0";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
+    hercules-ci-effects.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } ({ config, lib, extendModules, ... }: {
       imports = [
         inputs.haskell-flake.flakeModule
+        inputs.hercules-ci-effects.flakeModule
         inputs.flake-parts.flakeModules.easyOverlay
         ./docs/flake-module.nix
         ./tests/flake-module.nix
@@ -63,6 +66,23 @@
             ];
           });
         };
+
+      hercules-ci.flake-update = {
+        enable = true;
+        autoMergeMethod = "merge";
+        when = {
+          hour = [ 2 ];
+          dayOfMonth = [ 5 ];
+        };
+      };
+
+      herculesCI.ciSystems = [
+        # "aarch64-darwin"
+        # "aarch64-linux"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
+
       flake = {
         debug = { inherit inputs config lib; };
 
@@ -79,12 +99,6 @@
             in composition.config.out.dockerComposeYaml;
         };
         nixosModules.arion = ./nixos-module.nix;
-        herculesCI.ciSystems = [
-          # "aarch64-darwin"
-          # "aarch64-linux"
-          "x86_64-darwin"
-          "x86_64-linux"
-        ];
       };
     });
 }
