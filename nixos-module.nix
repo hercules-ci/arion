@@ -1,9 +1,11 @@
 { config, lib, options, pkgs, ... }:
 let
   inherit (lib)
+    any
     attrValues
     mkIf
     mkOption
+    mkEnableOption
     mkMerge
     types
     ;
@@ -25,24 +27,34 @@ let
         type = arionSettingsType name;
         visible = "shallow";
       };
+      rootless = mkEnableOption "Run this project in rootless mode";
       _systemd = mkOption { internal = true; };
     };
-    config = {
-      _systemd.services."arion-${name}" = {
-        wantedBy = [ "multi-user.target" ];
-        after = [ "sockets.target" ];
+    config =
+      let
 
-        path = [
-          cfg.package
-          cfg.docker.client.package
-        ];
-        environment.ARION_PREBUILT = config.settings.out.dockerComposeYaml;
-        script = ''
-          echo 1>&2 "docker compose file: $ARION_PREBUILT"
-          arion --prebuilt-file "$ARION_PREBUILT" up
-        '';
-      };
-    };
+        service = {
+          wantedBy = [ "multi-user.target" ];
+          after = [ "sockets.target" ];
+
+          path = [
+            cfg.package
+            cfg.docker.client.package
+          ];
+          environment.ARION_PREBUILT = config.settings.out.dockerComposeYaml;
+          environment.DOCKER_HOST = mkIf config.rootless "unix:///run/user/1000/docker.sock"; # TODO: Do not hardcode path
+          script = ''
+            echo 1>&2 "docker compose file: $ARION_PREBUILT"
+            arion --prebuilt-file "$ARION_PREBUILT" up
+          '';
+        };
+
+    in
+      if false then
+      # if false then
+        { _systemd.user.services."arion-${name}" = service; }
+      else
+        { _systemd.services."arion-${name}" = service; };
   };
 
   arionSettingsType = name:
@@ -107,6 +119,9 @@ in
       (mkIf (cfg.backend == "docker") {
         virtualisation.docker.enable = true;
         virtualisation.arion.docker.client.package = pkgs.docker;
+      })
+      (mkIf (any (project: project.rootless) (attrValues cfg.projects)) {
+        virtualisation.docker.rootless.enable = true;
       })
     ]
   );
