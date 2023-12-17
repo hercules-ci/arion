@@ -53,10 +53,13 @@ NOTE: This deployment method does NOT use an `arion-pkgs.nix` file, but reuses
 
   virtualisation.arion = {
     backend = "podman-socket"; # or "docker"
-    projects.example.settings = {
-      # Specify you project here, or import it from a file.
-      # NOTE: This does NOT use ./arion-pkgs.nix, but defaults to NixOS' pkgs.
-      imports = [ ./arion-compose.nix ];
+    projects.example = {
+      serviceName = "example"; # optional systemd service name, defaults to arion-example in this case
+      settings = {
+        # Specify you project here, or import it from a file.
+        # NOTE: This does NOT use ./arion-pkgs.nix, but defaults to NixOS' pkgs.
+        imports = [ ./arion-compose.nix ];
+      };
     };
   };
 }
