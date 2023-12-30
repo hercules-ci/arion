@@ -9,7 +9,7 @@ let
     ''See ${link "https://github.com/compose-spec/compose-spec/blob/${composeSpecRev}/05-services.md#${fragment}" "Compose Spec Services #${fragment}"}'';
 
   networkRef = fragment:
-    ''See ${link "https://github.com/compose-spec/compose-spec/blob/${composeSpecRev}/06-networks.md${fragment}" "Compose Spec Networks #${fragment}"}'';
+    ''See ${link "https://github.com/compose-spec/compose-spec/blob/${composeSpecRev}/06-networks.md#${fragment}" "Compose Spec Networks #${fragment}"}'';
 
 in
 {
