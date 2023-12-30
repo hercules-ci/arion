@@ -26,9 +26,14 @@ let
         visible = "shallow";
       };
       _systemd = mkOption { internal = true; };
+      serviceName = mkOption {
+        description = "The name of the Arion project's systemd service";
+        type = types.str;
+        default = "arion-${name}";
+      };
     };
     config = {
-      _systemd.services."arion-${name}" = {
+      _systemd.services.${config.serviceName} = {
         wantedBy = [ "multi-user.target" ];
         after = [ "sockets.target" ];
 
