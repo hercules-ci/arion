@@ -3,6 +3,7 @@
   services.webserver = { pkgs, lib, ... }: {
     nixos.useSystemd = true;
     nixos.configuration.boot.tmpOnTmpfs = true;
+    nixos.configuration.networking.useDHCP = false;
     nixos.configuration.services.nginx.enable = true;
     nixos.configuration.services.nginx.virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
     nixos.configuration.services.nscd.enable = false;
