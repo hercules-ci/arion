@@ -45,7 +45,7 @@ in
       pkgs.stdenv
     ];
 
-    virtualisation.memorySize = 1024;
+    virtualisation.memorySize = 2048;
     virtualisation.diskSize = 8000;
   };
   testScript = ''
