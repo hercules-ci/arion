@@ -4,7 +4,7 @@ pkgs.nixosTest {
   name = "test-basic-arion-kafka";
   nodes = {
     machine = { ... }: {
-      virtualisation.memorySize = 3000;
+      virtualisation.memorySize = 4096;
       virtualisation.diskSize = 10000;
       imports = [
         ../../nixos-module.nix
