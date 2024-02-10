@@ -66,6 +66,22 @@ in
         https://docs.docker.com/compose/compose-file/build/#context
       '';
     };
+    service.build.dockerfile = mkOption {
+      type = nullOr str;
+      default = null;
+      description = ''
+        Sets an alternate Dockerfile. A relative path is resolved from the build context.
+        https://docs.docker.com/compose/compose-file/build/#dockerfile
+      '';
+    };
+    service.build.target = mkOption {
+      type = nullOr str;
+      default = null;
+      description = ''
+        Defines the stage to build as defined inside a multi-stage Dockerfile.
+        https://docs.docker.com/compose/compose-file/build/#target
+      '';
+    };
     service.hostname = mkOption {
       type = nullOr str;
       default = null;
@@ -337,8 +353,8 @@ in
       ;
   } // lib.optionalAttrs (config.service.image != null) {
     inherit (config.service) image;
-  } // lib.optionalAttrs (config.service.build.context != null) {
-    inherit (config.service) build;
+  } // lib.optionalAttrs (config.service.build.context != null ) {
+    build = lib.filterAttrs (n: v: v != null)  config.service.build;
   } // lib.optionalAttrs (cap_add != []) {
     inherit cap_add;
   } // lib.optionalAttrs (cap_drop != []) {
