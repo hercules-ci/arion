@@ -88,7 +88,7 @@
 
         defaultPackage =
           lib.mapAttrs
-            (ps: lib.warn "arion.defaultPackage has been removed in favor of arion.packages.\${system}.default"
+            (_system: ps: lib.warn "arion.defaultPackage has been removed in favor of arion.packages.\${system}.default"
               ps.default)
             config.flake.packages;
 
