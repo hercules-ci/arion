@@ -86,12 +86,6 @@
       flake = {
         debug = { inherit inputs config lib; };
 
-        defaultPackage =
-          lib.mapAttrs
-            (_system: ps: lib.warn "arion.defaultPackage has been removed in favor of arion.packages.\${system}.default"
-              ps.default)
-            config.flake.packages;
-
         lib = {
           eval = import ./src/nix/eval-composition.nix;
           build = args@{ ... }:
