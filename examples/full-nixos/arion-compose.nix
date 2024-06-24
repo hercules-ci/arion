@@ -2,7 +2,7 @@
   project.name = "full-nixos";
   services.webserver = { pkgs, lib, ... }: {
     nixos.useSystemd = true;
-    nixos.configuration.boot.tmpOnTmpfs = true;
+    nixos.configuration.boot.tmp.useTmpfs = true;
     nixos.configuration.networking.useDHCP = false;
     nixos.configuration.services.nginx.enable = true;
     nixos.configuration.services.nginx.virtualHosts.localhost.root = "${pkgs.nix.doc}/share/doc/nix/manual";
