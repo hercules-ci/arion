@@ -13,10 +13,10 @@
           };
 
         # Currently broken; kafka can't reach zookeeper
-        # nixosModuleWithPodman =
-        #   import ./nixos-virtualization-arion-test/test.nix final {
-        #     virtualisation.arion.backend = "podman-socket";
-        #   };
+        nixosModuleWithPodman =
+          import ./nixos-virtualization-arion-test/test.nix final {
+            virtualisation.arion.backend = "podman-socket";
+          };
 
         testWithPodman =
           nixosTest (import ./arion-test { usePodman = true; pkgs = final; });
