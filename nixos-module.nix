@@ -42,10 +42,22 @@ let
           cfg.docker.client.package
         ];
         environment.ARION_PREBUILT = config.settings.out.dockerComposeYaml;
-        script = ''
-          echo 1>&2 "docker compose file: $ARION_PREBUILT"
-          arion --prebuilt-file "$ARION_PREBUILT" up
-        '';
+        serviceConfig.Type = "oneshot";
+        serviceConfig.RemainAfterExit = true;
+        serviceConfig.ExecStart = [
+          (lib.getExe (pkgs.writeScriptBin "nixos-arion-start" ''
+            #!${pkgs.runtimeShell}
+            echo 1>&2 "starting arion project: $ARION_PREBUILT"
+            arion --prebuilt-file "$ARION_PREBUILT" up --detach
+          ''))
+        ];
+        serviceConfig.ExecStop = [
+          (lib.getExe (pkgs.writeScriptBin "nixos-arion-stop" ''
+            #!${pkgs.runtimeShell}
+            echo 1>&2 "stopping arion project: $ARION_PREBUILT"
+            arion --prebuilt-file "$ARION_PREBUILT" down
+          ''))
+        ];
       };
     };
   };
