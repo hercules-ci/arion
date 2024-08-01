@@ -4,10 +4,18 @@
             "name": "unit-test-data"
         }
     },
+    "secrets": {
+        "foo": {
+            "environment": "FOO"
+        }
+    },
     "services": {
         "webserver": {
             "build": {
-                "context": "<STOREPATH>"
+                "context": "<STOREPATH>",
+                "secrets": [
+                    "foo"
+                ]
             },
             "environment": {},
             "ports": [

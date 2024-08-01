@@ -3,6 +3,7 @@
     ./modules/composition/host-environment.nix
     ./modules/composition/images.nix
     ./modules/composition/networks.nix
+    ./modules/composition/secrets.nix
     ./modules/composition/service-info.nix
     ./modules/composition/composition.nix
 ]
