@@ -17,7 +17,7 @@ in
         The secret is created with the contents of the file at the specified path.
         ${secretRef "file"}
       '';
-      type = types.nullOr types.str;
+      type = types.nullOr (types.either types.path types.str);
     };
 
     environment = mkOption {
