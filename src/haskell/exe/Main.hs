@@ -112,6 +112,7 @@ parseCommand =
       <> commandDC runEvalAndDC "top" "Display the running processes"
       <> commandDC runEvalAndDC "unpause" "Unpause services"
       <> commandDC runBuildAndDC "up" "Create and start containers"
+      <> commandDC runEvalAndDC "deploy" "Deploy a new stack or update an existing stack"
       <> commandDC runDC "version" "Show the Docker-Compose version information"
 
       <> metavar "DOCKER-COMPOSE-COMMAND"
@@ -164,7 +165,10 @@ callDC cmd dopts opts shouldLoadImages path = do
   let firstOpts = projectArgs extendedInfo <> commonArgs opts
   DockerCompose.run DockerCompose.Args
     { files = [path]
-    , otherArgs = firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
+    , otherArgs = case cmd of
+        "deploy" -> unDockerComposeArgs dopts ++ toList (projectName extendedInfo)
+        _ -> firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
+    , useSwarm = cmd == "deploy"
     }
 
 projectArgs :: ExtendedInfo -> [Text]
@@ -314,6 +318,7 @@ runExec detach privileged user noTTY index envs workDir service commandAndArgs o
     DockerCompose.run DockerCompose.Args
       { files = [path]
       , otherArgs = projectArgs extendedInfo <> commonArgs opts <> args
+      , useSwarm = False
       }
 
 main :: IO ()
