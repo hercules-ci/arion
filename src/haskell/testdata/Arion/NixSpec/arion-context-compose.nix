@@ -6,15 +6,14 @@
     ports = [
       "8080:80"
     ];
-    secrets = [
-      {
-        source = "foo";
+    secrets = {
+      "foo" = {
         target = "/run/secrets/foo";
         uid = "123";
         gid = "123";
         mode = "0440";
-      }
-    ];
+      };
+    };
   };
   secrets.foo.environment = "FOO";
 }

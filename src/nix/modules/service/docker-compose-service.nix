@@ -128,7 +128,7 @@ in
             '';
           };
           secrets = mkOption {
-            type = nullOr (listOf (either str serviceSecretType));
+            type = nullOr (either (listOf str) (attrsOf serviceSecretType));
             default = null;
             description = ''
               Build-time secrets exposed to the service.
@@ -138,7 +138,7 @@ in
       });
     };
     service.secrets = mkOption {
-      type = nullOr (listOf (either str serviceSecretType));
+      type = nullOr (either (listOf str) (attrsOf serviceSecretType));
       default = [];
       description = ''
         Run-time secrets exposed to the service.
@@ -451,7 +451,9 @@ in
   } // lib.optionalAttrs (config.service.extra_hosts != []) {
     inherit (config.service) extra_hosts;
   } // lib.optionalAttrs (config.service.secrets != []) {
-    secrets = lib.lists.map (s: {
+    secrets = lib.mapAttrsToList (k: s: {
+      source = k;
+      target = k;
     } // lib.optionalAttrs (s.source != null) {
       inherit (s) source;
     } // lib.optionalAttrs (s.target != null) {
