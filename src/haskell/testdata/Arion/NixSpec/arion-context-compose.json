@@ -6,7 +6,8 @@
     },
     "secrets": {
         "foo": {
-            "environment": "FOO"
+            "environment": "FOO",
+            "external": false
         }
     },
     "services": {

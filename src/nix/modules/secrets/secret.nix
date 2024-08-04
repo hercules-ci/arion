@@ -28,6 +28,15 @@ in
       type = types.nullOr types.str;
     };
 
+    external = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Whether the value of this secret is set via other means.
+        ${secretRef "secrets"}
+      '';
+    };
+
     out = mkOption {
       internal = true;
       description = ''
@@ -48,6 +57,7 @@ in
             inherit (options)
               file
               environment
+              external
               ;
           }
         );
