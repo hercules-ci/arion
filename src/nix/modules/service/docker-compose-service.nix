@@ -18,6 +18,36 @@ let
   cap_add = lib.attrNames (lib.filterAttrs (name: value: value == true) config.service.capabilities);
   cap_drop = lib.attrNames (lib.filterAttrs (name: value: value == false) config.service.capabilities);
 
+  serviceSecretType = types.submodule {
+    options = {
+      source = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
+      uid = mkOption {
+        type = nullOr (either str int);
+        default = null;
+        description = serviceRef "secrets";
+      };
+      gid = mkOption {
+        type = nullOr (either str int);
+        default = null;
+        description = serviceRef "secrets";
+      };
+      mode = mkOption {
+        type = nullOr str;
+        default = null;
+        example = "0444";
+        description = ''
+          The default value of is usually 0444. This option may not be supported
+          when not deploying to a Swarm.
+          ${serviceRef "secrets"}
+        '';
+      };
+    };
+  };
+
 in
 {
   imports = [
@@ -93,7 +123,7 @@ in
             '';
           };
           secrets = mkOption {
-            type = nullOr (listOf str);
+            type = nullOr (either (listOf str) (attrsOf serviceSecretType));
             default = null;
             description = ''
               Build-time secrets exposed to the service.
@@ -103,11 +133,19 @@ in
       });
     };
     service.secrets = mkOption {
-      type = listOf str;
+      type = either (listOf str) (attrsOf serviceSecretType);
       default = [];
       description = ''
         Run-time secrets exposed to the service.
       '';
+      example = {
+        redis_secret = {
+          source = "web_cache_redis_secret";
+          uid = 123;
+          gid = 123;
+          mode = "0440";
+        };
+      };
     };
     service.hostname = mkOption {
       type = nullOr str;
