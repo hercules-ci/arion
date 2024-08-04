@@ -22,15 +22,15 @@
             "ports": [
                 "8080:80"
             ],
-            "secrets": {
-                "foo": {
-                    "gid": 123,
+            "secrets": [
+                {
+                    "gid": "123",
                     "mode": "0440",
-                    "source": "web_cache_redis_secret",
-                    "target": "/run/secrets/web_cache_redis_secret",
-                    "uid": 123
+                    "source": "foo",
+                    "target": "/run/secrets/foo",
+                    "uid": "123"
                 }
-            },
+            ],
             "sysctls": {},
             "volumes": []
         }

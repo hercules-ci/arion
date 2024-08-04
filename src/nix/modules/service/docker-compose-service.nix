@@ -31,12 +31,12 @@ let
         description = serviceRef "secrets";
       };
       uid = mkOption {
-        type = nullOr (either str int);
+        type = nullOr str;
         default = null;
         description = serviceRef "secrets";
       };
       gid = mkOption {
-        type = nullOr (either str int);
+        type = nullOr str;
         default = null;
         description = serviceRef "secrets";
       };
@@ -128,7 +128,7 @@ in
             '';
           };
           secrets = mkOption {
-            type = nullOr (either (listOf str) (attrsOf serviceSecretType));
+            type = nullOr (listOf (either str serviceSecretType));
             default = null;
             description = ''
               Build-time secrets exposed to the service.
@@ -138,7 +138,7 @@ in
       });
     };
     service.secrets = mkOption {
-      type = either (listOf str) (attrsOf serviceSecretType);
+      type = nullOr (listOf (either str serviceSecretType));
       default = [];
       description = ''
         Run-time secrets exposed to the service.
@@ -451,7 +451,18 @@ in
   } // lib.optionalAttrs (config.service.extra_hosts != []) {
     inherit (config.service) extra_hosts;
   } // lib.optionalAttrs (config.service.secrets != []) {
-    inherit (config.service) secrets;
+    secrets = lib.lists.map (s: {
+    } // lib.optionalAttrs (s.source != null) {
+      inherit (s) source;
+    } // lib.optionalAttrs (s.target != null) {
+      inherit (s) target;
+    } // lib.optionalAttrs (s.uid != null) {
+      inherit (s) uid;
+    } // lib.optionalAttrs (s.gid != null) {
+      inherit (s) gid;
+    } // lib.optionalAttrs (s.mode != null) {
+      inherit (s) mode;
+    }) config.service.secrets;
   } // lib.optionalAttrs (config.service.hostname != null) {
     inherit (config.service) hostname;
   } // lib.optionalAttrs (config.service.dns != []) {
