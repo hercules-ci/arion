@@ -25,6 +25,11 @@ let
         default = null;
         description = serviceRef "secrets";
       };
+      target = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
       uid = mkOption {
         type = nullOr (either str int);
         default = null;
@@ -141,6 +146,7 @@ in
       example = {
         redis_secret = {
           source = "web_cache_redis_secret";
+          target = "/run/secrets/web_cache_redis_secret";
           uid = 123;
           gid = 123;
           mode = "0440";

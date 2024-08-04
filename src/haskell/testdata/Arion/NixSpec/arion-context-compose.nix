@@ -9,6 +9,7 @@
     secrets = {
       foo = {
         source = "web_cache_redis_secret";
+        target = "/run/secrets/web_cache_redis_secret";
         uid = 123;
         gid = 123;
         mode = "0440";
