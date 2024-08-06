@@ -75,7 +75,7 @@ in
     out.dockerComposeYamlAttrs = config.assertWarn config.docker-compose.raw;
 
     docker-compose.raw = {
-      version = "3.4";
+      version = "3.8";
       services = lib.mapAttrs (k: c: c.out.service) config.services;
       x-arion = config.docker-compose.extended;
       volumes = config.docker-compose.volumes;

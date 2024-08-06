@@ -61,6 +61,7 @@
           devShells.default = config.devShells.haskell-package.overrideAttrs (o: {
             nativeBuildInputs = o.nativeBuildInputs or [ ] ++ [
               pkgs.docker-compose
+              pkgs.docker
               pkgs.nixpkgs-fmt
               config.haskellProjects.haskell-package.haskellPackages.releaser
             ];
