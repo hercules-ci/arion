@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ lib, pkgs, ... }: {
   project.name = "whale";
 
   docker-compose.raw = {
@@ -58,5 +58,29 @@
       "${./zookeeper}"
       "start-foreground"
     ];
+  };
+
+  services.stop-probe = {
+    image.command = [
+      (lib.getExe (pkgs.writeScriptBin "stop-probe" ''
+        #!${pkgs.runtimeShell}
+        touch /diagnostics/stop-probe-started
+        onSIGTERM() {
+          echo "Handling SIGTERM"
+          touch /diagnostics/stop-probe-terminated-cleanly
+          echo "Bye!"
+        }
+        echo "Registering SIGTERM handler"
+        trap onSIGTERM SIGTERM
+        sleep 3600
+      ''))
+    ];
+    service.useHostStore = true;
+    service.volumes = [
+      "/tmp/shared:/diagnostics"
+    ];
+    service.environment = {
+      "PATH" = lib.makeBinPath [ pkgs.busybox ];
+    };
   };
 }
