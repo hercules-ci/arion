@@ -28,9 +28,12 @@ in
     };
   };
 
-  config = {
-    image.contents = mkIf config.image.enableRecommendedContents [
+  config = mkIf config.image.enableRecommendedContents {
+    image.contents = [
       (pkgs.callPackage recommendedContents {})
     ];
+    image.rawConfig.Env = {
+      "PATH" = lib.mkDefault "/run/current-system/sw/bin:/bin:/usr/bin:/usr/local/bin";
+    };
   };
 }
