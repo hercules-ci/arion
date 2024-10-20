@@ -343,6 +343,103 @@ in
         ${serviceRef "cap_drop"}
       '';
     };
+    service.blkio_config = mkOption {
+      default = null;
+      example = { weight = 300; };
+      description = ''
+        Block IO limits for the service.
+
+        ${serviceRef "blkio_config"}
+      '';
+      type = nullOr (
+        submodule (
+          { config, options, ... }:
+          let
+            deviceBpsModule = submodule (
+              { config, options, ... }:
+              {
+                options = {
+                  path = mkOption {
+                    type = str;
+                    example = "/dev/sda";
+                    description = serviceRef "blkio_config";
+                  };
+                  rate = mkOption {
+                    type = str;
+                    example = "12mb";
+                    description = serviceRef "blkio_config";
+                  };
+                };
+              }
+            );
+            deviceIopsModule = submodule (
+              { config, options, ... }:
+              {
+                options = {
+                  path = mkOption {
+                    type = str;
+                    example = "/dev/sda";
+                    description = serviceRef "blkio_config";
+                  };
+                  rate = mkOption {
+                    type = int;
+                    example = 120;
+                    description = serviceRef "blkio_config";
+                  };
+                };
+              }
+            );
+          in
+          {
+            options = {
+              _out = mkOption {
+                internal = true;
+                readOnly = true;
+                default = lib.mapAttrs (k: opt: opt.value) (lib.filterAttrs (_: opt: opt.isDefined) { inherit (options) weight weight_device device_read_bps device_write_bps device_read_iops device_write_iops; });
+              };
+              weight = mkOption {
+                type = int;
+                example = 300;
+                description = serviceRef "blkio_config";
+              };
+              weight_device = mkOption {
+                description = serviceRef "blkio_config";
+                type = listOf (submodule ({ config, options, ... }: {
+                  options = {
+                    path = mkOption {
+                      type = str;
+                      example = "/dev/sda";
+                      description = serviceRef "blkio_config";
+                    };
+                    weight = mkOption {
+                      type = int;
+                      example = 400;
+                      description = serviceRef "blkio_config";
+                    };
+                  };
+                }));
+              };
+              device_read_bps = mkOption {
+                type = listOf (deviceBpsModule);
+                description = serviceRef "blkio_config";
+              };
+              device_write_bps = mkOption {
+                type = listOf (deviceBpsModule);
+                description = serviceRef "blkio_config";
+              };
+              device_read_iops = mkOption {
+                type = listOf (deviceIopsModule);
+                description = serviceRef "blkio_config";
+              };
+              device_write_iops = mkOption {
+                type = listOf (deviceIopsModule);
+                description = serviceRef "blkio_config";
+              };
+            };
+          }
+        )
+      );
+    };
   };
 
   config.out.service = {
@@ -411,5 +508,7 @@ in
     inherit (config.service) working_dir;
   } // lib.optionalAttrs (config.service.user != null) {
     inherit (config.service) user;
+  } // lib.optionalAttrs (config.service.blkio_config != null) {
+    blkio_config = config.service.blkio_config._out;
   };
 }
