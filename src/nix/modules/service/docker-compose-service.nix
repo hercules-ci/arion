@@ -18,6 +18,41 @@ let
   cap_add = lib.attrNames (lib.filterAttrs (name: value: value == true) config.service.capabilities);
   cap_drop = lib.attrNames (lib.filterAttrs (name: value: value == false) config.service.capabilities);
 
+  serviceSecretType = types.submodule {
+    options = {
+      source = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
+      target = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
+      uid = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
+      gid = mkOption {
+        type = nullOr str;
+        default = null;
+        description = serviceRef "secrets";
+      };
+      mode = mkOption {
+        type = nullOr str;
+        default = null;
+        example = "0444";
+        description = ''
+          The default value of is usually 0444. This option may not be supported
+          when not deploying to a Swarm.
+          ${serviceRef "secrets"}
+        '';
+      };
+    };
+  };
+
 in
 {
   imports = [
@@ -57,30 +92,66 @@ in
       default = [];
       description = serviceRef "tmpfs";
     };
-    service.build.context = mkOption {
-      type = nullOr str;
-      default = null;
-      description = ''
-        Locates a Dockerfile to use for creating an image to use in this service.
+    service.build = mkOption {
+      default = {};
+      description = serviceRef "build";
+      type = submodule ({ options, ...}: {
+        options = {
+          _out = mkOption {
+            internal = true;
+            readOnly = true;
+            default = lib.mapAttrs (k: opt: opt.value) (lib.filterAttrs (_: opt: opt.value != null) { inherit (options) context dockerfile target secrets; });
+          };
+          context = mkOption {
+            type = nullOr str;
+            default = null;
+            description = ''
+              Locates a Dockerfile to use for creating an image to use in this service.
 
-        https://docs.docker.com/compose/compose-file/build/#context
-      '';
+              https://docs.docker.com/compose/compose-file/build/#context
+            '';
+          };
+          dockerfile = mkOption {
+            type = nullOr str;
+            default = null;
+            description = ''
+              Sets an alternate Dockerfile. A relative path is resolved from the build context.
+              https://docs.docker.com/compose/compose-file/build/#dockerfile
+            '';
+          };
+          target = mkOption {
+            type = nullOr str;
+            default = null;
+            description = ''
+              Defines the stage to build as defined inside a multi-stage Dockerfile.
+              https://docs.docker.com/compose/compose-file/build/#target
+            '';
+          };
+          secrets = mkOption {
+            type = nullOr (either (listOf str) (attrsOf serviceSecretType));
+            default = null;
+            description = ''
+              Build-time secrets exposed to the service.
+            '';
+          };
+        };
+      });
     };
-    service.build.dockerfile = mkOption {
-      type = nullOr str;
-      default = null;
+    service.secrets = mkOption {
+      type = nullOr (either (listOf str) (attrsOf serviceSecretType));
+      default = [];
       description = ''
-        Sets an alternate Dockerfile. A relative path is resolved from the build context.
-        https://docs.docker.com/compose/compose-file/build/#dockerfile
+        Run-time secrets exposed to the service.
       '';
-    };
-    service.build.target = mkOption {
-      type = nullOr str;
-      default = null;
-      description = ''
-        Defines the stage to build as defined inside a multi-stage Dockerfile.
-        https://docs.docker.com/compose/compose-file/build/#target
-      '';
+      example = {
+        redis_secret = {
+          source = "web_cache_redis_secret";
+          target = "/run/secrets/web_cache_redis_secret";
+          uid = 123;
+          gid = 123;
+          mode = "0440";
+        };
+      };
     };
     service.hostname = mkOption {
       type = nullOr str;
@@ -450,8 +521,8 @@ in
       ;
   } // lib.optionalAttrs (config.service.image != null) {
     inherit (config.service) image;
-  } // lib.optionalAttrs (config.service.build.context != null ) {
-    build = lib.filterAttrs (n: v: v != null)  config.service.build;
+  } // lib.optionalAttrs (config.service.build._out != {}) {
+    build = config.service.build._out;
   } // lib.optionalAttrs (cap_add != []) {
     inherit cap_add;
   } // lib.optionalAttrs (cap_drop != []) {
@@ -476,6 +547,21 @@ in
     inherit (config.service) external_links;
   } // lib.optionalAttrs (config.service.extra_hosts != []) {
     inherit (config.service) extra_hosts;
+  } // lib.optionalAttrs (config.service.secrets != []) {
+    secrets = lib.mapAttrsToList (k: s: {
+      source = k;
+      target = k;
+    } // lib.optionalAttrs (s.source != null) {
+      inherit (s) source;
+    } // lib.optionalAttrs (s.target != null) {
+      inherit (s) target;
+    } // lib.optionalAttrs (s.uid != null) {
+      inherit (s) uid;
+    } // lib.optionalAttrs (s.gid != null) {
+      inherit (s) gid;
+    } // lib.optionalAttrs (s.mode != null) {
+      inherit (s) mode;
+    }) config.service.secrets;
   } // lib.optionalAttrs (config.service.hostname != null) {
     inherit (config.service) hostname;
   } // lib.optionalAttrs (config.service.dns != []) {

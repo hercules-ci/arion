@@ -4,14 +4,32 @@
             "name": "unit-test-data"
         }
     },
+    "secrets": {
+        "foo": {
+            "environment": "FOO",
+            "external": false
+        }
+    },
     "services": {
         "webserver": {
             "build": {
-                "context": "<STOREPATH>"
+                "context": "<STOREPATH>",
+                "secrets": [
+                    "foo"
+                ]
             },
             "environment": {},
             "ports": [
                 "8080:80"
+            ],
+            "secrets": [
+                {
+                    "gid": "123",
+                    "mode": "0440",
+                    "source": "foo",
+                    "target": "/run/secrets/foo",
+                    "uid": "123"
+                }
             ],
             "sysctls": {},
             "volumes": []
