@@ -19,6 +19,7 @@ data-files:          nix/*.nix
                    , nix/modules/composition/*.nix
                    , nix/modules/networks/*.nix
                    , nix/modules/nixos/*.nix
+                   , nix/modules/secrets/*.nix
                    , nix/modules/service/*.nix
                    , nix/modules/lib/*.nix
 
