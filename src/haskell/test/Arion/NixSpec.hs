@@ -15,13 +15,13 @@ spec :: Spec
 spec = describe "evaluateComposition" $ do
   it "matches an example" $ do
     x <- Arion.Nix.evaluateComposition EvaluationArgs
-      { evalUid      = 123
-      , evalModules  = NEL.fromList
+      { posixUID      = 123
+      , evalModulesFile  = NEL.fromList
                          ["src/haskell/testdata/Arion/NixSpec/arion-compose.nix"]
-      , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
-      , evalWorkDir  = Nothing
-      , evalMode     = ReadOnly
-      , evalUserArgs = ["--show-trace"]
+      , pkgsExpr     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
+      , workDir  = Nothing
+      , mode     = ReadOnly
+      , extraNixArgs = ["--show-trace"]
       }
     let actual = pretty x
     expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-compose.json"
@@ -29,13 +29,13 @@ spec = describe "evaluateComposition" $ do
 
   it "matches an build.context example" $ do
     x <- Arion.Nix.evaluateComposition EvaluationArgs
-      { evalUid      = 1234
-      , evalModules  = NEL.fromList
+      { posixUID      = 1234
+      , evalModulesFile  = NEL.fromList
                          ["src/haskell/testdata/Arion/NixSpec/arion-context-compose.nix"]
-      , evalPkgs     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
-      , evalWorkDir  = Nothing
-      , evalMode     = ReadOnly
-      , evalUserArgs = ["--show-trace"]
+      , pkgsExpr     = "import <nixpkgs> { system = \"x86_64-linux\"; }"
+      , workDir  = Nothing
+      , mode     = ReadOnly
+      , extraNixArgs = ["--show-trace"]
       }
     let actual = pretty x
     expected <- T.readFile "src/haskell/testdata/Arion/NixSpec/arion-context-compose.json"

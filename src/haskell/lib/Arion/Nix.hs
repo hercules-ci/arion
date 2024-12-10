@@ -30,12 +30,12 @@ data EvaluationMode =
   ReadWrite | ReadOnly
 
 data EvaluationArgs = EvaluationArgs
- { evalUid :: Int
- , evalModules :: NonEmpty FilePath
- , evalPkgs :: Text
- , evalWorkDir :: Maybe FilePath
- , evalMode :: EvaluationMode
- , evalUserArgs :: [Text]
+ { posixUID :: Int
+ , evalModulesFile :: NonEmpty FilePath
+ , pkgsExpr :: Text
+ , workDir :: Maybe FilePath
+ , mode :: EvaluationMode
+ , extraNixArgs :: [Text]
  }
 
 evaluateComposition :: EvaluationArgs -> IO Value
@@ -51,11 +51,11 @@ evaluateComposition ea = do
       args =
         [ evalComposition ]
         ++ commandArgs
-        ++ modeArguments ea.evalMode
+        ++ modeArguments ea.mode
         ++ argArgs ea
-        ++ map toS ea.evalUserArgs
+        ++ map toS ea.extraNixArgs
       procSpec = (proc "nix-instantiate" args)
-        { cwd = ea.evalWorkDir
+        { cwd = ea.workDir
         , std_out = CreatePipe
         }
   
@@ -101,8 +101,8 @@ buildComposition outLink ea = do
         [ evalComposition ]
         ++ commandArgs
         ++ argArgs ea
-        ++ map toS ea.evalUserArgs
-      procSpec = (proc "nix-build" args) { cwd = ea.evalWorkDir }
+        ++ map toS ea.extraNixArgs
+      procSpec = (proc "nix-build" args) { cwd = ea.workDir }
   
   withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
@@ -132,8 +132,8 @@ replForComposition ea = do
     let args =
           [ "repl", "--file", evalComposition ]
           ++ argArgs ea
-          ++ map toS ea.evalUserArgs
-        procSpec = (proc "nix" args) { cwd = ea.evalWorkDir }
+          ++ map toS ea.extraNixArgs
+        procSpec = (proc "nix" args) { cwd = ea.workDir }
     
     withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
@@ -149,13 +149,13 @@ argArgs :: EvaluationArgs -> [[Char]]
 argArgs ea =
       [ "--argstr"
       , "uid"
-      , show ea.evalUid
+      , show ea.posixUID
       , "--arg"
       , "modules"
-      , modulesNixExpr ea.evalModules
+      , modulesNixExpr ea.evalModulesFile
       , "--arg"
       , "pkgs"
-      , toS ea.evalPkgs
+      , toS ea.pkgsExpr
       ]
 
 getEvalCompositionFile :: IO FilePath

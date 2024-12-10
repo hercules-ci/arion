@@ -211,12 +211,12 @@ defaultEvaluationArgs :: CommonOptions -> IO EvaluationArgs
 defaultEvaluationArgs co = do
   uid <- getRealUserID
   pure EvaluationArgs
-    { evalUid = fromIntegral uid
-    , evalModules = co.files
-    , evalPkgs = co.pkgs
-    , evalWorkDir = Nothing
-    , evalMode = ReadWrite
-    , evalUserArgs = co.nixArgs
+    { posixUID = fromIntegral uid
+    , evalModulesFile = co.files
+    , pkgsExpr = co.pkgs
+    , workDir = Nothing
+    , mode = ReadWrite
+    , extraNixArgs = co.nixArgs
     }
 
 runCat :: CommonOptions -> IO ()
