@@ -1,20 +1,17 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE CPP #-}
-module Arion.Services
-  ( getDefaultExec
-  ) where
 
-import Prelude()
-import Protolude hiding (to)
+module Arion.Services
+  ( getDefaultExec,
+  )
+where
 
 import qualified Data.Aeson as Aeson
+import Protolude hiding (to)
+import Prelude ()
 #if MIN_VERSION_lens_aeson(1,2,0)
 import qualified Data.Aeson.Key as AK
 #endif
-import           Arion.Aeson (decodeFile)
-
+import Arion.Aeson (decodeFile)
 import Control.Lens
 import Data.Aeson.Lens
 
@@ -31,7 +28,6 @@ mkKey = identity
 -- | Subject to change
 getDefaultExec :: FilePath -> Text -> IO [Text]
 getDefaultExec fp service = do
-
   v <- decodeFile fp
 
   pure ((v :: Aeson.Value) ^.. key "x-arion" . key "serviceInfo" . key (mkKey service) . key "defaultExec" . _Array . traverse . _String)

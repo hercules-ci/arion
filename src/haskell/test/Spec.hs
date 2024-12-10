@@ -1,12 +1,11 @@
 module Spec
-  ( spec
+  ( spec,
   )
 where
 
-import           Test.Hspec
 import qualified Arion.NixSpec
+import Test.Hspec
 
 spec :: Spec
 spec = do
   describe "Arion.Nix" Arion.NixSpec.spec
-
