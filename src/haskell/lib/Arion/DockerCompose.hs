@@ -1,25 +1,24 @@
 module Arion.DockerCompose where
 
-import           Prelude                        ( )
-import           Protolude
-import           System.Process
+import Protolude
+import System.Process
+import Prelude ()
 
 data Args = Args
-  { files :: [FilePath]
-  , otherArgs :: [Text]
+  { files :: [FilePath],
+    otherArgs :: [Text]
   }
 
 run :: Args -> IO ()
 run args = do
   let fileArgs = args.files >>= \f -> ["--file", f]
-      allArgs  = fileArgs ++ map toS args.otherArgs
+      allArgs = fileArgs ++ map toS args.otherArgs
 
       procSpec = proc "docker-compose" allArgs
 
   -- hPutStrLn stderr ("Running docker-compose with " <> show allArgs :: Text)
 
   withCreateProcess procSpec $ \_in _out _err procHandle -> do
-
     exitCode <- waitForProcess procHandle
 
     case exitCode of
