@@ -12,6 +12,10 @@
   hercules-ci.flake-update = {
     enable = true;
     autoMergeMethod = "merge";
+    flakes = {
+      "." = { };
+      "dev" = { };
+    };
     when = {
       hour = [ 2 ];
       dayOfMonth = [ 5 ];
