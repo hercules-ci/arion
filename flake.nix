@@ -22,6 +22,7 @@
         module = { inputs, ... }: {
           imports = [
             inputs.hercules-ci-effects.flakeModule
+            inputs.git-hooks-nix.flakeModule
             ./tests/flake-module.nix
             ./dev/flake-module.nix
           ];
