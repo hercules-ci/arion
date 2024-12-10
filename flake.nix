@@ -14,11 +14,24 @@
     flake-parts.lib.mkFlake { inherit inputs; } ({ config, lib, extendModules, ... }: {
       imports = [
         inputs.haskell-flake.flakeModule
-        inputs.hercules-ci-effects.flakeModule
         inputs.flake-parts.flakeModules.easyOverlay
+        inputs.flake-parts.flakeModules.partitions
         ./docs/flake-module.nix
-        ./tests/flake-module.nix
       ];
+
+      partitions.dev = {
+        module = {
+          imports = [
+            inputs.hercules-ci-effects.flakeModule
+            ./tests/flake-module.nix
+            ./dev/flake-module.nix
+          ];
+        };
+      };
+      partitionedAttrs.devShells = "dev";
+      partitionedAttrs.checks = "dev";
+      partitionedAttrs.herculesCI = "dev";
+
       systems = inputs.nixpkgs.lib.systems.flakeExposed;
       perSystem = { config, self', inputs', pkgs, system, final, ... }:
         let h = pkgs.haskell.lib.compose; in
@@ -58,30 +71,7 @@
                   ];
               };
           };
-          devShells.default = config.devShells.haskell-package.overrideAttrs (o: {
-            nativeBuildInputs = o.nativeBuildInputs or [ ] ++ [
-              pkgs.docker-compose
-              pkgs.nixpkgs-fmt
-              config.haskellProjects.haskell-package.haskellPackages.releaser
-            ];
-          });
         };
-
-      hercules-ci.flake-update = {
-        enable = true;
-        autoMergeMethod = "merge";
-        when = {
-          hour = [ 2 ];
-          dayOfMonth = [ 5 ];
-        };
-      };
-
-      herculesCI.ciSystems = [
-        # "aarch64-darwin"
-        # "aarch64-linux"
-        "x86_64-darwin"
-        "x86_64-linux"
-      ];
 
       flake = {
         debug = { inherit inputs config lib; };
