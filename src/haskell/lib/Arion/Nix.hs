@@ -131,7 +131,7 @@ replForComposition :: EvaluationArgs -> IO ()
 replForComposition ea = do
     evalComposition <- getEvalCompositionFile
     let args =
-          [ "repl", evalComposition ]
+          [ "repl", "--file", evalComposition ]
           ++ argArgs ea
           ++ map toS (evalUserArgs ea)
         procSpec = (proc "nix" args) { cwd = evalWorkDir ea }
