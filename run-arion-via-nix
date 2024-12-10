@@ -3,4 +3,4 @@
 # For manual testing of a hacked arion built via Nix.
 # Works when called from outside the project directory.
 
-exec nix run -f "$(dirname ${BASH_SOURCE[0]})" arion "$@"
+exec nix run -f "$(dirname ${BASH_SOURCE[0]})" arion -- "$@"
