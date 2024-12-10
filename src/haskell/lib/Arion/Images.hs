@@ -1,6 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Arion.Images
   ( loadImages
   ) where
@@ -22,12 +19,13 @@ loadImages requestedImages = do
   loaded <- getDockerImages
 
   let
+    isNew :: Image -> Bool
     isNew i =
       -- On docker, the image name is unmodified
-      (imageName i <> ":" <> imageTag i) `notElem` loaded
+      (i.imageName <> ":" <> i.imageTag) `notElem` loaded
       -- On podman, you used to automatically get a localhost prefix
       -- however, since NixOS 22.05, this expected to be part of the name instead
-        && ("localhost/" <> imageName i <> ":" <> imageTag i) `notElem` loaded
+        && ("localhost/" <> i.imageName <> ":" <> i.imageTag) `notElem` loaded
 
   traverse_ loadImage . filter isNew $ requestedImages
 

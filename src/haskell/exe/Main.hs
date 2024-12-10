@@ -1,7 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ApplicativeDo #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 import Protolude hiding (Down, option)
 
@@ -32,7 +31,7 @@ data CommonOptions =
     , compatibility :: Bool
     , logLevel :: Maybe Text
     }
-  deriving (Show)
+  deriving stock (Show)
 
 newtype DockerComposeArgs =
   DockerComposeArgs { unDockerComposeArgs :: [Text] }
@@ -160,32 +159,32 @@ runEvalAndDC cmd dopts opts = do
 callDC :: Text -> DockerComposeArgs -> CommonOptions -> Bool -> FilePath -> IO ()
 callDC cmd dopts opts shouldLoadImages path = do
   extendedInfo <- loadExtendedInfoFromPath path
-  when shouldLoadImages $ loadImages (images extendedInfo)
+  when shouldLoadImages $ loadImages (extendedInfo.images)
   let firstOpts = projectArgs extendedInfo <> commonArgs opts
   DockerCompose.run DockerCompose.Args
     { files = [path]
-    , otherArgs = firstOpts ++ [cmd] ++ unDockerComposeArgs dopts
+    , otherArgs = firstOpts ++ [cmd] ++ dopts.unDockerComposeArgs
     }
 
 projectArgs :: ExtendedInfo -> [Text]
 projectArgs extendedInfo =
   do
-    n <- toList (projectName extendedInfo)
+    n <- toList (extendedInfo.projectName)
     ["--project-name", n]
 
 commonArgs :: CommonOptions -> [Text]
 commonArgs opts = do
-    guard (noAnsi opts)
+    guard opts.noAnsi
     ["--no-ansi"]
   <> do
-    guard (compatibility opts)
+    guard opts.compatibility
     ["--compatibility"]
   <> do
-    l <- toList (logLevel opts)
+    l <- toList opts.logLevel
     ["--log-level", l]
 
 withBuiltComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
-withBuiltComposeFile opts cont = case prebuiltComposeFile opts of
+withBuiltComposeFile opts cont = case opts.prebuiltComposeFile of
   Just prebuilt -> do
     cont prebuilt
   Nothing -> do
@@ -193,7 +192,7 @@ withBuiltComposeFile opts cont = case prebuiltComposeFile opts of
     Arion.Nix.withBuiltComposition args cont
 
 withComposeFile :: CommonOptions -> (FilePath -> IO r) -> IO r
-withComposeFile opts cont = case prebuiltComposeFile opts of
+withComposeFile opts cont = case opts.prebuiltComposeFile of
   Just prebuilt -> do
     cont prebuilt
   Nothing -> do
@@ -201,7 +200,7 @@ withComposeFile opts cont = case prebuiltComposeFile opts of
     Arion.Nix.withEvaluatedComposition args cont
 
 getComposeValue :: CommonOptions -> IO Value
-getComposeValue opts = case prebuiltComposeFile opts of
+getComposeValue opts = case opts.prebuiltComposeFile of
   Just prebuilt -> do
     decodeFile prebuilt
   Nothing -> do
@@ -213,11 +212,11 @@ defaultEvaluationArgs co = do
   uid <- getRealUserID
   pure EvaluationArgs
     { evalUid = fromIntegral uid
-    , evalModules = files co
-    , evalPkgs = pkgs co
+    , evalModules = co.files
+    , evalPkgs = co.pkgs
     , evalWorkDir = Nothing
     , evalMode = ReadWrite
-    , evalUserArgs = nixArgs co
+    , evalUserArgs = co.nixArgs
     }
 
 runCat :: CommonOptions -> IO ()

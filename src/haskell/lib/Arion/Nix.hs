@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Arion.Nix
   ( evaluateComposition
   , withEvaluatedComposition
@@ -52,11 +51,11 @@ evaluateComposition ea = do
       args =
         [ evalComposition ]
         ++ commandArgs
-        ++ modeArguments (evalMode ea)
+        ++ modeArguments ea.evalMode
         ++ argArgs ea
-        ++ map toS (evalUserArgs ea)
+        ++ map toS ea.evalUserArgs
       procSpec = (proc "nix-instantiate" args)
-        { cwd = evalWorkDir ea
+        { cwd = ea.evalWorkDir
         , std_out = CreatePipe
         }
   
@@ -102,8 +101,8 @@ buildComposition outLink ea = do
         [ evalComposition ]
         ++ commandArgs
         ++ argArgs ea
-        ++ map toS (evalUserArgs ea)
-      procSpec = (proc "nix-build" args) { cwd = evalWorkDir ea }
+        ++ map toS ea.evalUserArgs
+      procSpec = (proc "nix-build" args) { cwd = ea.evalWorkDir }
   
   withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
@@ -133,8 +132,8 @@ replForComposition ea = do
     let args =
           [ "repl", "--file", evalComposition ]
           ++ argArgs ea
-          ++ map toS (evalUserArgs ea)
-        procSpec = (proc "nix" args) { cwd = evalWorkDir ea }
+          ++ map toS ea.evalUserArgs
+        procSpec = (proc "nix" args) { cwd = ea.evalWorkDir }
     
     withCreateProcess procSpec $ \_in _out _err procHandle -> do
 
@@ -150,13 +149,13 @@ argArgs :: EvaluationArgs -> [[Char]]
 argArgs ea =
       [ "--argstr"
       , "uid"
-      , show $ evalUid ea
+      , show ea.evalUid
       , "--arg"
       , "modules"
-      , modulesNixExpr $ evalModules ea
+      , modulesNixExpr ea.evalModules
       , "--arg"
       , "pkgs"
-      , toS $ evalPkgs ea
+      , toS ea.evalPkgs
       ]
 
 getEvalCompositionFile :: IO FilePath

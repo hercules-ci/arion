@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Arion.DockerCompose where
 
 import           Prelude                        ( )
@@ -12,8 +11,8 @@ data Args = Args
 
 run :: Args -> IO ()
 run args = do
-  let fileArgs = files args >>= \f -> ["--file", f]
-      allArgs  = fileArgs ++ map toS (otherArgs args)
+  let fileArgs = args.files >>= \f -> ["--file", f]
+      allArgs  = fileArgs ++ map toS args.otherArgs
 
       procSpec = proc "docker-compose" allArgs
 

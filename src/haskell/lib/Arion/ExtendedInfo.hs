@@ -1,6 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-
 
 Parses the x-arion field in the generated compose file.
@@ -20,12 +17,13 @@ data Image = Image
   , imageExe :: Maybe Text -- ^ path to exe producing image tar
   , imageName :: Text
   , imageTag :: Text
-  } deriving (Eq, Show, Generic, Aeson.ToJSON, Aeson.FromJSON)
+  } deriving stock (Eq, Show, Generic)
+    deriving anyclass (Aeson.ToJSON, Aeson.FromJSON)
 
 data ExtendedInfo = ExtendedInfo {
     projectName :: Maybe Text,
     images :: [Image]
-  } deriving (Eq, Show)
+  } deriving stock (Eq, Show)
 
 loadExtendedInfoFromPath :: FilePath -> IO ExtendedInfo
 loadExtendedInfoFromPath fp = do

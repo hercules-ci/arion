@@ -44,6 +44,15 @@ common common
                    , protolude >= 0.2
                    , unix
   ghc-options:     -Wall
+  default-extensions:
+    BlockArguments
+    DeriveAnyClass
+    DeriveGeneric
+    DerivingStrategies
+    LambdaCase
+    NoFieldSelectors
+    OverloadedRecordDot
+    OverloadedStrings
 
 flag ghci
   default: False
