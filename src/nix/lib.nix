@@ -11,11 +11,15 @@ let
   networkRef = fragment:
     ''See ${link "https://github.com/compose-spec/compose-spec/blob/${composeSpecRev}/06-networks.md#${fragment}" "Compose Spec Networks #${fragment}"}'';
 
+  secretRef = fragment:
+    ''See ${link "https://github.com/compose-spec/compose-spec/blob/${composeSpecRev}/09-secrets.md#${fragment}" "Compose Spec Secrets #${fragment}"}'';
+
 in
 {
   inherit
     link
     networkRef
     serviceRef
+    secretRef
     ;
 }
