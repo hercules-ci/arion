@@ -1,5 +1,25 @@
 # Revision history for Arion
 
+## 0.2.2.0 -- 2024-12-11
+
+### Added
+
+* [`serivces.<name>.service.blkio_config`](https://docs.hercules-ci.com/arion/options#_services_name_service_blkio_config)
+* [`services.<name>.service.build.dockerfile`](https://docs.hercules-ci.com/arion/options#_services_name_service_build_dockerfile)
+* [`services.<name>.service.stop_grace_period`](https://docs.hercules-ci.com/arion/options#_services_name_service_stop_grace_period)
+* In the [NixOS deployment module], `virtualisation.arion.projects.<name>.serviceName` to override `<name>` used in systemd unit
+
+### Fixed
+
+* `nix repl` did not pass `--file` to Nix for file-based repls
+* `services.<name>.service.build.context` was ignored
+* `boot.tmpOnTmpfs` -> `boot.tmp.useTmpfs`
+* Remove lorri from local development environment, as it would fail silently
+
+### Removed
+
+* `defaultPackage` flake output. Use `packages.<system>.default` instead.
+
 ## 0.2.1.0 -- 2023-07-26
 
 ### Added
@@ -98,3 +118,6 @@
 
 * First released version. Released on an unsuspecting world.
 
+
+
+[NixOS deployment module]: https://docs.hercules-ci.com/arion/deployment#_nixos_module
