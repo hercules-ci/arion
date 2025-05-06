@@ -4,6 +4,7 @@
             "name": "unit-test-data"
         }
     },
+    "secrets": {},
     "services": {
         "webserver": {
             "command": [
