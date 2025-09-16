@@ -17,6 +17,8 @@
   hercules-ci.flake-update = {
     enable = true;
     autoMergeMethod = "merge";
+    baseMerge.enable = true;
+    baseMerge.method = "merge";
     flakes = {
       "." = { };
       "dev" = { };
