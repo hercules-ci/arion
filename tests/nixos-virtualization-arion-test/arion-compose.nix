@@ -1,62 +1,46 @@
 { pkgs, ... }: {
   project.name = "whale";
 
-  docker-compose.raw = {
-    volumes.zookeeper = { };
-    volumes.kafka = { };
+  docker-compose.volumes = {
+    kafka = { };
   };
 
   services.kafka = {
     service.useHostStore = true;
-    # service.volumes = [
-    #   {
-    #     type = "volume";
-    #     source = "kafka";
-    #     target = "/data";
-    #     # volume.nocopy = true;
-    #   }
-    # ];
+    service.volumes = [
+      {
+        type = "volume";
+        source = "kafka";
+        target = "/var/lib/kafka/data";
+      }
+    ];
     service.ports = [ "9092:9092" ];
-    service.depends_on = [ "zookeeper" ];
+    service.environment = {
+      # KRaft requires a unique cluster ID
+      KAFKA_CLUSTER_ID = "MkU3OEVBNTcwNTJENDM2Qk";
+    };
     image.name = "localhost/kafka";
     image.contents = [
       (pkgs.runCommand "root" { } ''
         mkdir -p $out/bin
         ln -s ${pkgs.runtimeShell} $out/bin/sh
+        mkdir -p $out/var/lib/kafka/data
       '')
     ];
-    image.command = [
-      "${pkgs.apacheKafka}/bin/kafka-server-start.sh"
-      "${./kafka/server.properties}"
-    ];
-  };
-
-  services.zookeeper = {
-    service.useHostStore = true;
-    service.ports = [ "2181:2181" ];
-    # service.volumes = [
-    #   {
-    #     type = "volume";
-    #     source = "zookeeper";
-    #     target = "/data";
-    #     # volume.nocopy = true;
-    #   }
-    # ];
-    image.name = "localhost/zookeeper";
-    image.contents = [
-      (pkgs.buildEnv {
-        name = "root";
-        paths = [
-          # pkgs.sed
-          pkgs.busybox
-        ];
-      })
-    ];
-    image.command = [
-      "${pkgs.zookeeper}/bin/zkServer.sh"
-      "--config"
-      "${./zookeeper}"
-      "start-foreground"
+    # KRaft requires formatting the log directories with a cluster ID first
+    image.command = [ 
+      "${pkgs.writeShellScript "start-kafka" ''
+        # Format the storage if not already done
+        if [ ! -f /var/lib/kafka/data/meta.properties ]; then
+          echo "Formatting Kafka storage..."
+          ${pkgs.apacheKafka}/bin/kafka-storage.sh format \
+            -t $KAFKA_CLUSTER_ID \
+            -c ${./kafka/server.properties}
+        fi
+        
+        # Start Kafka server
+        exec ${pkgs.apacheKafka}/bin/kafka-server-start.sh ${./kafka/server.properties}
+      ''}"
     ];
   };
 }
