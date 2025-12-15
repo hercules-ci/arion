@@ -17,7 +17,6 @@
             "volumes": []
         }
     },
-    "version": "3.4",
     "volumes": {},
     "x-arion": {
         "images": [
