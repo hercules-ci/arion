@@ -1,25 +1,37 @@
 {
   perSystem = { pkgs, final, ... }:
     let
-      inherit (final) nixosTest arion lib;
+      inherit (final) arion lib;
+      inherit (final.testers) runNixOSTest;
     in
     {
       checks = lib.optionalAttrs pkgs.stdenv.isLinux {
-        test = nixosTest ./arion-test;
+        test = runNixOSTest {
+          imports = [ ./arion-test ];
+        };
 
         nixosModuleWithDocker =
-          import ./nixos-virtualization-arion-test/test.nix final {
-            virtualisation.arion.backend = "docker";
+          runNixOSTest {
+            imports = [ ./nixos-virtualization-arion-test/test.nix ];
+            extraBaseModules = {
+              virtualisation.arion.backend = "docker";
+            };
           };
 
         # Currently broken; kafka can't reach zookeeper
         # nixosModuleWithPodman =
-        #   import ./nixos-virtualization-arion-test/test.nix final {
-        #     virtualisation.arion.backend = "podman-socket";
+        #   runNixOSTest {
+        #     imports = [ ./nixos-virtualization-arion-test/test.nix ];
+        #     extraBaseModules = {
+        #       virtualisation.arion.backend = "podman-socket";
+        #     };
         #   };
 
         testWithPodman =
-          nixosTest (import ./arion-test { usePodman = true; pkgs = final; });
+          runNixOSTest {
+            imports = [ ./arion-test ];
+            _module.args.usePodman = true;
+          };
 
         testBuild = arion.build {
 

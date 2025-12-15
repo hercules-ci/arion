@@ -1,6 +1,5 @@
-pkgs: module:
-
-pkgs.nixosTest {
+{ pkgs, ... }:
+{
   name = "test-basic-arion-kafka";
   nodes = {
     machine = { ... }: {
@@ -8,7 +7,6 @@ pkgs.nixosTest {
       virtualisation.diskSize = 10000;
       imports = [
         ../../nixos-module.nix
-        module
       ];
 
       virtualisation.arion.projects.whale.settings = {
@@ -35,6 +33,6 @@ pkgs.nixosTest {
         ) | grep --line-buffered hello | { read; kill $(<pid); rm pid; }
       ) 2>/dev/console
     """)
-    
+
   '';
 }
