@@ -1,4 +1,4 @@
-{ usePodman ? false, pkgs, lib ? pkgs.lib, ... }:
+{ pkgs, lib, usePodman, ... }:
 
 let
   # To make some prebuilt derivations available in the vm
@@ -9,6 +9,7 @@ let
 
   inherit (lib)
     concatMapStringsSep
+    mkDefault
     optionalAttrs
     optionalString
     ;
@@ -20,6 +21,12 @@ let
 in
 {
   name = "arion-test";
+
+  # Test parameter defaults
+  _module.args = {
+    usePodman = mkDefault false;
+  };
+
   nodes.machine = { pkgs, lib, ... }: {
     environment.systemPackages = [
       pkgs.arion
