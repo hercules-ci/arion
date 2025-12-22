@@ -68,6 +68,14 @@ in
       description = "A attribute set of volume configurations.";
       default = {};
     };
+    docker-compose.secrets = lib.mkOption {
+      type = lib.types.attrsOf lib.types.unspecified;
+      description = ''
+        An attribute set of secret configurations. For more info, see:
+        https://docs.docker.com/compose/compose-file/09-secrets/
+      '';
+      default = {};
+    };
   };
   config = {
     out.dockerComposeYaml = pkgs.writeText "docker-compose.yaml" config.out.dockerComposeYamlText;
@@ -78,6 +86,7 @@ in
       services = lib.mapAttrs (k: c: c.out.service) config.services;
       x-arion = config.docker-compose.extended;
       volumes = config.docker-compose.volumes;
+      secrets = config.docker-compose.secrets;
     };
   };
 }
