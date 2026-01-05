@@ -30,7 +30,7 @@ let
         {
           name = null; tag = null; contents = null; config = null;
           created = null; extraCommands = null; maxLayers = null;
-          fakeRootCommands = null;
+          fakeRootCommands = null; enableFakechroot = null;
         }
         args;
       acceptedArgs = functionArgs dockerTools.streamLayeredImage;
@@ -50,6 +50,8 @@ let
       name
       contents
       includeStorePaths
+      fakeRootCommands
+      enableFakechroot
       ;
     config = config.image.rawConfig;
     maxLayers = 100;
@@ -68,8 +70,6 @@ let
           ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
         done;
       '';
-
-    fakeRootCommands = config.image.fakeRootCommands;
   };
 
   priorityIsDefault = option: option.highestPrio >= (lib.mkDefault true).priority;
@@ -128,6 +128,15 @@ in
       default = "";
       description = ''
         Commands that build the root of the container in the current working directory.
+
+        See [`dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage).
+      '';
+    };
+    image.enableFakechroot = mkOption {
+      type = bool;
+      default = false;
+      description = ''
+        Runs the commands from `image.fakeRootCommands` in a complete fakechroot environment instead of fakeroot. This allows installation in `/` to work as expected, similar to the instruction [`RUN`](https://docs.docker.com/reference/dockerfile/#run).
 
         See [`dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage).
       '';
