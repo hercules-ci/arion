@@ -1,7 +1,11 @@
 { pkgs, lib, config, options, ... }:
 let
   inherit (lib)
+    all
+    flip
     functionArgs
+    hasAttr
+    isDerivation
     mkOption
     optionalAttrs
     types
@@ -10,13 +14,90 @@ let
   inherit (pkgs)
     dockerTools
     ;
-  inherit (types) attrsOf listOf nullOr package str unspecified bool;
+  inherit (types)
+    addCheck
+    attrs
+    attrsOf
+    bool
+    coercedTo
+    listOf
+    nonEmptyStr
+    nullOr
+    oneOf
+    package
+    path
+    str
+    unspecified
+    ;
 
   # TODO: dummy-config is a useless layer. Nix 2.3 will let us inspect
   #       the string context instead, so we can avoid this.
   contentsList = config.image.contents ++ [
     (pkgs.writeText "dummy-config.json" (builtins.toJSON config.image.rawConfig))
   ];
+
+  # Neither image names nor tags can can be empty strings; setting either to an
+  # empty string will cause `docker load` to croak with the error message
+  # "invalid reference format".
+  fallbackImageRepoTagComponent = component: fallback:
+    if nonEmptyStr.check component
+    then component
+    else fallback;
+  fallbackImageName = fallbackImageRepoTagComponent config.image.name;
+  fallbackImageTag = fallbackImageRepoTagComponent config.image.tag;
+
+  # Shim for `services.<name>.image.tarball` definitions that refer to
+  # arbitrary paths and not `dockerTools`-produced derivations.
+  dummyImagePackage = outPath:
+    let
+      tarballSuffix = ".tar.gz";
+      repoTagSeparator = "-";
+      baseName = baseNameOf outPath;
+      baseNameNoExtension = lib.strings.removeSuffix tarballSuffix baseName;
+      baseNameComponents = lib.strings.splitString repoTagSeparator baseNameNoExtension;
+      fallbacks =
+        if ((lib.isStorePath outPath) && (lib.hasSuffix tarballSuffix baseName) && (lib.hasInfix repoTagSeparator baseName))
+        then {
+          imageName = lib.concatStringsSep repoTagSeparator (lib.tail baseNameComponents);
+          imageTag = lib.head baseNameComponents;
+        }
+        else {
+          imageName = null;
+          imageTag = null;
+        };
+    in
+    {
+      inherit outPath;
+      type = "derivation";
+      imageName = fallbackImageName fallbacks.imageName;
+      imageTag = fallbackImageTag fallbacks.imageTag;
+    };
+
+  # Type matching the essential attributes of derivations produced by
+  # `dockerTools` builder functions.
+  imagePackageType = addCheck attrs (x: isDerivation x && (all (flip hasAttr x) [ "imageName" "imageTag" ]));
+
+  # `coercedTo path dummyImagePackage package` looks sufficient, but it is not.
+  # `coercedTo` defines this `check` function:
+  #
+  #   x: (coercedType.check x && finalType.check (coerceFunc x)) || finalType.check x;
+  #
+  # and this `merge` function:
+  #
+  #   loc: defs:
+  #     let
+  #       coerceVal = val:
+  #         if coercedType.check val then coerceFunc val
+  #         else val;
+  #     in finalType.merge loc (map (def: def // { value = coerceVal def.value; }) defs);
+  #
+  # Meaning that values that satisfy `finalType.check` may still be subject to
+  # coercion.  In this case, derivations satisfy `path.check`, so will be
+  # coerced using the `dummyImagePackage` function.  To avoid this unnecessary
+  # coercion, we instead force checking whether the value satisfies
+  # `imagePackageType.check` *first* via placing `imagePackageType` at the head
+  # of the list provided to `oneOf`.
+  imageTarballType = oneOf [ imagePackageType (coercedTo path dummyImagePackage imagePackageType) ];
 
   includeStorePathsWarningAndDefault = lib.warn ''
     You're using a version of Nixpkgs that doesn't support the includeStorePaths
@@ -47,10 +128,11 @@ let
 
   builtImage = buildOrStreamLayeredImage {
     inherit (config.image)
-      name
+      tag
       contents
       includeStorePaths
       ;
+    name = fallbackImageName ("localhost/" + config.service.name);
     config = config.image.rawConfig;
     maxLayers = 100;
 
@@ -76,23 +158,6 @@ let
 in
 {
   options = {
-    build.image = mkOption {
-      type = nullOr package;
-      description = ''
-        Docker image derivation to be `docker load`-ed.
-      '';
-      internal = true;
-    };
-    build.imageName = mkOption {
-      type = str;
-      description = "Derived from `build.image`";
-      internal = true;
-    };
-    build.imageTag = mkOption {
-      type = str;
-      description = "Derived from `build.image`";
-      internal = true;
-    };
     image.nixBuild = mkOption {
       type = bool;
       description = ''
@@ -106,14 +171,42 @@ in
       '';
     };
     image.name = mkOption {
-      type = str;
-      default = "localhost/" + config.service.name;
-      defaultText = lib.literalExpression or lib.literalExample ''"localhost/" + config.service.name'';
+      type = nullOr str;
+      default = null;
       description = ''
-        A human readable name for the docker image.
+        A human readable name for the Docker image.
 
         Shows up in the `docker ps` output in the
         `IMAGE` column, among other places.
+
+        ::: {.important}
+        If you set {option}`services.<name>.image.tarball` to an arbitrary
+        Docker image tarball (and not, say, a derivation produced by one of the
+        [`dockerTools`](https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools)
+        builder functions), then you **must** set {option}`services.<name>.image.name`
+        to the name of the image in the tarball.  Otherwise, Arion will not be
+        able to properly identify the image in the generated Docker Compose
+        configuration file.
+        :::
+      '';
+    };
+    image.tag = mkOption {
+      type = nullOr str;
+      default = null;
+      description = ''
+        A tag to assign to the built image, or (if you specified an image archive
+        with `image.tarball`) the tag that arion should use when referring to
+        the loaded image.
+
+        ::: {.important}
+        If you set {option}`services.<name>.image.tarball` to an arbitrary
+        Docker image tarball (and not, say, a derivation produced by one of the
+        [`dockerTools`](https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools)
+        builder functions), then you **must** set {option}`services.<name>.image.tag`
+        to one of the tags associated with `services.<name>.image.name` in the
+        image tarball.  Otherwise, Arion will not be able to properly identify
+        the image in the generated Docker Compose configuration file.
+        :::
       '';
     };
     image.contents = mkOption {
@@ -162,20 +255,43 @@ in
       description = ''
       '';
     };
+    image.tarball = mkOption {
+      type = nullOr imageTarballType;
+      default = builtImage;
+      defaultText = "${builtins.storeDir}/image-built-from-service-configuration.tar.gz";
+      description = ''
+        Docker image tarball to be `docker load`-ed.  This can be a derivation
+        produced with one of the [`dockerTools`](https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-dockerTools)
+        builder functions, or a Docker image tarball at some arbitrary
+        location.
+
+        By default, when `services.<name>.image.nixBuild` is enabled, this is
+        the image produced using `services.<name>.image.command`,
+        `services.<name>.image.contents`, and
+        `services.<name>.image.rawConfig`.
+
+        ::: {.note}
+        Using this option causes Arion to ignore most other options in the
+        {option}`services.<name>.image` namespace. The exceptions are
+        {option}`services.<name>.image.name` and {option}`services.<name>.image.tag`,
+        which are used when the provided {option}`services.<name>.image.tarball`
+        is not a derivation with the attributes `imageName` and `imageTag`.
+        :::
+      '';
+      example = lib.literalExpression ''
+        pkgs.dockerTools.buildLayeredImage {
+          # ...
+        };
+      '';
+    };
   };
   config = lib.mkMerge [{
-      build.image = builtImage;
-      build.imageName = config.build.image.imageName;
-      build.imageTag =
-                   if config.build.image.imageTag != ""
-                   then config.build.image.imageTag
-                   else lib.head (lib.strings.splitString "-" (baseNameOf config.build.image.outPath));
       image.rawConfig.Cmd = config.image.command;
       image.nixBuild = lib.mkDefault (priorityIsDefault options.service.image);
     }
     ( lib.mkIf (config.service.build.context == null)
     {
-      service.image = lib.mkDefault "${config.build.imageName}:${config.build.imageTag}";
+      service.image = lib.mkDefault "${config.image.tarball.imageName}:${config.image.tarball.imageTag}";
     })
   ];
 }
