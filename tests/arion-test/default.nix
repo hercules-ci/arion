@@ -46,6 +46,7 @@ in
       # Pre-build the image because we don't want to build the world
       # in the vm.
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/custom-image/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/traefik/arion-compose.nix ]).config.out.dockerComposeYaml
@@ -66,6 +67,18 @@ in
     with subtest("minimal"):
         machine.succeed(
             "rm -rf work && cp -frT ${../../examples/minimal} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
+        )
+        machine.wait_until_succeeds("curl --fail localhost:8000")
+        machine.succeed(
+            "cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion down"
+        )
+        machine.wait_until_fails("curl --fail localhost:8000")
+
+    # Tests
+    #  - examples/custom-image
+    with subtest("custom-image"):
+        machine.succeed(
+            "rm -rf work && cp -frT ${../../examples/custom-image} work && cd work && NIX_PATH=nixpkgs='${pkgs.path}' arion up -d"
         )
         machine.wait_until_succeeds("curl --fail localhost:8000")
         machine.succeed(
