@@ -1,5 +1,11 @@
 # Revision history for Arion
 
+## 0.2.3.0 -- 2026-09-15
+
+### Fixed
+
+* Fixed failing test due to use of deprecated option `system.journald.console`.
+
 ## 0.2.2.0 -- 2024-12-11
 
 ### Added

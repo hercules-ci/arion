@@ -14,7 +14,10 @@
   boot.specialFileSystems = lib.mkForce {};
   networking.hostName = "";
 
-  services.journald.console = "/dev/console";
+  services.journald.settings.Journal = {
+    ForwardToConsole = true;
+    TTYPath = "/dev/console";
+  };
 
   systemd.services.systemd-logind.enable = false;
   systemd.services.console-getty.enable = false;
