@@ -229,6 +229,16 @@ in
         ${serviceRef "privileged"}
       '';
     };
+    service.security_opt = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/engine/security/seccomp/#pass-a-profile-for-a-container"
+        "`docker run --security-opt` documentation"}
+
+        ${serviceRef "security_opt"}
+      '';
+    };
     service.entrypoint = mkOption {
       type = nullOr str;
       default = null;
@@ -488,6 +498,8 @@ in
     inherit (config.service) ports;
   } // lib.optionalAttrs (config.service.privileged != null) {
     inherit (config.service) privileged;
+  } // lib.optionalAttrs (config.service.security_opt != null) {
+    inherit (config.service) security_opt;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
   } // lib.optionalAttrs (config.service.networks != [] && config.service.networks != {}) {
