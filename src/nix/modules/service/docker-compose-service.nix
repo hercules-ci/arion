@@ -233,7 +233,7 @@ in
       type = listOf str;
       default = [];
       description = ''
-        See ${link "https://docs.docker.com/engine/security/seccomp/#pass-a-profile-for-a-container"
+        See ${link "https://docs.docker.com/reference/cli/docker/container/run/#security-opt"
         "`docker run --security-opt` documentation"}
 
         ${serviceRef "security_opt"}
