@@ -24,13 +24,16 @@ let
     useHostStore does not achieve the intended speedup.
   '' {};
 
+  enableFakechrootUnsupported =
+    throw "image.enableFakechroot requires Nixpkgs 22.05 or newer.";
+
   buildOrStreamLayeredImage = args:
     let
       args_base = builtins.intersectAttrs
         {
           name = null; tag = null; contents = null; config = null;
           created = null; extraCommands = null; maxLayers = null;
-          fakeRootCommands = null; enableFakechroot = null;
+          fakeRootCommands = null;
         }
         args;
       acceptedArgs = functionArgs dockerTools.streamLayeredImage;
@@ -39,10 +42,17 @@ let
         then { inherit (args) includeStorePaths; }
         else includeStorePathsWarningAndDefault
       );
-      args_streamLayered = args_base // args_no_store;
+      args_fakechroot = lib.optionalAttrs (args.enableFakechroot or false) (
+        if acceptedArgs ? enableFakechroot
+        then { inherit (args) enableFakechroot; }
+        else enableFakechrootUnsupported
+      );
+      args_streamLayered = args_base // args_no_store // args_fakechroot;
     in
       if dockerTools?streamLayeredImage
       then dockerTools.streamLayeredImage args_streamLayered // { isExe = true; }
+      else if args.enableFakechroot or false
+      then enableFakechrootUnsupported
       else dockerTools.buildLayeredImage args_base;
 
   builtImage = buildOrStreamLayeredImage {
