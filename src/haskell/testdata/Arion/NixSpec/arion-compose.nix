@@ -10,4 +10,8 @@
       "8000:80" # host:container
     ];
   };
+  services.extra-options.service = {
+    image = "busybox";
+    device_cgroup_rules = [ "c 1:3 mr" ];
+  };
 }
