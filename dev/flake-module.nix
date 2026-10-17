@@ -5,7 +5,7 @@
       nativeBuildInputs = o.nativeBuildInputs or [ ] ++ [
         pkgs.docker-compose
         pkgs.nixpkgs-fmt
-        config.haskellProjects.haskell-package.haskellPackages.releaser
+        config.haskellProjects.haskell-package.basePackages.releaser
       ];
       shellHook = ''
         ${config.pre-commit.installationScript}

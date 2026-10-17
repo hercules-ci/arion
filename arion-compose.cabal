@@ -15,6 +15,7 @@ category:            Distribution, Network, Cloud, Distributed Computing
 extra-source-files:  CHANGELOG.md, README.asciidoc,
                      src/haskell/testdata/**/*.nix
                      src/haskell/testdata/**/*.json
+                     src/haskell/testdata/Arion/NixSpec/build-context/Dockerfile
 data-files:          nix/*.nix
                    , nix/modules/composition/*.nix
                    , nix/modules/networks/*.nix
