@@ -10,4 +10,8 @@
       "8000:80" # host:container
     ];
   };
+  services.extra-options.service = {
+    image = "busybox";
+    read_only = true;
+  };
 }

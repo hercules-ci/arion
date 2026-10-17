@@ -5,6 +5,13 @@
         }
     },
     "services": {
+        "extra-options": {
+            "environment": {},
+            "image": "busybox",
+            "read_only": true,
+            "sysctls": {},
+            "volumes": []
+        },
         "webserver": {
             "command": [
                 "/usr/sbin/init"
@@ -45,6 +52,11 @@
             "name": "unit-test-data"
         },
         "serviceInfo": {
+            "extra-options": {
+                "defaultExec": [
+                    "/bin/sh"
+                ]
+            },
             "webserver": {
                 "defaultExec": [
                     "/run/current-system/sw/bin/bash",
