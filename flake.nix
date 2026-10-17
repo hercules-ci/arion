@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    haskell-flake.url = "github:srid/haskell-flake/0.1.0";
+    haskell-flake.url = "github:srid/haskell-flake/1.0.0";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   };
@@ -46,30 +46,23 @@
           packages.overlay-test = final.arion;
           packages.arion = import ./nix/arion.nix { inherit pkgs; };
           haskellProjects.haskell-package = {
-            # not autodetected: https://github.com/srid/haskell-flake/issues/49
-            packages.arion-compose.root = ./.;
-
-            overrides =
-              self: super: {
-                arion-compose =
-                  lib.pipe super.arion-compose [
-                    (h.addBuildTools [ pkgs.nix ])
-                    (h.overrideCabal (o: {
-                      src = pkgs.lib.sourceByRegex ./. [
-                        ".*[.]cabal"
-                        "LICENSE"
-                        "src/?.*"
-                        "README.asciidoc"
-                        "CHANGELOG.md"
-                      ];
-                      preCheck = ''
-                        export NIX_LOG_DIR=$TMPDIR
-                        export NIX_STATE_DIR=$TMPDIR
-                        export NIX_PATH=nixpkgs=${pkgs.path}
-                      '';
-                    }))
-                  ];
-              };
+            settings.arion-compose = {
+              extraBuildTools = [ pkgs.nix ];
+              custom = h.overrideCabal (o: {
+                src = pkgs.lib.sourceByRegex ./. [
+                  ".*[.]cabal"
+                  "LICENSE"
+                  "src/?.*"
+                  "README.asciidoc"
+                  "CHANGELOG.md"
+                ];
+                preCheck = ''
+                  export NIX_LOG_DIR=$TMPDIR
+                  export NIX_STATE_DIR=$TMPDIR
+                  export NIX_PATH=nixpkgs=${pkgs.path}
+                '';
+              });
+            };
           };
         };
 
