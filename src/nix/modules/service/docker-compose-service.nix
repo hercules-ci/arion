@@ -498,7 +498,7 @@ in
     inherit (config.service) ports;
   } // lib.optionalAttrs (config.service.privileged != null) {
     inherit (config.service) privileged;
-  } // lib.optionalAttrs (config.service.security_opt != null) {
+  } // lib.optionalAttrs (config.service.security_opt != []) {
     inherit (config.service) security_opt;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
