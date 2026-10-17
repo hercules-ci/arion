@@ -233,7 +233,6 @@ in
       type = nullOr bool;
       default = null;
       description = ''
-      See ${link "https://github.com/compose-spec/compose-spec/blob/55b450aee50799a2f33cc99e1d714518babe305e/05-services.md#read_only" "compose-spec documentation"}
         ${serviceRef "read_only"}
       '';
     };
