@@ -229,6 +229,14 @@ in
         ${serviceRef "privileged"}
       '';
     };
+    service.read_only = mkOption {
+      type = nullOr bool;
+      default = null;
+      description = ''
+      See ${link "https://github.com/compose-spec/compose-spec/blob/55b450aee50799a2f33cc99e1d714518babe305e/05-services.md#read_only" "compose-spec documentation"}
+        ${serviceRef "read_only"}
+      '';
+    };
     service.entrypoint = mkOption {
       type = nullOr str;
       default = null;
@@ -488,6 +496,8 @@ in
     inherit (config.service) ports;
   } // lib.optionalAttrs (config.service.privileged != null) {
     inherit (config.service) privileged;
+  } // lib.optionalAttrs (config.service.read_only != null) {
+    inherit (config.service) read_only;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
   } // lib.optionalAttrs (config.service.networks != [] && config.service.networks != {}) {
