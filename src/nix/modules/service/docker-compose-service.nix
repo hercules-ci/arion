@@ -125,22 +125,28 @@ in
                 default = "service_started";
               };
               restart = mkOption {
-                type = bool;
+                type = nullOr bool;
                 description = ''
-                  When set to `true`, Compose restarts this service when the dependency service is restarted.
+                  When set to `true`, Compose restarts this service after it updates the dependency service.
+                  When `null`, the key is omitted, and Compose does not restart this service.
+
+                  Requires Compose 2.17 or newer.
 
                   ${serviceRef "depends_on"}
                 '';
-                default = true;
+                default = null;
               };
               required = mkOption {
-                type = bool;
+                type = nullOr bool;
                 description = ''
-                  When set to `true`, the dependency is required. When `false`, Compose only warns if the dependency service is not started or available.
+                  When set to `false`, Compose only warns if the dependency service is not started or available.
+                  When `null`, the key is omitted, and Compose treats the dependency as required.
+
+                  Requires Compose 2.20 or newer.
 
                   ${serviceRef "depends_on"}
                 '';
-                default = true;
+                default = null;
               };
             };
           };
@@ -479,7 +485,10 @@ in
   } // lib.optionalAttrs (config.service.container_name != null) {
     inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
-    inherit (config.service) depends_on;
+    depends_on =
+      if builtins.isList config.service.depends_on
+      then config.service.depends_on
+      else lib.mapAttrs (_: lib.filterAttrs (_: v: v != null)) config.service.depends_on;
   } // lib.optionalAttrs (options.service.healthcheck.highestPrio < 1500) {
     healthcheck = config.service.healthcheck._out;
   } // lib.optionalAttrs (config.service.devices != []) {

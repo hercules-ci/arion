@@ -10,4 +10,13 @@
       "8000:80" # host:container
     ];
   };
+  services.extra-options.service = {
+    image = "busybox";
+    depends_on.webserver.required = false;
+    depends_on.depends-on-list.restart = true;
+  };
+  services.depends-on-list.service = {
+    image = "busybox";
+    depends_on = [ "webserver" ];
+  };
 }
