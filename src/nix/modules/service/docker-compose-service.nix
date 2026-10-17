@@ -124,6 +124,24 @@ in
                 description = serviceRef "depends_on";
                 default = "service_started";
               };
+              restart = mkOption {
+                type = bool;
+                description = ''
+                  When set to `true`, Compose restarts this service when the dependency service is restarted.
+
+                  ${serviceRef "depends_on"}
+                '';
+                default = true;
+              };
+              required = mkOption {
+                type = bool;
+                description = ''
+                  When set to `true`, the dependency is required. When `false`, Compose only warns if the dependency service is not started or available.
+
+                  ${serviceRef "depends_on"}
+                '';
+                default = true;
+              };
             };
           };
        in mkOption {
