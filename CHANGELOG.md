@@ -1,5 +1,11 @@
 # Revision history for Arion
 
+## Unreleased
+
+### Fixed
+
+* `nixos.useSystemd` failed on NixOS 26.11, which removes `services.journald.console`
+
 ## 0.2.2.0 -- 2024-12-11
 
 ### Added

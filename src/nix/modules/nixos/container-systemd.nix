@@ -2,7 +2,7 @@
   NixOS configuration to for running a mostly normal systemd-based
   NixOS in Docker.
  */
-{ pkgs, lib, ...}: {
+{ pkgs, lib, options, ...}: {
 
   # imports = [
   #   # This profile doesn't seem to work well.
@@ -14,7 +14,18 @@
   boot.specialFileSystems = lib.mkForce {};
   networking.hostName = "";
 
-  services.journald.console = "/dev/console";
+  # NixOS 26.11 replaces services.journald.console with settings.
+  services.journald =
+    if options.services.journald ? settings
+    then {
+      settings.Journal = {
+        ForwardToConsole = true;
+        TTYPath = "/dev/console";
+      };
+    }
+    else {
+      console = "/dev/console";
+    };
 
   systemd.services.systemd-logind.enable = false;
   systemd.services.console-getty.enable = false;
