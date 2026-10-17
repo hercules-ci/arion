@@ -187,7 +187,7 @@ in
       type = listOf str;
       default = [];
       description = ''
-        See ${link "https://docs.docker.com/engine/containers/run/#runtime-constraints-on-resources"
+        See ${link "https://docs.docker.com/reference/cli/docker/container/run/#device-cgroup-rule"
         "`docker run --device-cgroup-rule` documentation"}
 
         ${serviceRef "device_cgroup_rules"}
