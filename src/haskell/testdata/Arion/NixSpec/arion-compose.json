@@ -5,6 +5,38 @@
         }
     },
     "services": {
+        "depends-on-list": {
+            "depends_on": [
+                "webserver"
+            ],
+            "environment": {},
+            "image": "busybox",
+            "sysctls": {},
+            "volumes": []
+        },
+        "extra-options": {
+            "depends_on": {
+                "depends-on-list": {
+                    "condition": "service_started",
+                    "restart": true
+                },
+                "webserver": {
+                    "condition": "service_started",
+                    "required": false
+                }
+            },
+            "device_cgroup_rules": [
+                "c 1:3 mr"
+            ],
+            "environment": {},
+            "image": "busybox",
+            "read_only": true,
+            "security_opt": [
+                "no-new-privileges:true"
+            ],
+            "sysctls": {},
+            "volumes": []
+        },
         "webserver": {
             "command": [
                 "/usr/sbin/init"
@@ -45,6 +77,16 @@
             "name": "unit-test-data"
         },
         "serviceInfo": {
+            "depends-on-list": {
+                "defaultExec": [
+                    "/bin/sh"
+                ]
+            },
+            "extra-options": {
+                "defaultExec": [
+                    "/bin/sh"
+                ]
+            },
             "webserver": {
                 "defaultExec": [
                     "/run/current-system/sw/bin/bash",

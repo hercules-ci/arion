@@ -24,6 +24,9 @@ let
     useHostStore does not achieve the intended speedup.
   '' {};
 
+  enableFakechrootUnsupported =
+    throw "image.enableFakechroot requires Nixpkgs 22.05 or newer.";
+
   buildOrStreamLayeredImage = args:
     let
       args_base = builtins.intersectAttrs
@@ -39,10 +42,17 @@ let
         then { inherit (args) includeStorePaths; }
         else includeStorePathsWarningAndDefault
       );
-      args_streamLayered = args_base // args_no_store;
+      args_fakechroot = lib.optionalAttrs (args.enableFakechroot or false) (
+        if acceptedArgs ? enableFakechroot
+        then { inherit (args) enableFakechroot; }
+        else enableFakechrootUnsupported
+      );
+      args_streamLayered = args_base // args_no_store // args_fakechroot;
     in
       if dockerTools?streamLayeredImage
       then dockerTools.streamLayeredImage args_streamLayered // { isExe = true; }
+      else if args.enableFakechroot or false
+      then enableFakechrootUnsupported
       else dockerTools.buildLayeredImage args_base;
 
   builtImage = buildOrStreamLayeredImage {
@@ -50,6 +60,8 @@ let
       name
       contents
       includeStorePaths
+      fakeRootCommands
+      enableFakechroot
       ;
     config = config.image.rawConfig;
     maxLayers = 100;
@@ -68,8 +80,6 @@ let
           ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
         done;
       '';
-
-    fakeRootCommands = config.image.fakeRootCommands;
   };
 
   priorityIsDefault = option: option.highestPrio >= (lib.mkDefault true).priority;
@@ -128,6 +138,15 @@ in
       default = "";
       description = ''
         Commands that build the root of the container in the current working directory.
+
+        See [`dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage).
+      '';
+    };
+    image.enableFakechroot = mkOption {
+      type = bool;
+      default = false;
+      description = ''
+        Runs the commands from `image.fakeRootCommands` in a complete fakechroot environment instead of fakeroot. This allows installation in `/` to work as expected, similar to the instruction [`RUN`](https://docs.docker.com/reference/dockerfile/#run).
 
         See [`dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage).
       '';

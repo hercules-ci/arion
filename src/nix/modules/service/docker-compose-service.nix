@@ -124,6 +124,30 @@ in
                 description = serviceRef "depends_on";
                 default = "service_started";
               };
+              restart = mkOption {
+                type = nullOr bool;
+                description = ''
+                  When set to `true`, Compose restarts this service after it updates the dependency service.
+                  When `null`, the key is omitted, and Compose does not restart this service.
+
+                  Requires Compose 2.17 or newer.
+
+                  ${serviceRef "depends_on"}
+                '';
+                default = null;
+              };
+              required = mkOption {
+                type = nullOr bool;
+                description = ''
+                  When set to `false`, Compose only warns if the dependency service is not started or available.
+                  When `null`, the key is omitted, and Compose treats the dependency as required.
+
+                  Requires Compose 2.20 or newer.
+
+                  ${serviceRef "depends_on"}
+                '';
+                default = null;
+              };
             };
           };
        in mkOption {
@@ -183,6 +207,16 @@ in
         ${serviceRef "devices"}
       '';
     };
+    service.device_cgroup_rules = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/reference/cli/docker/container/run/#device-cgroup-rule"
+        "`docker run --device-cgroup-rule` documentation"}
+
+        ${serviceRef "device_cgroup_rules"}
+      '';
+    };
     service.dns = mkOption {
       type = listOf str;
       default = [];
@@ -227,6 +261,23 @@ in
       default = null;
       description = ''
         ${serviceRef "privileged"}
+      '';
+    };
+    service.read_only = mkOption {
+      type = nullOr bool;
+      default = null;
+      description = ''
+        ${serviceRef "read_only"}
+      '';
+    };
+    service.security_opt = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/reference/cli/docker/container/run/#security-opt"
+        "`docker run --security-opt` documentation"}
+
+        ${serviceRef "security_opt"}
       '';
     };
     service.entrypoint = mkOption {
@@ -461,11 +512,16 @@ in
   } // lib.optionalAttrs (config.service.container_name != null) {
     inherit (config.service) container_name;
   } // lib.optionalAttrs (config.service.depends_on != []) {
-    inherit (config.service) depends_on;
+    depends_on =
+      if builtins.isList config.service.depends_on
+      then config.service.depends_on
+      else lib.mapAttrs (_: lib.filterAttrs (_: v: v != null)) config.service.depends_on;
   } // lib.optionalAttrs (options.service.healthcheck.highestPrio < 1500) {
     healthcheck = config.service.healthcheck._out;
   } // lib.optionalAttrs (config.service.devices != []) {
     inherit (config.service) devices;
+  } // lib.optionalAttrs (config.service.device_cgroup_rules != []) {
+    inherit (config.service) device_cgroup_rules;
   } // lib.optionalAttrs (config.service.entrypoint != null) {
     inherit (config.service) entrypoint;
   } // lib.optionalAttrs (config.service.env_file != []) {
@@ -488,6 +544,10 @@ in
     inherit (config.service) ports;
   } // lib.optionalAttrs (config.service.privileged != null) {
     inherit (config.service) privileged;
+  } // lib.optionalAttrs (config.service.read_only != null) {
+    inherit (config.service) read_only;
+  } // lib.optionalAttrs (config.service.security_opt != []) {
+    inherit (config.service) security_opt;
   } // lib.optionalAttrs (config.service.network_mode != null) {
     inherit (config.service) network_mode;
   } // lib.optionalAttrs (config.service.networks != [] && config.service.networks != {}) {
