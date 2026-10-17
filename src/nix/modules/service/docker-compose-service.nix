@@ -183,6 +183,16 @@ in
         ${serviceRef "devices"}
       '';
     };
+    service.device_cgroup_rules = mkOption {
+      type = listOf str;
+      default = [];
+      description = ''
+        See ${link "https://docs.docker.com/engine/containers/run/#runtime-constraints-on-resources"
+        "`docker run --device-cgroup-rule` documentation"}
+
+        ${serviceRef "device_cgroup_rules"}
+      '';
+    };
     service.dns = mkOption {
       type = listOf str;
       default = [];
@@ -466,6 +476,8 @@ in
     healthcheck = config.service.healthcheck._out;
   } // lib.optionalAttrs (config.service.devices != []) {
     inherit (config.service) devices;
+  } // lib.optionalAttrs (config.service.device_cgroup_rules != []) {
+    inherit (config.service) device_cgroup_rules;
   } // lib.optionalAttrs (config.service.entrypoint != null) {
     inherit (config.service) entrypoint;
   } // lib.optionalAttrs (config.service.env_file != []) {
