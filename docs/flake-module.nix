@@ -5,6 +5,7 @@
       #       which has support for things like {options}`foo`.
       let
         eval = lib.evalModules {
+          class = "arionProject";
           modules = import ../src/nix/modules.nix;
         };
       in

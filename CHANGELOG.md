@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+* Arion evaluates projects, services and networks with the module classes `arionProject`, `arionService` and `arionNetwork`, and each refuses a module declaring another class with `_class`. See [Module classes](https://docs.hercules-ci.com/arion/#_module_classes).
+
+### Changed
+
+* Arion requires Nixpkgs 23.05 or later, for the `class` parameter of `lib.evalModules` and `types.submoduleWith`.
+
 ### Fixed
 
 * `nixos.useSystemd` failed on NixOS 26.11, which removes `services.journald.console`

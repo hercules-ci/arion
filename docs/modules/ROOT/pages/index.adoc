@@ -217,6 +217,50 @@ nix-repl>
 
 ```
 
+=== Module classes
+
+Arion evaluates three kinds of module, each with its own
+https://nixos.org/manual/nixpkgs/unstable/#module-system-lib-evalModules-param-class[module class]:
+
+|===
+| Class | Where
+
+| `arionProject` | the project, such as `arion-compose.nix`
+| `arionService` | `services.<name>`
+| `arionNetwork` | `networks.<name>`
+|===
+
+Without a class declaration, a module imported into the wrong place typically
+fails on a missing option, with an error that is hard to trace back to the
+import. With a `_class` declaration, arion refuses the module anywhere else,
+with an error naming both classes.
+
+Most modules are used in fixed arrangements that are demonstrably correct, so
+`_class` declarations are only useful when the module in question is used
+through imports more than once.
+
+You may publish such a module as `modules.<class>.<name>` in the flake outputs
+attribute set, for example `modules.arionProject.default`. The
+https://flake.parts/options/flake-parts-modules.html[`flake.modules`] option of
+flake-parts adds the `_class` declaration automatically.
+
+When using file imports, declare it in the module file:
+
+```nix
+# postgres.nix, imported by several projects
+{
+  _class = "arionProject";
+  services.postgres.service = {
+    image = "postgres:16";
+    ports = [ "5432:5432" ];
+  };
+}
+```
+
+This will catch an accidental usage like
+`services.postgres = { ... }: { imports = [ ./postgres.nix ]; };` with an error
+message that highlights the root cause instead of option mismatches.
+
 == Build with Nix
 
 You can build a project with `nix-build` using an expression like

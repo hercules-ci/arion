@@ -14,6 +14,7 @@ in
   options = {
     networks = mkOption {
       type = types.lazyAttrsOf (types.submoduleWith {
+        class = "arionNetwork";
         modules = [
           ../networks/network.nix
         ];
