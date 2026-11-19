@@ -63,8 +63,6 @@ in
       type = lib.types.attrsOf (lib.types.submoduleWith {
         class = "arionService";
         modules = [ service ];
-        # As `types.submodule`: an attribute set defines config only.
-        shorthandOnlyDefinesConfig = true;
       });
       description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
