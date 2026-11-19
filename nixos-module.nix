@@ -52,7 +52,7 @@ let
 
   arionSettingsType = name:
     (cfg.package.eval { modules = [{ project.name = lib.mkDefault name; }]; }).type or (
-      throw "lib.evalModules did not produce a type. Please upgrade Nixpkgs to nixos-unstable or >=nixos-21.11"
+      throw "lib.evalModules did not produce a type. Please upgrade Nixpkgs to nixos-unstable or >=nixos-23.05"
     );
 
 in

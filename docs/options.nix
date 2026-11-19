@@ -2,6 +2,7 @@
 
 let
   eval = pkgs.lib.evalModules {
+    class = "arionProject";
     modules = import ../src/nix/modules.nix;
   };
   options = pkgs.nixosOptionsDoc {

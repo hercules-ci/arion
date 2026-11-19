@@ -17,7 +17,7 @@ let
     imports = [ argsModule ] ++ import ../service/all-modules.nix;
   };
   argsModule =
-    { name, # injected by types.submodule
+    { name, # injected by types.submoduleWith
       ...
     }: {
       _file = ./docker-compose.nix;
@@ -60,7 +60,12 @@ in
       description = "Attribute set that will be turned into the x-arion section of the docker-compose.yaml file.";
     };
     services = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.submodule service);
+      type = lib.types.attrsOf (lib.types.submoduleWith {
+        class = "arionService";
+        modules = [ service ];
+        # As `types.submodule`: an attribute set defines config only.
+        shorthandOnlyDefinesConfig = true;
+      });
       description = "An attribute set of service configurations. A service specifies how to run an image as a container.";
     };
     docker-compose.volumes = lib.mkOption {

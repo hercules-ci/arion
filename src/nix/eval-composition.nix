@@ -12,6 +12,7 @@ let
   inherit (pkgs) lib;
 
   composition = lib.evalModules {
+    class = "arionProject";
     modules = builtinModules ++ modules;
   };
 
