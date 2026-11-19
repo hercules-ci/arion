@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+### BREAKING
+
+* An arion project module that redeclares `options.services` with `types.submodule`, or with `types.submoduleWith` and `shorthandOnlyDefinesConfig = true`, fails with "conflicting shorthandOnlyDefinesConfig values".
+  Use `types.submoduleWith` without that flag, or with `shorthandOnlyDefinesConfig = null` to also work with earlier arion versions.
+
 ### Added
 
 * Arion evaluates projects, services and networks with the module classes `arionProject`, `arionService` and `arionNetwork`, and each refuses a module declaring another class with `_class`. See [Module classes](https://docs.hercules-ci.com/arion/#_module_classes).
+* A service definition that is an attribute set can use module attributes such as `imports`, without wrapping it in a function, as with `networks`.
 
 ### Changed
 
